@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>AS Study Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Bengali:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        darkMode: ['class', '[data-theme="dark"]'],
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'Noto Sans Bengali', 'sans-serif'],
+            },
+            colors: {
+              glass: {
+                border: 'rgba(255, 255, 255, 0.1)',
+                surface: 'rgba(30, 41, 59, 0.7)',
+              }
+            },
+            animation: {
+              'fade-in': 'fadeIn 0.3s ease-in-out',
+            },
+            keyframes: {
+              fadeIn: {
+                '0%': { opacity: '0' },
+                '100%': { opacity: '1' },
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      :root {
+        --bg-dark: #0f172a;
+        --bg-light: #f8fafc;
+      }
+      body {
+        background-color: var(--bg-dark);
+        color: #e2e8f0;
+        transition: background-color 0.3s ease;
+      }
+      html[data-theme="light"] body {
+        background-color: var(--bg-light);
+        color: #1e293b;
+      }
+
+      /* Custom Scrollbar */
+      .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+      .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+      .custom-scrollbar::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 10px; opacity: 0.5; }
+      .custom-scrollbar { scrollbar-width: thin; scrollbar-color: #3b82f6 transparent; }
+
+      /* Glassmorphism Utilities */
+      .glass-card {
+        background: rgba(30, 41, 59, 0.6);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+      }
+      html[data-theme="light"] .glass-card {
+        background: rgba(255, 255, 255, 0.7);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+      }
+
+      /* Print Optimization: Landscape Side-by-Side */
+      @media print {
+        @page { size: landscape; margin: 5mm; }
+        body { background: white; color: black; }
+        .no-print { display: none !important; }
+        
+        #syllabus-print-container { 
+          display: block !important; 
+          width: 100%;
+          position: static;
+        }
+
+        /* Force grid layout for papers in print mode */
+        .print-grid {
+          display: grid !important;
+          grid-template-columns: 1fr 1fr;
+          gap: 1rem;
+          width: 100%;
+        }
+        
+        .glass-card {
+          box-shadow: none;
+          background: white;
+          border: 1px solid #ddd;
+          break-inside: avoid;
+        }
+        
+        /* Ensure text is readable */
+        * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "firebase/": "https://aistudiocdn.com/firebase@^12.6.0/"
+  }
+}
+</script>
+</head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
