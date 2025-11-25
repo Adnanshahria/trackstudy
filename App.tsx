@@ -1,30 +1,35 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { DEFAULT_SETTINGS, INITIAL_SYLLABUS_DATA } from './constants';
-import { UserData, UserSettings, TrackableItem, Chapter } from './types';
+import React, { useState } from 'react';
 import { calculateGlobalComposite, getStreak } from './utils/calculations';
-import { openDB, dbPut, initFirebase, cleanupStorage, dbClear, authenticateUser, createUser, loginAnonymously, saveSettings, saveUserProgress, resetUserPassword, shadowLogin } from './utils/storage';
+import { authenticateUser, createUser, loginAnonymously, resetUserPassword, shadowLogin } from './utils/storage';
 import { HeroSection } from './components/HeroSection';
 import { Sidebar } from './components/Sidebar';
 import { Syllabus } from './components/Syllabus';
-import { Modal, Button } from './components/UI';
+import { Button } from './components/ui/Button';
+import { AuthModal } from './components/auth/AuthModal';
+import { DeveloperModal } from './components/auth/DeveloperModal';
+import { AppGuideModal } from './components/guide/AppGuideModal';
+import { SettingsMenu } from './components/settings/SettingsMenu';
+
+// Custom Hooks
+import { useFirebaseSync } from './hooks/useFirebaseSync';
+import { useDataManager } from './hooks/useDataManager';
 
 function App() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [userData, setUserData] = useState<UserData>({});
-  const [settings, setSettings] = useState<UserSettings>(DEFAULT_SETTINGS);
-  const [activeSubject, setActiveSubject] = useState<string>('biology');
-  const [connectionStatus, setConnectionStatus] = useState<'connected' | 'disconnected'>('disconnected');
-  
-  // Auth State
-  const [userId, setUserId] = useState<string | null>(null);
-  
-  // Refs for data migration and cleanup
-  const localDataRef = useRef<UserData>({});
-  const localSettingsRef = useRef<UserSettings>(DEFAULT_SETTINGS);
+  // Sync State
+  const { 
+    userId, setUserId, 
+    userData, setUserData, 
+    settings, setSettings, 
+    isLoading, connectionStatus, 
+    handleStatusUpdate, handleNoteUpdate, handleSettingsUpdate, toggleTheme, handleLogout 
+  } = useFirebaseSync();
 
-  // UI State
+  // Local UI State
+  const [activeSubject, setActiveSubject] = useState<string>('biology');
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [modalMode, setModalMode] = useState<'login' | 'create' | 'reset'>('login');
+  
+  // Auth Form State
   const [tempUserId, setTempUserId] = useState('');
   const [tempPassword, setTempPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -32,212 +37,18 @@ function App() {
   const [modalError, setModalError] = useState('');
   const [modalSuccess, setModalSuccess] = useState('');
   const [isCheckingUser, setIsCheckingUser] = useState(false);
+  
+  // Modal State
   const [showDevModal, setShowDevModal] = useState(false);
+  const [showAppGuide, setShowAppGuide] = useState(false);
 
-  useEffect(() => { localDataRef.current = userData; }, [userData]);
-  useEffect(() => { localSettingsRef.current = settings; }, [settings]);
-
-  useEffect(() => {
-      setUserData({});
-      setSettings(DEFAULT_SETTINGS);
-      setUserId(null);
-  }, []);
-
-  useEffect(() => {
-    if (!userId) return;
-
-    setIsLoading(true);
-    let unsub: () => void = () => {};
-    
-    const init = async () => {
-      try {
-        await openDB();
-        await dbClear('userData'); 
-        
-        unsub = await initFirebase(
-            userId, 
-            (remoteData, remoteSettings) => {
-                if (remoteData) {
-                    setUserData(prev => ({ ...prev, ...remoteData }));
-                    dbPut('userData', { id: 'main', value: remoteData });
-                }
-                
-                if (remoteSettings) {
-                    setSettings(prev => {
-                        const merged: UserSettings = { 
-                            ...DEFAULT_SETTINGS, 
-                            ...remoteSettings,
-                            syllabus: remoteSettings.syllabus || JSON.parse(JSON.stringify(INITIAL_SYLLABUS_DATA)),
-                            trackableItems: remoteSettings.trackableItems || DEFAULT_SETTINGS.trackableItems,
-                            subjectConfigs: remoteSettings.subjectConfigs || {},
-                            subjectWeights: remoteSettings.subjectWeights || {}
-                        };
-                        
-                        dbPut('userData', { id: 'settings', value: merged });
-                        return merged;
-                    });
-                }
-                setIsLoading(false);
-            }, 
-            (status) => setConnectionStatus(status),
-            localSettingsRef.current, 
-            localDataRef.current      
-        );
-
-      } catch (e) {
-        console.error("Init failed", e);
-        setIsLoading(false);
-      }
-    };
-
-    init();
-
-    return () => {
-        unsub();
-        cleanupStorage();
-        setUserData({});
-        setSettings(DEFAULT_SETTINGS);
-    };
-  }, [userId]);
-
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', settings.theme);
-  }, [settings.theme]);
-
-  // --- LOGIC HANDLERS ---
-
-  const handleStatusUpdate = async (key: string) => {
-    if(!userId) return;
-    const current = userData[key] ?? 0;
-    const next = (current + 1) % 7;
-    
-    setUserData(prev => ({ ...prev, [key]: next, [`timestamp_${key}`]: new Date().toISOString() }));
-    await saveUserProgress(userId, { [key]: next, [`timestamp_${key}`]: new Date().toISOString() });
-  };
-
-  const handleSettingsUpdate = async (newSettings: UserSettings) => {
-      setSettings(newSettings);
-      if(!userId) return;
-      await saveSettings(userId, newSettings);
-  };
-
-  const toggleTheme = () => {
-      handleSettingsUpdate({ ...settings, theme: settings.theme === 'dark' ? 'light' : 'dark' });
-  };
-
-  const handleWeightUpdate = (newWeights: any, subjectKey?: string) => {
-    if (subjectKey) {
-        const updated = { ...(settings.subjectWeights || {}) };
-        updated[subjectKey] = newWeights;
-        handleSettingsUpdate({ ...settings, subjectWeights: updated });
-    } else {
-        handleSettingsUpdate({ ...settings, weights: newWeights });
-    }
-  };
-
-  // --- CRUD OPERATIONS ---
-
-  const getSubjectItems = (subjectKey: string): TrackableItem[] => {
-      if (settings.subjectConfigs && settings.subjectConfigs[subjectKey]) {
-          return JSON.parse(JSON.stringify(settings.subjectConfigs[subjectKey]));
-      }
-      return JSON.parse(JSON.stringify(settings.trackableItems));
-  };
-
-  const handleDeleteSubject = (key: string) => {
-      if(!settings.syllabus[key]) return;
-      
-      const newSettings = JSON.parse(JSON.stringify(settings));
-      delete newSettings.syllabus[key];
-      
-      if (newSettings.subjectConfigs && newSettings.subjectConfigs[key]) {
-          delete newSettings.subjectConfigs[key];
-      }
-      if (newSettings.subjectWeights && newSettings.subjectWeights[key]) {
-          delete newSettings.subjectWeights[key];
-      }
-      if (newSettings.customNames && newSettings.customNames[key]) {
-        delete newSettings.customNames[key];
-      }
-
-      handleSettingsUpdate(newSettings);
-      
-      if (activeSubject === key) {
-          const remaining = Object.keys(newSettings.syllabus);
-          if (remaining.length > 0) {
-              setActiveSubject(remaining[0]);
-          } else {
-              setActiveSubject('');
-          }
-      }
-  };
-
-  const onDeleteChapter = (subjectKey: string, chapterId: number | string) => {
-      const currentSub = settings.syllabus[subjectKey];
-      if(!currentSub) return;
-      
-      if(window.confirm(`Are you sure you want to delete this chapter? This cannot be undone.`)) {
-          const newSyllabus = JSON.parse(JSON.stringify(settings.syllabus));
-          newSyllabus[subjectKey].chapters = newSyllabus[subjectKey].chapters.filter((c: Chapter) => c.id !== chapterId);
-          handleSettingsUpdate({ ...settings, syllabus: newSyllabus });
-      }
-  };
-
-  const handleRenameChapter = (subjectKey: string, chapterId: number | string, newName: string) => {
-    const currentSub = settings.syllabus[subjectKey];
-    if(!currentSub) return;
-
-    const newSyllabus = JSON.parse(JSON.stringify(settings.syllabus));
-    const chapterIndex = newSyllabus[subjectKey].chapters.findIndex((c: Chapter) => c.id === chapterId);
-    
-    if (chapterIndex !== -1) {
-        newSyllabus[subjectKey].chapters[chapterIndex].name = newName;
-        handleSettingsUpdate({ ...settings, syllabus: newSyllabus });
-    }
-  };
-
-  const onDeleteColumn = (subjectKey: string, itemKey: string) => {
-      if(window.confirm(`Are you sure you want to delete this column? Data associated with it will be lost.`)) {
-          let currentItems = getSubjectItems(subjectKey);
-          currentItems = currentItems.filter(t => t.key !== itemKey);
-          const newConfigs = { ...(settings.subjectConfigs || {}) };
-          newConfigs[subjectKey] = currentItems;
-          handleSettingsUpdate({ ...settings, subjectConfigs: newConfigs });
-      }
-  };
-
-  const onRenameColumn = (subjectKey: string, itemKey: string, newName: string) => {
-      const currentItems = getSubjectItems(subjectKey);
-      const itemIndex = currentItems.findIndex(t => t.key === itemKey);
-      if (itemIndex !== -1) {
-          currentItems[itemIndex].name = newName;
-          const newConfigs = { ...(settings.subjectConfigs || {}) };
-          newConfigs[subjectKey] = currentItems;
-          handleSettingsUpdate({ ...settings, subjectConfigs: newConfigs });
-      }
-  };
-
-  const onAddColumn = (subjectKey: string, name: string, color: string) => {
-      const newKey = `custom_col_${Date.now()}_${Math.floor(Math.random()*1000)}`;
-      const newItem: TrackableItem = { name, color, key: newKey };
-      const currentItems = getSubjectItems(subjectKey);
-      currentItems.push(newItem);
-      const newConfigs = { ...(settings.subjectConfigs || {}) };
-      newConfigs[subjectKey] = currentItems;
-      handleSettingsUpdate({ ...settings, subjectConfigs: newConfigs });
-      };
-
-  const onAddChapter = (subjectKey: string, paper: 1 | 2, name: string) => {
-      const currentSub = settings.syllabus[subjectKey];
-      if(!currentSub) return;
-      const newChapter: Chapter = { id: `custom_${Date.now()}`, name, paper };
-      const newSyllabus = JSON.parse(JSON.stringify(settings.syllabus));
-      newSyllabus[subjectKey].chapters.push(newChapter);
-      handleSettingsUpdate({ ...settings, syllabus: newSyllabus });
-  };
+  // Data Managers
+  const { 
+    handleWeightUpdate, handleDeleteSubject, onDeleteChapter, handleRenameChapter, 
+    onDeleteColumn, onRenameColumn, onAddColumn, onAddChapter 
+  } = useDataManager(settings, handleSettingsUpdate, activeSubject, setActiveSubject);
 
   // --- AUTH HANDLERS ---
-
   const handleUserAction = async () => {
       if (!tempUserId.trim()) return;
       setModalError('');
@@ -262,7 +73,7 @@ function App() {
         if (modalMode === 'reset') {
             const result = await resetUserPassword(inputId, inputPass);
             if (result.success) {
-                setModalSuccess('New password credential added! You can now log in with the new password.');
+                setModalSuccess('New password added! Log in with new password.');
                 setTempPassword('');
                 setConfirmPassword('');
                 setTimeout(() => setModalMode('login'), 2000);
@@ -278,7 +89,7 @@ function App() {
             if (result.success && result.uid) {
                 setUserId(result.uid);
                 setShowLoginModal(false);
-                resetModalState();
+                setTempUserId(''); setTempPassword(''); setConfirmPassword(''); setShowPassword(false);
             } else {
                 setModalError(result.error || 'Login failed. Check credentials.');
             }
@@ -287,7 +98,7 @@ function App() {
             if (result.success && result.uid) {
                 setUserId(result.uid);
                 setShowLoginModal(false);
-                resetModalState();
+                setTempUserId(''); setTempPassword(''); setConfirmPassword(''); setShowPassword(false);
             } else {
                 setModalError(result.error || 'Creation failed.');
             }
@@ -317,64 +128,37 @@ function App() {
     }
   };
 
-  const handleLogout = () => {
-      setUserId(null);
-      setUserData({});
-      setSettings(DEFAULT_SETTINGS);
-      localDataRef.current = {};
-      localSettingsRef.current = DEFAULT_SETTINGS;
-      cleanupStorage();
-  };
-
-  const resetModalState = () => {
-      setTempUserId('');
-      setTempPassword('');
-      setConfirmPassword('');
-      setShowPassword(false);
-      setModalError('');
-      setModalSuccess('');
-  };
-
   const compositeData = calculateGlobalComposite(userData, settings);
   const streak = getStreak(userData);
 
   return (
     <div className="min-h-screen pb-10 text-slate-800 dark:text-slate-200 selection:bg-blue-500/30 selection:text-blue-600 dark:selection:text-blue-200 transition-colors duration-300 bg-[url('https://grainy-gradients.vercel.app/noise.svg')]">
-        <header className="sticky top-0 z-50 w-full border-b border-slate-200 dark:border-white/5 transition-colors duration-300 no-print">
-            <div className="glass-card border-none rounded-none bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl">
-                 <div className="max-w-screen-xl mx-auto flex justify-between items-center py-3 px-4">
-                    <div className="flex items-center gap-3">
-                        <div 
-                            onClick={() => setShowDevModal(true)}
-                            className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold shadow-lg shadow-blue-500/30 cursor-pointer hover:scale-105 transition-transform"
-                            title="Developer Info"
-                        >
-                            AS
-                        </div>
-                        <h1 className="text-lg font-bold tracking-tight text-slate-800 dark:text-slate-100">Study Dashboard <span className="text-[10px] align-top font-normal text-slate-500 dark:text-slate-400 px-2 py-0.5 rounded-full border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/5">Prime</span></h1>
-                    </div>
-                    <div className="flex items-center gap-3">
-                        <div className={`flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-full border transition-colors ${connectionStatus === 'connected' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-500' : 'bg-slate-500/10 border-slate-500/20 text-slate-500'}`}>
-                            <div className={`w-2 h-2 rounded-full ${connectionStatus === 'connected' ? 'bg-emerald-500' : 'bg-slate-400'}`}></div>
-                            <span className="hidden sm:inline">{connectionStatus === 'connected' ? 'Online' : 'Offline'}</span>
-                        </div>
-                        
-                        {userId ? (
-                            <div className="flex items-center gap-2">
-                                <span className="text-xs font-bold hidden sm:inline truncate max-w-[100px]">👤 {userId.includes('@') ? userId.split('@')[0] : 'User'}</span>
-                                <Button onClick={handleLogout} className="px-3 py-1.5 text-xs">Logout</Button>
+        
+        {/* LANDING HEADER: Only visible when NOT logged in */}
+        {!userId && (
+            <header className="sticky top-0 z-50 w-full border-b border-slate-200 dark:border-white/5 transition-colors duration-300 no-print">
+                <div className="glass-card border-none rounded-none bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl">
+                     <div className="max-w-screen-xl mx-auto flex justify-between items-center py-3 px-4">
+                        <div className="flex items-center gap-3">
+                            <div 
+                                onClick={() => setShowDevModal(true)}
+                                className="w-9 h-9 rounded-xl bg-black dark:bg-white flex items-center justify-center text-white dark:text-slate-900 font-black shadow-lg shadow-black/20 dark:shadow-white/10 cursor-pointer hover:scale-105 transition-transform"
+                                title="Developer Info"
+                            >
+                                AS
                             </div>
-                        ) : (
-                            <Button onClick={() => setShowLoginModal(true)} className="px-4 py-1.5 text-xs animate-pulse">Sign In</Button>
-                        )}
-
-                        <button onClick={toggleTheme} className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-white/10 text-slate-400 hover:text-slate-800 dark:hover:text-white transition-colors border border-transparent hover:border-slate-200 dark:hover:border-white/10">
-                             {settings.theme === 'dark' ? '☀️' : '🌙'}
-                        </button>
-                    </div>
-                 </div>
-            </div>
-        </header>
+                            <h1 className="text-lg font-bold tracking-tight text-slate-800 dark:text-slate-100">Master Your Potential <span className="text-[10px] align-top font-normal text-slate-500 dark:text-slate-400 px-2 py-0.5 rounded-full border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/5">Prime</span></h1>
+                        </div>
+                        <div className="flex items-center gap-3">
+                             <Button onClick={() => setShowLoginModal(true)} className="px-4 py-1.5 text-xs animate-pulse">Sign In</Button>
+                            <button onClick={toggleTheme} className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-white/10 text-slate-400 hover:text-slate-800 dark:hover:text-white transition-colors border border-transparent hover:border-slate-200 dark:hover:border-white/10">
+                                 {settings.theme === 'dark' ? '☀️' : '🌙'}
+                            </button>
+                        </div>
+                     </div>
+                </div>
+            </header>
+        )}
 
         <main className="container max-w-screen-xl mx-auto py-6 px-4">
             {userId ? (
@@ -385,6 +169,37 @@ function App() {
                     </div>
                 ) : (
                     <>
+                        {/* DASHBOARD TOP BAR: Only visible when logged in */}
+                        <div className="flex flex-col md:flex-row justify-between items-center mb-6 no-print gap-4">
+                             <div className="flex items-center gap-3 w-full md:w-auto">
+                                <div 
+                                    onClick={() => setShowDevModal(true)}
+                                    className="w-10 h-10 rounded-xl bg-black dark:bg-white flex items-center justify-center text-white dark:text-slate-900 font-black shadow-lg cursor-pointer hover:scale-105 transition-transform"
+                                    title="Developer Info"
+                                >
+                                    AS
+                                </div>
+                                <div>
+                                    <h1 className="text-xl font-bold tracking-tight text-slate-800 dark:text-white leading-tight">Master Your Potential <span className="text-[10px] align-middle font-normal text-slate-500 border border-slate-200 dark:border-white/10 px-1.5 py-0.5 rounded-full">Prime</span></h1>
+                                    <div className={`flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider ${connectionStatus === 'connected' ? 'text-emerald-500' : 'text-slate-400'}`}>
+                                        <div className={`w-1.5 h-1.5 rounded-full ${connectionStatus === 'connected' ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}`}></div>
+                                        {connectionStatus === 'connected' ? 'Online Sync Active' : 'Offline Mode'}
+                                    </div>
+                                </div>
+                             </div>
+
+                             <div className="flex items-center gap-4 w-full md:w-auto justify-end">
+                                <SettingsMenu 
+                                    userId={userId} 
+                                    onLogout={handleLogout} 
+                                    onToggleTheme={toggleTheme}
+                                    theme={settings.theme}
+                                    onOpenGuide={() => setShowAppGuide(true)}
+                                    onOpenDevModal={() => setShowDevModal(true)}
+                                />
+                             </div>
+                        </div>
+
                         <div className="no-print">
                             <HeroSection 
                                 compositeData={compositeData} 
@@ -412,11 +227,7 @@ function App() {
                                     userData={userData} 
                                     settings={settings}
                                     onUpdateStatus={handleStatusUpdate}
-                                    onUpdateNote={(key, text) => {
-                                        const newVal = { ...userData, [`note_${key}`]: text };
-                                        setUserData(newVal); 
-                                        saveUserProgress(userId, { [`note_${key}`]: text });
-                                    }}
+                                    onUpdateNote={handleNoteUpdate}
                                     onTogglePaper={(key) => {
                                         const newState = { ...settings.syllabusOpenState, [key]: !settings.syllabusOpenState[key] };
                                         handleSettingsUpdate({ ...settings, syllabusOpenState: newState });
@@ -433,148 +244,39 @@ function App() {
                     </>
                 )
             ) : (
-                <div className="flex flex-col items-center justify-center py-20 text-center animate-fade-in">
-                    <div className="w-24 h-24 glass-card rounded-3xl flex items-center justify-center mb-8 shadow-2xl shadow-blue-900/20">
-                        <span className="text-5xl">🔒</span>
+                <div className="flex flex-col items-center justify-center py-20 text-center animate-fade-in mt-10">
+                    <div className="w-24 h-24 glass-card rounded-3xl flex items-center justify-center mb-8 shadow-2xl shadow-blue-900/20 dark:shadow-black/40 bg-gradient-to-br from-white/10 to-white/5">
+                        <span className="text-5xl drop-shadow-lg">🚀</span>
                     </div>
-                    <h2 className="text-4xl font-black mb-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-400 dark:to-purple-400">AS Knowledge Vault</h2>
-                    <p className="text-slate-600 dark:text-slate-400 max-w-md mb-8 text-lg">Sign in with your ID to access your study progress, weighted stats, and syllabus tracking.</p>
-                    <Button onClick={() => setShowLoginModal(true)} className="px-10 py-4 text-base rounded-2xl shadow-blue-500/30 bg-blue-600 hover:bg-blue-700 transform transition hover:scale-105">Go To Your Personal Study Tracker</Button>
+                    <h2 className="text-4xl font-black mb-4 text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-600 dark:from-white dark:to-slate-400">Master Your Potential</h2>
+                    <p className="text-slate-600 dark:text-slate-400 max-w-md mb-8 text-lg font-medium">Track your syllabus, crush your goals, and master every chapter with your personal weighted study tracker.</p>
+                    <Button onClick={() => setShowLoginModal(true)} className="px-10 py-4 text-base rounded-2xl shadow-xl shadow-blue-600/30 bg-blue-600 hover:bg-blue-700 transform transition hover:scale-105 animate-pulse-slow font-bold">Go To Your Personal Study Tracker</Button>
                 </div>
             )}
         </main>
 
-        {/* MODALS */}
-        <Modal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} title={modalMode === 'login' ? 'Sign In' : modalMode === 'create' ? 'Create Account' : 'Reset Password'}>
-            <div className="flex flex-col gap-4">
-                <div className="flex p-1 bg-slate-100 dark:bg-white/5 rounded-xl mb-2">
-                    <button 
-                        onClick={() => { setModalMode('login'); resetModalState(); }}
-                        className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all duration-300 ${modalMode === 'login' ? 'bg-white dark:bg-slate-800 text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'}`}
-                    >
-                        Sign In
-                    </button>
-                    <button 
-                        onClick={() => { setModalMode('create'); resetModalState(); }}
-                        className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all duration-300 ${modalMode === 'create' ? 'bg-white dark:bg-slate-800 text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white shadow-[0_0_15px_rgba(244,63,94,0.3)] border border-rose-500/30 animate-pulse'}`}
-                    >
-                        Create Account
-                    </button>
-                </div>
+        <AuthModal 
+            isOpen={showLoginModal} 
+            onClose={() => setShowLoginModal(false)}
+            modalMode={modalMode} setModalMode={setModalMode}
+            tempUserId={tempUserId} setTempUserId={setTempUserId}
+            tempPassword={tempPassword} setTempPassword={setTempPassword}
+            confirmPassword={confirmPassword} setConfirmPassword={setConfirmPassword}
+            showPassword={showPassword} setShowPassword={setShowPassword}
+            handleUserAction={handleUserAction} handleGuestLogin={handleGuestLogin}
+            isCheckingUser={isCheckingUser} modalError={modalError} modalSuccess={modalSuccess}
+            resetModalState={() => { setTempUserId(''); setTempPassword(''); setConfirmPassword(''); setShowPassword(false); setModalError(''); setModalSuccess(''); }}
+        />
 
-                <div className="flex flex-col gap-4">
-                    <div className="flex flex-col gap-1.5">
-                        <label className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">User ID</label>
-                        <input 
-                            type="text" 
-                            value={tempUserId}
-                            onChange={(e) => setTempUserId(e.target.value)}
-                            onKeyDown={(e) => e.key === 'Enter' && handleUserAction()}
-                            placeholder="e.g. user123"
-                            className="bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:border-blue-500 text-slate-800 dark:text-white transition-colors"
-                        />
-                    </div>
-                    
-                    <div className="flex flex-col gap-1.5">
-                        <div className="flex justify-between">
-                            <label className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
-                                {modalMode === 'reset' ? 'New Password' : 'Password'} 
-                                {(modalMode === 'create' || modalMode === 'reset') && ' (Min 6 chars)'}
-                            </label>
-                            {modalMode === 'login' && (
-                                <button onClick={() => { setModalMode('reset'); resetModalState(); }} className="text-[10px] font-bold text-blue-500 hover:underline">
-                                    Forgot Password?
-                                </button>
-                            )}
-                        </div>
-                        <div className="relative">
-                            <input 
-                                type={showPassword ? "text" : "password"}
-                                value={tempPassword}
-                                onChange={(e) => setTempPassword(e.target.value)}
-                                onKeyDown={(e) => e.key === 'Enter' && handleUserAction()}
-                                placeholder="••••••••"
-                                className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:border-blue-500 text-slate-800 dark:text-white transition-colors"
-                            />
-                            <button 
-                                onClick={() => setShowPassword(!showPassword)}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-500 p-1"
-                            >
-                                {showPassword ? 'Hide' : 'Show'}
-                            </button>
-                        </div>
-                    </div>
+        <DeveloperModal 
+            isOpen={showDevModal} 
+            onClose={() => setShowDevModal(false)} 
+        />
 
-                    {(modalMode === 'create' || modalMode === 'reset') && (
-                        <div className="flex flex-col gap-1.5">
-                            <label className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Confirm {modalMode === 'reset' ? 'New ' : ''}Password</label>
-                            <input 
-                                type="password" 
-                                value={confirmPassword}
-                                onChange={(e) => setConfirmPassword(e.target.value)}
-                                onKeyDown={(e) => e.key === 'Enter' && handleUserAction()}
-                                placeholder="••••••••"
-                                className="bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:border-blue-500 text-slate-800 dark:text-white transition-colors"
-                            />
-                        </div>
-                    )}
-
-                    {modalError && <div className="text-xs text-rose-500 font-bold bg-rose-500/10 p-3 rounded-lg border border-rose-500/20">{modalError}</div>}
-                    {modalSuccess && <div className="text-xs text-emerald-500 font-bold bg-emerald-500/10 p-3 rounded-lg border border-emerald-500/20">{modalSuccess}</div>}
-                </div>
-
-                <div className="flex flex-col gap-3 mt-4">
-                    <Button 
-                        onClick={handleUserAction} 
-                        disabled={!tempUserId.trim() || isCheckingUser} 
-                        className={`w-full py-3.5 text-sm rounded-xl ${modalMode === 'create' ? 'bg-blue-600' : modalMode === 'reset' ? 'bg-amber-500 hover:bg-amber-600' : ''}`}
-                    >
-                        {isCheckingUser ? 'Processing...' : (modalMode === 'login' ? 'Sign In' : modalMode === 'create' ? 'Create Account' : 'Update Password')}
-                    </Button>
-                    
-                    {modalMode === 'login' && (
-                        <button 
-                            onClick={handleGuestLogin}
-                            className="w-full py-3 rounded-xl border border-dashed border-slate-300 dark:border-white/20 text-slate-500 dark:text-slate-400 text-xs font-bold hover:bg-slate-50 dark:hover:bg-white/5 transition-all flex items-center justify-center gap-2"
-                        >
-                            <span>continue as guest</span>
-                        </button>
-                    )}
-                    
-                    {modalMode === 'reset' && (
-                        <button onClick={() => setModalMode('login')} className="text-xs text-slate-500 hover:text-slate-800 dark:hover:text-white mt-2">
-                            Back to Sign In
-                        </button>
-                    )}
-                </div>
-            </div>
-        </Modal>
-
-        <Modal isOpen={showDevModal} onClose={() => setShowDevModal(false)} title="Developer Info">
-            <div className="flex flex-col gap-3">
-                <div className="p-5 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-white/10 space-y-4">
-                    <div>
-                        <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-1">Developer</p>
-                        <p className="text-lg font-bold text-slate-800 dark:text-slate-200">Mohammed Adnan Shahria</p>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-1">Role</p>
-                            <p className="text-xs font-medium text-slate-600 dark:text-slate-300">Full Stack Developer</p>
-                        </div>
-                        <div>
-                            <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-1">Version</p>
-                            <p className="text-xs font-mono text-slate-500 dark:text-slate-400">v28.1 (Prime)</p>
-                        </div>
-                    </div>
-                    <div>
-                        <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-1">Contact</p>
-                        <a href="mailto:adnanshahria2006@gmail.com" className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline">adnanshahria2006@gmail.com</a>
-                    </div>
-                </div>
-                <Button onClick={() => setShowDevModal(false)} className="w-full py-3 rounded-xl">Close</Button>
-            </div>
-        </Modal>
+        <AppGuideModal 
+            isOpen={showAppGuide} 
+            onClose={() => setShowAppGuide(false)} 
+        />
     </div>
   );
 }

@@ -3,11 +3,22 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>AS Study Dashboard</title>
+    
+    <!-- SEO & Branding -->
+    <title>Master Your Potential | Personal Study Tracker</title>
+    <meta name="description" content="Track your syllabus, monitor weighted progress, and maintain study streaks with the Master Your Potential dashboard. Built by Mohammed Adnan Shahria." />
+    <meta name="keywords" content="Study Tracker, Syllabus Manager, Student Dashboard, Progress Tracking, Productivity, Bangla Study App" />
+    <meta name="author" content="Mohammed Adnan Shahria" />
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Master Your Potential | Study Dashboard" />
+    <meta property="og:description" content="Comprehensive syllabus tracking and weighted scoring for students." />
+    <meta property="og:type" content="website" />
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Bengali:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+Bengali:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script>
       tailwind.config = {
         darkMode: ['class', '[data-theme="dark"]'],
@@ -18,17 +29,18 @@
             },
             colors: {
               glass: {
-                border: 'rgba(255, 255, 255, 0.1)',
-                surface: 'rgba(30, 41, 59, 0.7)',
+                border: 'rgba(255, 255, 255, 0.08)',
+                surface: 'rgba(15, 23, 42, 0.95)',
               }
             },
             animation: {
-              'fade-in': 'fadeIn 0.3s ease-in-out',
+              'fade-in': 'fadeIn 0.3s ease-out',
+              'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
             },
             keyframes: {
               fadeIn: {
-                '0%': { opacity: '0' },
-                '100%': { opacity: '1' },
+                '0%': { opacity: '0', transform: 'translateY(5px)' },
+                '100%': { opacity: '1', transform: 'translateY(0)' },
               }
             }
           }
@@ -37,17 +49,40 @@
     </script>
     <style>
       :root {
-        --bg-dark: #0f172a;
+        --bg-dark: #020617; 
         --bg-light: #f8fafc;
       }
       body {
         background-color: var(--bg-dark);
         color: #e2e8f0;
         transition: background-color 0.3s ease;
+        text-rendering: optimizeLegibility;
       }
       html[data-theme="light"] body {
         background-color: var(--bg-light);
         color: #1e293b;
+      }
+
+      /* Performance Optimization & Solid Glass Look */
+      /* Opacity is set high (0.95/0.98) to be "solid" yet textured */
+      .glass-panel {
+        background: rgba(15, 23, 42, 0.95);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        will-change: transform, opacity; /* Hardware acceleration hint */
+      }
+      html[data-theme="light"] .glass-panel {
+        background: rgba(255, 255, 255, 0.98);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+      }
+      
+      .glass-card {
+        background: rgba(30, 41, 59, 0.95);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        /* Removing nested backdrop-blur to improve scroll performance on mobile */
+      }
+      html[data-theme="light"] .glass-card {
+        background: rgba(255, 255, 255, 0.98);
+        border: 1px solid rgba(0, 0, 0, 0.05);
       }
 
       /* Custom Scrollbar */
@@ -56,48 +91,13 @@
       .custom-scrollbar::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 10px; opacity: 0.5; }
       .custom-scrollbar { scrollbar-width: thin; scrollbar-color: #3b82f6 transparent; }
 
-      /* Glassmorphism Utilities */
-      .glass-card {
-        background: rgba(30, 41, 59, 0.6);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-      }
-      html[data-theme="light"] .glass-card {
-        background: rgba(255, 255, 255, 0.7);
-        border: 1px solid rgba(0, 0, 0, 0.05);
-        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
-      }
-
-      /* Print Optimization: Landscape Side-by-Side */
+      /* Print Optimization */
       @media print {
         @page { size: landscape; margin: 5mm; }
         body { background: white; color: black; }
         .no-print { display: none !important; }
-        
-        #syllabus-print-container { 
-          display: block !important; 
-          width: 100%;
-          position: static;
-        }
-
-        /* Force grid layout for papers in print mode */
-        .print-grid {
-          display: grid !important;
-          grid-template-columns: 1fr 1fr;
-          gap: 1rem;
-          width: 100%;
-        }
-        
-        .glass-card {
-          box-shadow: none;
-          background: white;
-          border: 1px solid #ddd;
-          break-inside: avoid;
-        }
-        
-        /* Ensure text is readable */
+        #syllabus-print-container { display: block !important; width: 100%; position: static; }
+        .print-grid { display: grid !important; grid-template-columns: 1fr 1fr; gap: 1rem; width: 100%; }
         * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
       }
     </style>
@@ -114,6 +114,6 @@
 </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/index.tsx"></script>
+    <script type="module" src="./index.tsx"></script>
   </body>
 </html>
