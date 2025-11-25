@@ -13,7 +13,7 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, 
     return (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
             <div 
-                className={`glass-card w-full max-w-lg rounded-2xl flex flex-col max-h-[85vh] shadow-2xl shadow-black/20 ring-1 ring-white/10 animate-[scaleIn_0.2s_ease-out] ${className}`} 
+                className={`glass-card w-full max-w-2xl rounded-2xl flex flex-col max-h-[85vh] shadow-2xl shadow-black/20 ring-1 ring-white/10 animate-[scaleIn_0.2s_ease-out] ${className}`} 
                 onClick={(e) => e.stopPropagation()}
             >
                 <div className="px-5 py-4 border-b border-white/5 flex justify-between items-center bg-white/5 rounded-t-2xl">

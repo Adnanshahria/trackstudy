@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CompositeData, UserSettings, TrackableItem } from '../types';
+import { CompositeData, UserSettings, TrackableItem, SubjectData } from '../types';
 import { Button } from './ui/Button';
 import { Modal } from './ui/Modal';
 
@@ -122,7 +122,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ compositeData, streak,
                                     >
                                         <option value="global">Global Defaults</option>
                                         {Object.entries(settings.syllabus).map(([key, data]) => (
-                                            <option key={key} value={key}>{data.name}</option>
+                                            <option key={key} value={key}>{(data as SubjectData).name}</option>
                                         ))}
                                     </select>
                                 </div>
@@ -130,7 +130,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ compositeData, streak,
                             </div>
 
                             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4 max-h-[200px] overflow-y-auto custom-scrollbar">
-                                {currentConfigItems.map(item => (
+                                {currentConfigItems.map((item: TrackableItem) => (
                                     <div key={item.key} className="flex flex-col gap-1">
                                         <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase truncate font-semibold" title={item.name}>
                                             {item.name}

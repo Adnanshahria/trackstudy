@@ -181,9 +181,9 @@ function App() {
                                     AS
                                 </div>
                                 <div className="flex flex-col justify-center">
-                                    <h1 className="text-lg md:text-xl font-bold tracking-tight text-slate-800 dark:text-white leading-tight truncate">
+                                    <h1 className="text-lg md:text-xl font-bold tracking-tight text-slate-800 dark:text-white leading-tight truncate flex items-center flex-wrap gap-2">
                                         Master Your Potential 
-                                        <span className="ml-2 text-[10px] align-middle font-bold text-blue-600 dark:text-blue-400 border border-blue-500/30 dark:border-blue-400/30 px-1.5 py-0.5 rounded-full shadow-[0_0_8px_rgba(59,130,246,0.5)] dark:shadow-[0_0_10px_rgba(96,165,250,0.6)]">Prime</span>
+                                        <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 border border-blue-500/30 dark:border-blue-400/30 px-2 py-0.5 rounded-full shadow-[0_0_10px_rgba(59,130,246,0.6)] dark:shadow-[0_0_12px_rgba(96,165,250,0.7)] animate-pulse bg-blue-500/5">Prime</span>
                                     </h1>
                                     <div className={`flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider mt-0.5 ${connectionStatus === 'connected' ? 'text-emerald-500' : 'text-slate-400'}`}>
                                         <div className={`w-1.5 h-1.5 rounded-full ${connectionStatus === 'connected' ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}`}></div>
