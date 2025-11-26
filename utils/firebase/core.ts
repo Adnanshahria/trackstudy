@@ -15,6 +15,8 @@ try {
         firebaseApp = firebase.app(); // Use existing instance
     }
 
+    console.log("Firebase Initialized on:", window.location.hostname);
+
     firebaseAuth = firebase.auth();
     firestore = firebase.firestore();
     

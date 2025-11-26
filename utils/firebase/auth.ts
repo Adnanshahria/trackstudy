@@ -13,6 +13,7 @@ const getErrorMessage = (error: any) => {
     if (code === 'auth/wrong-password') return 'Incorrect password.';
     if (code === 'auth/email-already-in-use') return 'User ID/Email already exists.';
     if (code === 'auth/weak-password') return 'Password should be at least 6 characters.';
+    if (code === 'auth/unauthorized-domain') return 'Domain not allowed. Add this domain in Firebase Console > Authentication > Settings.';
     return error.message || 'Authentication failed.';
 };
 
