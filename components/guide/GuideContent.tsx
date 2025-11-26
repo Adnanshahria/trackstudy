@@ -1,8 +1,9 @@
+
 import React from 'react';
 
 export const GuideIntroContent = () => (
     <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-        <strong className="text-slate-900 dark:text-white">TS, TrackStudy</strong> হলো আপনার পার্সোনাল স্টাডি ট্র্যাকার। এটি শুধু সিলেবাস শেষ করার জন্য নয়, বরং প্রতিটি চ্যাপ্টার কতটা দক্ষতার সাথে শেষ করেছেন তা ট্র্যাক করার জন্য তৈরি।
+        <strong className="text-slate-900 dark:text-white">TrackStudy</strong> হলো আপনার পার্সোনাল স্টাডি ট্র্যাকার। এটি শুধু সিলেবাস শেষ করার জন্য নয়, বরং প্রতিটি চ্যাপ্টার কতটা দক্ষতার সাথে শেষ করেছেন তা ট্র্যাক করার জন্য তৈরি।
     </p>
 );
 

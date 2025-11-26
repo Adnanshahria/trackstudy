@@ -10,7 +10,7 @@ export const DashboardHeader: React.FC<{ onDev: () => void, status: string, user
             <div onClick={onDev} className="w-9 h-9 md:w-10 md:h-10 shrink-0 rounded-xl bg-black dark:bg-white flex items-center justify-center text-white dark:text-slate-900 font-black shadow-lg cursor-pointer hover:scale-105 transition-transform text-sm md:text-base ring-1 ring-white/20">TS</div>
             <div className="flex items-center gap-3">
                 <h1 className="text-lg md:text-xl font-bold tracking-tight text-slate-800 dark:text-white leading-tight truncate drop-shadow-sm">
-                    TS, TrackStudy
+                    TrackStudy
                 </h1>
                 {/* Status Dot moved beside the title */}
                 <div 

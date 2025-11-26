@@ -8,7 +8,7 @@ export const LandingHeader: React.FC<{ onDev: () => void, onLogin: () => void, o
              <div className="max-w-screen-xl mx-auto flex justify-between items-center py-3 px-4">
                 <div className="flex items-center gap-3">
                     <div onClick={onDev} className="w-9 h-9 rounded-xl bg-black dark:bg-white flex items-center justify-center text-white dark:text-slate-900 font-black shadow-lg cursor-pointer hover:scale-105 transition-transform">TS</div>
-                    <h1 className="text-lg font-bold tracking-tight text-slate-800 dark:text-slate-100">TS, TrackStudy</h1>
+                    <h1 className="text-lg font-bold tracking-tight text-slate-800 dark:text-slate-100">TrackStudy</h1>
                 </div>
                 <div className="flex items-center gap-3">
                      <SettingsMenu userId={null} onLogout={() => {}} onToggleTheme={onToggleTheme} theme={theme} onOpenGuide={onGuide} onOpenDevModal={onDev} onOpenAppearance={() => {}} />
