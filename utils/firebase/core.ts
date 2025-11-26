@@ -7,6 +7,8 @@ let firebaseApp: firebase.app.App;
 let firestore: firebase.firestore.Firestore;
 let firebaseAuth: firebase.auth.Auth;
 
+console.log("🔥 Initializing Firebase...");
+
 try {
     // Initialize Firebase only if it hasn't been initialized yet
     if (!firebase.apps.length) {
