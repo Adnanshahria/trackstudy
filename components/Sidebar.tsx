@@ -56,21 +56,34 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeSubject, onChangeSubject
                 />
             </div>
 
-            {/* ROW 2: Performance */}
-            <div className="shrink-0">
-                <PerformanceWidget settings={settings} userData={userData} activeSubject={activeSubject} onConfig={() => setModals({ ...modals, perf: true })} />
-            </div>
-
-            {/* ROW 3: Subjects (Scrollable) */}
-            <div className="glass-panel p-4 rounded-3xl flex-1 min-h-0 flex flex-col">
-                <SidebarHeader isEditing={isEditingSubjects} setIsEditing={setIsEditingSubjects} setModals={setModals} />
-                <div className="overflow-y-auto custom-scrollbar flex-1 -mr-2 pr-2">
-                    <SidebarSubjectList 
-                        settings={settings} activeSubject={activeSubject} isEditing={isEditingSubjects} 
-                        userData={userData} onChangeSubject={onChangeSubject} setModals={setModals}
-                        onUpdateSettings={onUpdateSettings} 
-                        onDeleteSubject={(key) => setDeleteConfirm(key)}
+            {/* ROW 2: Unified Command Center (Performance + Subjects) */}
+            <div className="glass-panel rounded-3xl flex-1 min-h-0 flex flex-col overflow-hidden shadow-xl">
+                {/* Top Section: Performance */}
+                <div className="p-5 pb-0 shrink-0">
+                    <PerformanceWidget 
+                        settings={settings} 
+                        userData={userData} 
+                        activeSubject={activeSubject} 
+                        onConfig={() => setModals({ ...modals, perf: true })} 
                     />
+                </div>
+
+                {/* Divider */}
+                <div className="px-5 py-4 shrink-0">
+                    <div className="h-px bg-slate-200 dark:bg-white/5 w-full"></div>
+                </div>
+
+                {/* Bottom Section: Subjects (Scrollable) */}
+                <div className="px-5 pb-5 flex-1 min-h-0 flex flex-col overflow-hidden">
+                    <SidebarHeader isEditing={isEditingSubjects} setIsEditing={setIsEditingSubjects} setModals={setModals} />
+                    <div className="overflow-y-auto custom-scrollbar flex-1 -mr-2 pr-2">
+                        <SidebarSubjectList 
+                            settings={settings} activeSubject={activeSubject} isEditing={isEditingSubjects} 
+                            userData={userData} onChangeSubject={onChangeSubject} setModals={setModals}
+                            onUpdateSettings={onUpdateSettings} 
+                            onDeleteSubject={(key) => setDeleteConfirm(key)}
+                        />
+                    </div>
                 </div>
             </div>
 
