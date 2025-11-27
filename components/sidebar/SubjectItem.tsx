@@ -20,7 +20,6 @@ export const SubjectItem: React.FC<Props> = ({ subKey, data, isActive, isEditing
     const progress = calculateProgress(subKey, items.map(i => i.key), userData, settings.subjectProgressWeights, items, settings.syllabus);
     const displayName = settings.customNames?.[subKey] || data.name;
 
-    // Robust Color Mapping to ensure Physics (indigo) and new subjects work correctly
     const colorMap: Record<string, { bar: string, border: string, bg: string, text: string }> = {
         emerald: { bar: 'bg-emerald-500', border: 'border-emerald-500/50', bg: 'bg-emerald-500/10', text: 'text-emerald-700 dark:text-emerald-300' },
         amber: { bar: 'bg-amber-500', border: 'border-amber-500/50', bg: 'bg-amber-500/10', text: 'text-amber-700 dark:text-amber-300' },
@@ -31,7 +30,6 @@ export const SubjectItem: React.FC<Props> = ({ subKey, data, isActive, isEditing
         teal: { bar: 'bg-teal-500', border: 'border-teal-500/50', bg: 'bg-teal-500/10', text: 'text-teal-700 dark:text-teal-300' },
     };
 
-    // Default to blue if color not found
     const theme = colorMap[data.color] || colorMap.blue;
 
     const styles = {
@@ -43,20 +41,39 @@ export const SubjectItem: React.FC<Props> = ({ subKey, data, isActive, isEditing
     };
     
     return (
-        <div onClick={() => onChangeSubject(subKey)} className={`group flex items-center gap-3 p-3 rounded-2xl border cursor-pointer transition-colors relative overflow-hidden ${styles.bg} ${styles.border}`}>
+        <div onClick={() => onChangeSubject(subKey)} className={`group flex items-center p-3 rounded-2xl border cursor-pointer transition-colors relative overflow-hidden gap-3 ${styles.bg} ${styles.border}`}>
             {isActive && <div className={`absolute left-0 top-0 bottom-0 w-1 ${styles.bar}`}></div>}
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl transition-colors ${styles.icon}`}>{data.icon}</div>
-            <div className="flex-1 min-w-0">
-                <div className="flex justify-between items-center mb-1.5">
-                    <div className="flex items-center gap-2">
-                        <span className={`font-bold text-sm truncate max-w-[120px] ${styles.text}`}>{displayName}</span>
-                        {isEditing && <button onClick={(e) => { e.stopPropagation(); onRename(); }} className="text-[10px] text-slate-400 hover:text-blue-500 p-1">✏️</button>}
-                    </div>
-                    <span className={`text-xs font-mono font-bold ${styles.text}`}>{progress.overall.toFixed(0)}%</span>
+            
+            {/* 1. Icon: Rigid, fixed width, never shrinks */}
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl transition-colors flex-none ${styles.icon}`}>{data.icon}</div>
+            
+            {/* 2. Content: Flexible, takes all remaining space */}
+            <div className="flex-1 w-0 min-w-0 flex flex-col justify-center gap-1.5">
+                <div className="flex items-center gap-2">
+                    <span className={`font-bold text-sm truncate ${styles.text}`}>{displayName}</span>
+                    {isEditing && <button onClick={(e) => { e.stopPropagation(); onRename(); }} className="text-[10px] text-slate-400 hover:text-blue-500 p-1 flex-none">✏️</button>}
                 </div>
-                <div className="h-1.5 bg-slate-200 dark:bg-black/20 rounded-full overflow-hidden"><div className={`h-full rounded-full ${styles.bar}`} style={{ width: `${progress.overall}%` }}></div></div>
+                <div className="h-1.5 bg-slate-200 dark:bg-black/20 rounded-full overflow-hidden w-full">
+                    <div className={`h-full rounded-full ${styles.bar}`} style={{ width: `${progress.overall}%` }}></div>
+                </div>
             </div>
-            {isEditing && <button onClick={(e) => { e.stopPropagation(); onDelete(); }} className="w-6 h-6 bg-rose-500 text-white rounded-full flex items-center justify-center text-xs hover:scale-110 ml-2">✕</button>}
+
+            {/* 3. Percentage: Rigid, fixed width, isolated from content */}
+            <div className="w-10 flex-none text-right flex items-center justify-end">
+                <span className={`text-xs font-mono font-bold ${styles.text}`}>{progress.overall.toFixed(0)}%</span>
+            </div>
+
+            {/* 4. Delete Btn: Rigid, fixed width */}
+            {isEditing && (
+                <div className="w-6 flex-none flex items-center justify-center">
+                    <button 
+                        onClick={(e) => { e.stopPropagation(); onDelete(); }} 
+                        className="w-6 h-6 bg-rose-500 text-white rounded-full flex items-center justify-center text-xs hover:scale-110 shadow-sm"
+                    >
+                        ✕
+                    </button>
+                </div>
+            )}
         </div>
     );
 };

@@ -2,15 +2,14 @@ import { UserSettings, Chapter } from '../../types';
 
 export const useChapterActions = (settings: UserSettings, handleSettingsUpdate: (s: UserSettings) => void) => {
     
+    // Removed window.confirm logic. Confirmation is now handled by the UI (Modal).
     const onDeleteChapter = (subjectKey: string, chapterId: number | string) => {
         const currentSub = settings.syllabus[subjectKey];
         if (!currentSub) return;
         
-        if (window.confirm(`Are you sure you want to delete this chapter? This cannot be undone.`)) {
-            const newSyllabus = JSON.parse(JSON.stringify(settings.syllabus));
-            newSyllabus[subjectKey].chapters = newSyllabus[subjectKey].chapters.filter((c: Chapter) => c.id !== chapterId);
-            handleSettingsUpdate({ ...settings, syllabus: newSyllabus });
-        }
+        const newSyllabus = JSON.parse(JSON.stringify(settings.syllabus));
+        newSyllabus[subjectKey].chapters = newSyllabus[subjectKey].chapters.filter((c: Chapter) => c.id !== chapterId);
+        handleSettingsUpdate({ ...settings, syllabus: newSyllabus });
     };
 
     const handleRenameChapter = (subjectKey: string, chapterId: number | string, newName: string) => {

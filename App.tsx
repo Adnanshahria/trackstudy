@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { calculateGlobalComposite } from './utils/calculations';
 import { HeroSection } from './components/HeroSection';
@@ -16,7 +17,7 @@ import { useAuthHandlers } from './hooks/useAuthHandlers';
 import { useAppearance } from './hooks/ui/useAppearance';
 
 function App() {
-  const { userId, setUserId, userData, settings, isLoading, connectionStatus, handleStatusUpdate, handleNoteUpdate, handleSettingsUpdate, toggleTheme, handleLogout } = useFirebaseSync();
+  const { userId, setUserId, userData, settings, isLoading, connectionStatus, handleStatusUpdate, handleNoteUpdate, handleSettingsUpdate, toggleTheme, handleLogout, forceSync } = useFirebaseSync();
   const [activeSubject, setActiveSubject] = useState<string>('biology');
   const [showDevModal, setShowDevModal] = useState(false);
   const [showAppGuide, setShowAppGuide] = useState(false);
@@ -25,7 +26,6 @@ function App() {
   const auth = useAuthHandlers(setUserId);
   const dataMgr = useDataManager(settings, handleSettingsUpdate, activeSubject, setActiveSubject);
 
-  // Mount Appearance Hook (Applies CSS Variables)
   useAppearance(settings);
 
   const compositeData = calculateGlobalComposite(userData, settings);
@@ -54,6 +54,7 @@ function App() {
                         theme={settings.theme} 
                         onGuide={() => setShowAppGuide(true)}
                         onAppearance={() => setShowAppearance(true)}
+                        onForceSync={forceSync}
                     />
                     {isLoading ? (
                         <div className="flex flex-col items-center justify-center py-32 gap-4"><div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div><p className="text-sm font-bold text-slate-500 uppercase tracking-wider">Syncing Data...</p></div>
@@ -72,7 +73,6 @@ function App() {
             ) : <WelcomeHero onLogin={() => auth.setShowLoginModal(true)} />}
         </main>
         
-        {/* Modals */}
         <AuthModal isOpen={auth.showLoginModal} onClose={() => auth.setShowLoginModal(false)} {...auth} isCheckingUser={auth.isCheckingUser} modalError={auth.modalError} modalSuccess={auth.modalSuccess} />
         <DeveloperModal isOpen={showDevModal} onClose={() => setShowDevModal(false)} />
         <AppGuideModal isOpen={showAppGuide} onClose={() => setShowAppGuide(false)} />

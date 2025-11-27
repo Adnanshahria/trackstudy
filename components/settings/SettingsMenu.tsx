@@ -12,6 +12,7 @@ interface SettingsMenuProps {
     onOpenGuide: () => void;
     onOpenDevModal: () => void;
     onOpenAppearance: () => void;
+    onForceSync: () => void;
 }
 
 export const SettingsMenu: React.FC<SettingsMenuProps> = (props) => {

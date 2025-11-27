@@ -12,11 +12,10 @@ export const useColumnActions = (settings: UserSettings, handleSettingsUpdate: (
         handleSettingsUpdate({ ...settings, subjectConfigs: newConfigs });
     };
 
+    // Removed window.confirm logic. Confirmation is now handled by the UI (Modal).
     const onDeleteColumn = (subjectKey: string, itemKey: string) => {
-        if (window.confirm(`Are you sure you want to delete this column? Data associated with it will be lost.`)) {
-            const currentItems = getItems(subjectKey).filter((t: TrackableItem) => t.key !== itemKey);
-            updateConfig(subjectKey, currentItems);
-        }
+        const currentItems = getItems(subjectKey).filter((t: TrackableItem) => t.key !== itemKey);
+        updateConfig(subjectKey, currentItems);
     };
 
     const onRenameColumn = (subjectKey: string, itemKey: string, newName: string) => {

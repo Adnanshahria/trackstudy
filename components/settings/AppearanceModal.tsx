@@ -17,11 +17,25 @@ export const AppearanceModal: React.FC<Props> = ({ isOpen, onClose, settings, on
         { id: 'none', name: 'No Glow', colorClass: 'bg-slate-400' },
     ];
 
-    const currentGlow = settings.glowColor || 'red';
+    const currentGlow = settings.glowColor || 'green';
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} title="Appearance Settings">
             <div className="flex flex-col gap-6">
+                {/* Theme Toggle Section */}
+                <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/5">
+                    <div className="flex flex-col">
+                        <span className="text-sm font-bold text-slate-700 dark:text-slate-200">Theme Mode</span>
+                        <span className="text-[10px] text-slate-500 dark:text-slate-400">Switch between Light and Dark</span>
+                    </div>
+                    <button 
+                        onClick={() => onUpdateSettings({ ...settings, theme: settings.theme === 'dark' ? 'light' : 'dark' })}
+                        className="px-4 py-2 rounded-lg bg-slate-200 dark:bg-black/40 border border-slate-300 dark:border-white/10 text-xs font-bold flex items-center gap-2 transition-all hover:scale-105"
+                    >
+                        {settings.theme === 'dark' ? '🌙 Dark Mode' : '☀️ Light Mode'}
+                    </button>
+                </div>
+
                 <div>
                     <h4 className="text-sm font-bold text-slate-700 dark:text-slate-200 mb-3">Card Border Glow</h4>
                     <div className="grid grid-cols-2 gap-3">

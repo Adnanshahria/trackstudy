@@ -10,7 +10,8 @@ export const useDataSync = (
     setSettings: React.Dispatch<React.SetStateAction<UserSettings>>,
     localSettingsRef: React.MutableRefObject<UserSettings>,
     localDataRef: React.MutableRefObject<UserData>,
-    handleLogout: () => void
+    handleLogout: () => void,
+    syncKey: number = 0 // Add syncKey prop
 ) => {
     const [isLoading, setIsLoading] = useState(false);
     const [connectionStatus, setConnectionStatus] = useState<'connected' | 'disconnected'>('disconnected');
@@ -30,6 +31,7 @@ export const useDataSync = (
             if (isMounted.current) setIsLoading(true);
 
             try {
+                // Re-fetch local cache first for speed
                 const [cachedData, cachedSettings] = await Promise.all([
                     dbGet('main'),
                     dbGet('settings')
@@ -38,7 +40,7 @@ export const useDataSync = (
                 if (isMounted.current && (cachedData || cachedSettings)) {
                     if (cachedData) setUserData(prev => ({ ...prev, ...cachedData }));
                     if (cachedSettings) setSettings(prev => ({ ...prev, ...cachedSettings }));
-                    setIsLoading(false); 
+                    // Keep loading true until firebase confirms, or set false if confident
                 }
             } catch (e) {
                 console.warn("Local cache load failed", e);
@@ -70,7 +72,7 @@ export const useDataSync = (
                 });
                 
                 if (isMounted.current) unsub = unsubscribe;
-                else unsubscribe(); // Cleanup immediately if unmounted during await
+                else unsubscribe();
                 
             } catch (e) {
                 console.error("Sync init failed", e);
@@ -83,7 +85,7 @@ export const useDataSync = (
         return () => {
             unsub();
         };
-    }, [userId]);
+    }, [userId, syncKey]); // Depend on syncKey
 
     return { isLoading, connectionStatus };
 };

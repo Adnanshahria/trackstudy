@@ -6,35 +6,34 @@ export const GuideChangelog = () => (
     <GuideSectionCard title="🛠️ আপডেট লগ (Update Logs)" icon="📢">
         <div className="flex flex-col gap-3">
              {/* Newest Entry */}
-             <div className="p-3 bg-blue-500/5 rounded-lg border border-blue-500/10">
+             <div className="p-3 bg-emerald-500/5 rounded-lg border border-emerald-500/10">
                 <div className="flex justify-between items-center mb-1">
-                    <span className="text-xs font-bold text-blue-600 dark:text-blue-400">v38.3.2 - Dev UI</span>
-                    <span className="text-[10px] text-blue-500 border border-blue-200 dark:border-blue-900 px-1.5 rounded bg-blue-50 dark:bg-blue-900/20">Latest</span>
+                    <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">v38.3.6 - Experience Updates</span>
+                    <span className="text-[10px] text-emerald-500 border border-emerald-200 dark:border-emerald-900 px-1.5 rounded bg-emerald-50 dark:bg-emerald-900/20">Latest</span>
                 </div>
                 <ul className="space-y-1 text-xs text-slate-600 dark:text-slate-400 list-disc pl-4">
-                    <li><strong>Dev Info:</strong> Redesigned Developer Info with Neon Glow effects.</li>
-                    <li><strong>Branding:</strong> Enhanced header card effect and inline status dot.</li>
+                    <li><strong>Layout:</strong> Fixed subject list jitter and status dot overlap.</li>
+                    <li><strong>Tools:</strong> Added Force Sync button and Quick Add for progress bars.</li>
+                    <li><strong>Print:</strong> Optimized for Landscape mode.</li>
                 </ul>
             </div>
 
-             {/* Previous Entries */}
              <div className="p-3 rounded-lg opacity-80 border border-slate-200 dark:border-white/5">
                 <div className="flex justify-between items-center mb-1">
-                    <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">v38.3.1 - Header UI</span>
+                    <span className="text-xs font-bold text-blue-600 dark:text-blue-400">v38.3.5 - Data Stability</span>
                 </div>
                 <ul className="space-y-1 text-xs text-slate-600 dark:text-slate-400 list-disc pl-4">
-                    <li><strong>Card Effect:</strong> Header branding is now wrapped in a glass card style.</li>
-                    <li><strong>Status Indicator:</strong> Online/Offline dot moved inline with the title.</li>
+                    <li><strong>Bug Fix:</strong> Fixed column deletion data shifting.</li>
+                    <li><strong>Auto Migration:</strong> Data safely migrated to new ID system.</li>
                 </ul>
             </div>
 
              <div className="p-3 rounded-lg opacity-60 border border-slate-200 dark:border-white/5">
                 <div className="flex justify-between items-center mb-1">
-                    <span className="text-xs font-bold text-slate-700 dark:text-slate-300">v38.3.0 - Minimalist</span>
+                    <span className="text-xs font-bold text-slate-700 dark:text-slate-300">v38.3.4 - Rebranding</span>
                 </div>
                 <ul className="space-y-1 text-xs text-slate-600 dark:text-slate-400 list-disc pl-4">
-                    <li><strong>Minimalist Header:</strong> Removed "Prime" badges and redundant Sign In buttons.</li>
-                    <li><strong>Status Dot:</strong> Replaced status text with a clean indicator.</li>
+                    <li><strong>Rebrand:</strong> App is now <strong>TrackStudy</strong>.</li>
                 </ul>
             </div>
         </div>

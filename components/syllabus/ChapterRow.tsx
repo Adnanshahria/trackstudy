@@ -25,9 +25,9 @@ export const ChapterRow: React.FC<Props> = ({ ch, activeSubject, allItems, userD
             </div>
         </td>
         {allItems.map((item) => {
-            const idx = allItems.findIndex(x => x.key === item.key);
-            if (idx === -1) return null; // Safety check
-            const key = `s_${activeSubject}_${ch.id}_${idx}`;
+            // FIX: Use item.key directly for data storage/retrieval.
+            // This ensures that if columns are reordered or deleted, the data stays with the correct column type.
+            const key = `s_${activeSubject}_${ch.id}_${item.key}`;
             const val = userData[key] ?? 0;
             const hasNote = !!userData[`note_${key}`];
             return (

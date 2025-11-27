@@ -33,10 +33,9 @@ export const calculateProgress = (
         let chapterDivisor = 0;
 
         itemIdentifiers.forEach(itemId => {
-            const tIdx = allItems.findIndex(t => t.key === itemId);
-            if (tIdx === -1) return;
-
-            const key = `s_${subjectKey}_${ch.id}_${tIdx}`;
+            // FIX: Use itemId directly in the key construction instead of finding its index.
+            // This decouples data from column position.
+            const key = `s_${subjectKey}_${ch.id}_${itemId}`;
             const score = getPercent(userData[key] ?? 0);
 
             if (isWeighted) {

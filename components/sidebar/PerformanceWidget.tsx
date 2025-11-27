@@ -15,7 +15,10 @@ export const PerformanceWidget: React.FC<Props> = ({ settings, userData, activeS
         <div className="glass-panel p-5 rounded-3xl">
             <div className="flex justify-between items-center mb-5">
                 <h3 className="font-bold text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2"><span className="w-1.5 h-4 bg-purple-500 rounded-full"></span> Performance</h3>
-                <button onClick={onConfig} className="text-slate-400 hover:text-blue-600 dark:hover:text-white p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5">⚙️</button>
+                <div className="flex gap-1">
+                    <button onClick={onConfig} className="text-emerald-500 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 p-1 rounded-lg font-bold text-lg leading-none" title="Add Progress Bar">+</button>
+                    <button onClick={onConfig} className="text-slate-400 hover:text-blue-600 dark:hover:text-white p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5">⚙️</button>
+                </div>
             </div>
             <div className="flex flex-col gap-6">
                 {settings.progressBars.filter(conf => conf.visible !== false).map(conf => {

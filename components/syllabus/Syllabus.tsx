@@ -1,11 +1,12 @@
+
 import React, { useState } from 'react';
 import { calculateProgress } from '../utils/calculations';
 import { UserData, UserSettings } from '../types';
-import { SyllabusHeader } from './syllabus/SyllabusHeader';
-import { PaperSection } from './syllabus/PaperSection';
-import { SyllabusModals } from './syllabus/SyllabusModals';
-import { ConfirmModal } from './ui/ConfirmModal';
-import { PrintModal } from './syllabus/modals/PrintModal';
+import { SyllabusHeader } from './SyllabusHeader';
+import { PaperSection } from './PaperSection';
+import { SyllabusModals } from './SyllabusModals';
+import { ConfirmModal } from '../ui/ConfirmModal';
+import { PrintModal } from './modals/PrintModal';
 import { useSyllabusUI } from '../hooks/ui/useSyllabusUI';
 
 interface SyllabusProps {
@@ -56,8 +57,10 @@ export const Syllabus: React.FC<SyllabusProps> = ({ activeSubject, userData, set
     const handlePrint = (mode: 'p1' | 'p2' | 'both') => {
         setPrintMode(mode);
         setShowPrintModal(false);
+        // Slight delay to allow React to update the classNames before printing
         setTimeout(() => {
             window.print();
+            // Reset after print dialog closes (execution pauses during print)
             setPrintMode('both');
         }, 300);
     };
