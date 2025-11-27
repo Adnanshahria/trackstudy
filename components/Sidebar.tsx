@@ -66,11 +66,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeSubject, onChangeSubject
                 />
             </div>
 
-            {/* ROW 3: Subjects List (Fixed Height 500px) */}
-            <div 
-                className="glass-panel rounded-3xl flex flex-col overflow-hidden shadow-sm shrink-0"
-                style={{ height: '500px' }}
-            >
+            {/* ROW 3: Subjects List (Max Height ~4 items then scroll) */}
+            <div className="glass-panel rounded-3xl flex flex-col overflow-hidden shadow-sm shrink-0 max-h-[380px]">
                 <div className="pt-5 px-5 shrink-0">
                     <SidebarHeader isEditing={isEditingSubjects} setIsEditing={setIsEditingSubjects} setModals={setModals} />
                 </div>
