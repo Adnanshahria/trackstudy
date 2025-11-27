@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { calculateGlobalComposite } from './utils/calculations';
 import { Sidebar } from './components/Sidebar';
 import { Syllabus } from './components/Syllabus';
@@ -10,6 +10,7 @@ import { AppearanceModal } from './components/settings/AppearanceModal';
 import { LandingHeader } from './components/layout/LandingHeader';
 import { DashboardHeader } from './components/layout/DashboardHeader';
 import { WelcomeHero } from './components/layout/WelcomeHero';
+import { SkeletonDashboard } from './components/layout/SkeletonDashboard';
 import { useFirebaseSync } from './hooks/useFirebaseSync';
 import { useDataManager } from './hooks/useDataManager';
 import { useAuthHandlers } from './hooks/useAuthHandlers';
@@ -22,22 +23,38 @@ function App() {
   const [showAppGuide, setShowAppGuide] = useState(false);
   const [showAppearance, setShowAppearance] = useState(false);
   
-  const auth = useAuthHandlers(setUserId);
+  // State to handle the transition gap between login success and data load
+  const [postLoginLoading, setPostLoginLoading] = useState(false);
+  
+  const auth = useAuthHandlers(setUserId, () => setPostLoginLoading(true));
   const dataMgr = useDataManager(settings, handleSettingsUpdate, activeSubject, setActiveSubject);
 
   useAppearance(settings);
 
+  // When userId resolves, we can stop the forced loading state
+  useEffect(() => {
+    if (userId) {
+        setPostLoginLoading(false);
+    }
+  }, [userId]);
+
+  // SAFETY NET: If postLoginLoading is true for more than 8 seconds, force it off.
+  // This prevents the app from getting stuck on the loading screen if db sync fails silently.
+  useEffect(() => {
+    let timeout: ReturnType<typeof setTimeout>;
+    if (postLoginLoading) {
+        timeout = setTimeout(() => {
+            console.warn("⚠️ Post-login loading timed out. Forcing dashboard render.");
+            setPostLoginLoading(false);
+        }, 8000);
+    }
+    return () => clearTimeout(timeout);
+  }, [postLoginLoading]);
+
   const compositeData = calculateGlobalComposite(userData, settings);
 
-  if (isAuthResolving) {
-      return (
-          <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-[#1A1A1C] transition-colors duration-300">
-              <div className="flex flex-col items-center gap-4">
-                  <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                  <p className="text-sm font-bold text-slate-500 uppercase tracking-wider animate-pulse">Initializing...</p>
-              </div>
-          </div>
-      );
+  if (isAuthResolving || postLoginLoading) {
+      return <SkeletonDashboard />;
   }
 
   return (
@@ -67,10 +84,20 @@ function App() {
                         onForceSync={forceSync}
                     />
                     {isLoading ? (
-                        <div className="flex-1 flex flex-col items-center justify-center gap-4">
-                            <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                            <p className="text-sm font-bold text-slate-500 uppercase tracking-wider">Syncing Data...</p>
-                        </div>
+                         <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-6 items-start lg:overflow-hidden animate-pulse">
+                            <div className="hidden lg:flex flex-col gap-4 h-full">
+                                <div className="grid grid-cols-2 gap-3 shrink-0">
+                                    <div className="h-32 bg-slate-200 dark:bg-white/5 rounded-2xl border border-slate-300 dark:border-white/5"></div>
+                                    <div className="h-32 bg-slate-200 dark:bg-white/5 rounded-2xl border border-slate-300 dark:border-white/5"></div>
+                                </div>
+                                <div className="h-40 bg-slate-200 dark:bg-white/5 rounded-3xl shrink-0 border border-slate-300 dark:border-white/5"></div>
+                                <div className="flex-1 bg-slate-200 dark:bg-white/5 rounded-3xl border border-slate-300 dark:border-white/5"></div>
+                            </div>
+                            <div className="h-full flex flex-col gap-6 lg:overflow-y-auto pr-1 pb-20 lg:pb-0">
+                                <div className="h-20 bg-slate-200 dark:bg-white/5 rounded-2xl shrink-0 border border-slate-300 dark:border-white/5"></div>
+                                <div className="h-96 bg-slate-200 dark:bg-white/5 rounded-3xl shrink-0 border border-slate-300 dark:border-white/5"></div>
+                            </div>
+                         </div>
                     ) : (
                         <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-6 items-start lg:overflow-hidden print:block">
                             <div className="no-print lg:h-full lg:overflow-hidden flex flex-col pb-10 lg:pb-0">

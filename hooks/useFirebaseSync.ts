@@ -31,12 +31,16 @@ export const useFirebaseSync = () => {
         console.log("⏳ Waiting for Custom ID...");
         for (let i = 0; i < 5; i++) {
             await new Promise(resolve => setTimeout(resolve, 500));
-            await user.reload();
-            // Need to get the refreshed object from auth
-            const refreshed = firebaseAuth.currentUser;
-            if (refreshed?.displayName) {
-                console.log("✅ Custom ID found:", refreshed.displayName);
-                return refreshed.displayName;
+            try {
+                await user.reload();
+                // Need to get the refreshed object from auth
+                const refreshed = firebaseAuth.currentUser;
+                if (refreshed?.displayName) {
+                    console.log("✅ Custom ID found:", refreshed.displayName);
+                    return refreshed.displayName;
+                }
+            } catch (e) {
+                console.warn("Polling reload failed:", e);
             }
         }
 
@@ -55,16 +59,24 @@ export const useFirebaseSync = () => {
         }
 
         const unsubscribe = firebaseAuth.onAuthStateChanged(async (user) => {
-            if (user) {
-                // RACE CONDITION FIX:
-                // We await the polling function to ensure we get the 'guest_...' or 'username' ID
-                // instead of the raw Firebase UID.
-                const finalId = await waitForCustomId(user);
-                setUserId(finalId);
-            } else {
+            try {
+                if (user) {
+                    // RACE CONDITION FIX:
+                    // We await the polling function to ensure we get the 'guest_...' or 'username' ID
+                    // instead of the raw Firebase UID.
+                    const finalId = await waitForCustomId(user);
+                    setUserId(finalId);
+                } else {
+                    setUserId(null);
+                }
+            } catch (error) {
+                console.error("Auth State Change Error:", error);
+                // Fallback to null if something catastrophic happens
                 setUserId(null);
+            } finally {
+                // CRITICAL: Always resolve auth state to prevent infinite loading
+                setIsAuthResolving(false);
             }
-            setIsAuthResolving(false);
         });
         return () => unsubscribe && unsubscribe();
     }, []);

@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { authService } from '../services/authService';
 
-export const useAuthHandlers = (setUserId: (id: string) => void) => {
+export const useAuthHandlers = (setUserId: (id: string) => void, onSuccess?: () => void) => {
     const [showLoginModal, setShowLoginModal] = useState(false);
     const [modalMode, setModalMode] = useState<'login' | 'create' | 'reset'>('login');
     const [tempUserId, setTempUserId] = useState('');
@@ -35,6 +35,7 @@ export const useAuthHandlers = (setUserId: (id: string) => void) => {
                 // FIX: Do not manually setUserId here. Let the onAuthStateChanged listener in useFirebaseSync handle it.
                 // This prevents race conditions where we might have the wrong ID vs Auth Token.
                 if (result.success && result.uid) { 
+                    onSuccess?.(); // Trigger immediate transition
                     setShowLoginModal(false); 
                     resetModalState(); 
                 } 
@@ -42,6 +43,7 @@ export const useAuthHandlers = (setUserId: (id: string) => void) => {
             } else {
                 const result = await authService.signup(inputId, inputPass);
                 if (result.success && result.uid) { 
+                    onSuccess?.(); // Trigger immediate transition
                     setShowLoginModal(false); 
                     resetModalState(); 
                 } 
@@ -55,6 +57,7 @@ export const useAuthHandlers = (setUserId: (id: string) => void) => {
         try {
             const result = await authService.guestLogin();
             if (result.success && result.uid) { 
+                onSuccess?.(); // Trigger immediate transition
                 setShowLoginModal(false); 
                 // Listener will pick up state
             } 
