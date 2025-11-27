@@ -11,6 +11,7 @@ export const useFirebaseSync = () => {
     const [userData, setUserData] = useState<UserData>({});
     const [settings, setSettings] = useState<UserSettings>(DEFAULT_SETTINGS);
     const [userId, setUserId] = useState<string | null>(null);
+    const [isAuthResolving, setIsAuthResolving] = useState(true);
     
     // Add a key state to force re-mounting/re-syncing
     const [syncKey, setSyncKey] = useState(0);
@@ -24,8 +25,39 @@ export const useFirebaseSync = () => {
     useEffect(() => { 
         setUserData({}); 
         setSettings(DEFAULT_SETTINGS); 
-        const unsubscribe = firebaseAuth?.onAuthStateChanged(user => {
-            if (user) setUserId(user.uid);
+        
+        if (!firebaseAuth) {
+            console.error("Auth not initialized, skipping auth check.");
+            setIsAuthResolving(false);
+            return;
+        }
+
+        const unsubscribe = firebaseAuth.onAuthStateChanged(async (user) => {
+            if (user) {
+                // RACE CONDITION FIX:
+                // New users (Guest or Created) might have their `displayName` set asynchronously.
+                // If we use `user.uid` immediately, we might create a garbage document.
+                // We attempt to reload the user metadata to ensure we get the fresh displayName (Custom ID).
+                
+                let finalId = user.displayName;
+                
+                if (!finalId) {
+                    try {
+                        await user.reload();
+                        // Re-fetch current user after reload
+                        const refreshedUser = firebaseAuth.currentUser;
+                        finalId = refreshedUser?.displayName || refreshedUser?.uid || user.uid;
+                    } catch (e) {
+                        console.warn("User reload failed, falling back to UID", e);
+                        finalId = user.uid;
+                    }
+                }
+
+                setUserId(finalId);
+            } else {
+                setUserId(null);
+            }
+            setIsAuthResolving(false);
         });
         return () => unsubscribe && unsubscribe();
     }, []);
@@ -44,5 +76,5 @@ export const useFirebaseSync = () => {
         setSyncKey(prev => prev + 1);
     };
 
-    return { userId, setUserId, userData, setUserData, settings, setSettings, isLoading, connectionStatus, forceSync, ...actions };
+    return { userId, setUserId, isAuthResolving, userData, setUserData, settings, setSettings, isLoading, connectionStatus, forceSync, ...actions };
 };

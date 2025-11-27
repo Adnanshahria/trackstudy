@@ -110,14 +110,15 @@
 
       /* Print Optimization */
       @media print {
-        @page { size: landscape; margin: 5mm; }
-        body { background: white; color: black; zoom: 0.8; }
+        @page { size: landscape; margin: 0; }
+        body { background: white; color: black; zoom: 0.7; padding: 10mm; }
         .no-print { display: none !important; }
-        #syllabus-print-container { display: block !important; width: 100%; position: static; }
+        #syllabus-print-container { display: block !important; width: 100%; position: static; height: auto !important; overflow: visible !important; }
         .print-grid { display: grid !important; grid-template-columns: 1fr 1fr; gap: 1rem; width: 100%; }
         * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-        .glass-panel, .glass-card { border: 1px solid #ccc; box-shadow: none; }
-
+        .glass-panel, .glass-card { border: 1px solid #ccc; box-shadow: none; background: white !important; }
+        .custom-scrollbar { overflow: visible !important; max-height: none !important; }
+        
         /* Selective Printing Logic */
         .print-show-p1 .paper-section-2 { display: none !important; }
         .print-show-p1 .print-grid { grid-template-columns: 1fr !important; }

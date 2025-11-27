@@ -1,3 +1,4 @@
+
 import { UserSettings, Chapter } from '../../types';
 
 export const useChapterActions = (settings: UserSettings, handleSettingsUpdate: (s: UserSettings) => void) => {
@@ -28,7 +29,8 @@ export const useChapterActions = (settings: UserSettings, handleSettingsUpdate: 
     const onAddChapter = (subjectKey: string, paper: 1 | 2, name: string) => {
         const currentSub = settings.syllabus[subjectKey];
         if (!currentSub) return;
-        const newChapter: Chapter = { id: `custom_${Date.now()}`, name, paper };
+        // Fix: Add random suffix to prevent ID collision
+        const newChapter: Chapter = { id: `custom_${Date.now()}_${Math.floor(Math.random()*1000)}`, name, paper };
         const newSyllabus = JSON.parse(JSON.stringify(settings.syllabus));
         newSyllabus[subjectKey].chapters.push(newChapter);
         handleSettingsUpdate({ ...settings, syllabus: newSyllabus });

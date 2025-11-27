@@ -11,7 +11,7 @@ export const LandingHeader: React.FC<{ onDev: () => void, onLogin: () => void, o
                     <h1 className="text-lg font-bold tracking-tight text-slate-800 dark:text-slate-100">TrackStudy</h1>
                 </div>
                 <div className="flex items-center gap-3">
-                     <SettingsMenu userId={null} onLogout={() => {}} onToggleTheme={onToggleTheme} theme={theme} onOpenGuide={onGuide} onOpenDevModal={onDev} onOpenAppearance={() => {}} />
+                     <SettingsMenu userId={null} onLogout={() => {}} onToggleTheme={onToggleTheme} theme={theme} onOpenGuide={onGuide} onOpenDevModal={onDev} onOpenAppearance={() => {}} onForceSync={() => {}} />
                 </div>
              </div>
         </div>

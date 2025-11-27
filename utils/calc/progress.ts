@@ -1,3 +1,4 @@
+
 import { SyllabusData, TrackableItem, UserData } from '../../types';
 import { TRACKABLE_ITEMS } from '../../constants';
 import { getPercent, normalize } from './helpers';
@@ -53,9 +54,13 @@ export const calculateProgress = (
         else { p2Total += chAvg; p2Count++; }
     });
 
+    // BUG FIX: Handle division by zero if a paper has no chapters
+    const p1 = p1Count > 0 ? p1Total / p1Count : 0;
+    const p2 = p2Count > 0 ? p2Total / p2Count : 0;
+    
     return {
-        p1: p1Count ? p1Total / p1Count : 0,
-        p2: p2Count ? p2Total / p2Count : 0,
+        p1,
+        p2,
         overall: (p1Count + p2Count) ? (p1Total + p2Total) / (p1Count + p2Count) : 0
     };
 };

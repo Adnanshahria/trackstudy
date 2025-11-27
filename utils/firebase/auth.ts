@@ -24,19 +24,12 @@ const getErrorMessage = (error: any) => {
 export const authenticateUser = async (rawId: string, pass: string) => {
     if (!firebaseAuth || !firestore) return { success: false, error: "Database not connected. Check internet." };
     const email = getEmail(rawId);
-    const id = sanitizeId(rawId); 
-
+    
+    // We expect the user to login with credentials that map to a Custom ID (displayName).
+    // The listener in useFirebaseSync will pick up the displayName.
     try {
         const result = await firebaseAuth.signInWithEmailAndPassword(email, pass);
-        if (result.user) {
-            // CRITICAL FIX: Await this write to ensure data is saved before UI login state
-            await firestore.collection(FIREBASE_USER_COLLECTION).doc(id).set({
-                data: { username: rawId, password: pass } 
-            }, { merge: true });
-            
-            return { success: true, uid: id };
-        }
-        return { success: false, error: "User info missing" };
+        return { success: true, uid: result.user?.displayName || result.user?.uid };
     } catch (e: any) { return { success: false, error: getErrorMessage(e) }; }
 };
 
@@ -47,10 +40,14 @@ export const createUser = async (rawId: string, pass: string) => {
     try {
         const result = await firebaseAuth.createUserWithEmailAndPassword(getEmail(rawId), pass);
         if (result.user) {
+            // CRITICAL: Set the Auth Profile Display Name to the Custom ID.
+            await result.user.updateProfile({ displayName: id });
+
+            // Create Firestore Doc using the Custom ID (id), NOT the random UID.
             await firestore.collection(FIREBASE_USER_COLLECTION).doc(id).set({
                 createdAt: new Date().toISOString(),
                 settings: DEFAULT_SETTINGS,
-                data: { username: rawId, password: pass }
+                data: { username: id, password: pass }
             }, { merge: true });
             
             return { success: true, uid: id };
@@ -62,19 +59,30 @@ export const createUser = async (rawId: string, pass: string) => {
 export const loginAnonymously = async () => {
     if (!firebaseAuth) return { success: false, error: "Firebase Auth not initialized" };
     try {
-        await firebaseAuth.signInAnonymously();
-        const timestamp = Date.now().toString(36).slice(-4);
-        const random = Math.floor(1000 + Math.random() * 9000);
-        const guestId = `guest-${timestamp}-${random}`;
+        const result = await firebaseAuth.signInAnonymously();
+        
+        if (result.user) {
+            // Generate Custom Guest ID
+            const now = new Date();
+            const fmt = (n: number) => n.toString().padStart(2, '0');
+            const dateStr = `${now.getFullYear()}${fmt(now.getMonth()+1)}${fmt(now.getDate())}`;
+            const timeStr = `${fmt(now.getHours())}${fmt(now.getMinutes())}${fmt(now.getSeconds())}`;
+            const rand = Math.floor(1000 + Math.random() * 9000);
+            const guestDisplayName = `guest_${dateStr}_${timeStr}_${rand}`;
 
-        // Don't await guest creation, speed is priority for guests
-        firestore.collection(FIREBASE_USER_COLLECTION).doc(guestId).set({
-            createdAt: new Date().toISOString(),
-            settings: DEFAULT_SETTINGS,
-            data: { username: 'Guest User', isGuest: true }
-        }).catch(console.error);
+            // CRITICAL: Set Auth Profile to use Guest ID
+            await result.user.updateProfile({ displayName: guestDisplayName });
 
-        return { success: true, uid: guestId };
+            // Save to Firestore under the Guest ID
+            await firestore.collection(FIREBASE_USER_COLLECTION).doc(guestDisplayName).set({
+                createdAt: new Date().toISOString(),
+                settings: DEFAULT_SETTINGS,
+                data: { username: guestDisplayName, isGuest: true }
+            }, { merge: true });
+
+            return { success: true, uid: guestDisplayName };
+        }
+        return { success: false, error: "Guest session failed to start" };
     } catch (e: any) { return { success: false, error: getErrorMessage(e) }; }
 };
 

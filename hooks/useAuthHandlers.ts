@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { authService } from '../services/authService';
 
@@ -31,11 +32,19 @@ export const useAuthHandlers = (setUserId: (id: string) => void) => {
                 else { setModalError(result.error || 'Reset failed.'); }
             } else if (modalMode === 'login') {
                 const result = await authService.login(inputId, inputPass);
-                if (result.success && result.uid) { setUserId(result.uid); setShowLoginModal(false); resetModalState(); } 
+                // FIX: Do not manually setUserId here. Let the onAuthStateChanged listener in useFirebaseSync handle it.
+                // This prevents race conditions where we might have the wrong ID vs Auth Token.
+                if (result.success && result.uid) { 
+                    setShowLoginModal(false); 
+                    resetModalState(); 
+                } 
                 else { setModalError(result.error || 'Login failed.'); }
             } else {
                 const result = await authService.signup(inputId, inputPass);
-                if (result.success && result.uid) { setUserId(result.uid); setShowLoginModal(false); resetModalState(); } 
+                if (result.success && result.uid) { 
+                    setShowLoginModal(false); 
+                    resetModalState(); 
+                } 
                 else { setModalError(result.error || 'Creation failed.'); }
             }
         } catch (e) { setModalError('Network error.'); } finally { setIsCheckingUser(false); }
@@ -45,7 +54,10 @@ export const useAuthHandlers = (setUserId: (id: string) => void) => {
         setModalError(''); setIsCheckingUser(true);
         try {
             const result = await authService.guestLogin();
-            if (result.success && result.uid) { setUserId(result.uid); setShowLoginModal(false); } 
+            if (result.success && result.uid) { 
+                setShowLoginModal(false); 
+                // Listener will pick up state
+            } 
             else { setModalError(result.error || 'Guest login failed'); }
         } catch (e) { setModalError('Network error'); } finally { setIsCheckingUser(false); }
     };

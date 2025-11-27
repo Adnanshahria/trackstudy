@@ -14,7 +14,8 @@ export const GuideChangelog = () => (
                 <ul className="space-y-1 text-xs text-slate-600 dark:text-slate-400 list-disc pl-4">
                     <li><strong>Layout:</strong> Fixed subject list jitter and status dot overlap.</li>
                     <li><strong>Tools:</strong> Added Force Sync button and Quick Add for progress bars.</li>
-                    <li><strong>Print:</strong> Optimized for Landscape mode.</li>
+                    <li><strong>Guest Mode:</strong> Improved Guest IDs with readable timestamps.</li>
+                    <li><strong>Display:</strong> Optimized one-page view for desktop/tablet.</li>
                 </ul>
             </div>
 
