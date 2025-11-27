@@ -31,12 +31,15 @@ function App() {
 
   useAppearance(settings);
 
-  // When userId resolves, we can stop the forced loading state
+  // When userId resolves OR postLoginLoading becomes true, check if we can stop loading
+  // CRITICAL FIX: Added 'postLoginLoading' to dependencies.
+  // Previously, if userId was already set (e.g. fast auth) before postLoginLoading became true,
+  // this effect wouldn't run, leaving the user stuck on the loading screen.
   useEffect(() => {
-    if (userId) {
+    if (userId && postLoginLoading) {
         setPostLoginLoading(false);
     }
-  }, [userId]);
+  }, [userId, postLoginLoading]);
 
   // SAFETY NET: If postLoginLoading is true for more than 8 seconds, force it off.
   // This prevents the app from getting stuck on the loading screen if db sync fails silently.
