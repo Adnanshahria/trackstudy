@@ -1,4 +1,6 @@
 
+import { logger } from '../logger';
+
 const DB_NAME = 'AS_Study_Dashboard';
 const STORE_NAME = 'userData';
 
@@ -34,9 +36,9 @@ export const openDB = (): Promise<IDBDatabase> => {
     };
     
     request.onerror = (e) => {
-        console.warn("IndexedDB Open Error:", e);
+        logger.warn("IndexedDB Open Error", e);
         connectionPromise = null; // Reset on failure
-        reject(e); 
+        reject(e);
     };
   });
   
@@ -90,6 +92,6 @@ export const cleanupStorage = () => {
             connectionPromise = null;
         }
     } catch (e) {
-        console.warn("Storage cleanup failed:", e);
+        logger.warn("Storage cleanup failed", e);
     }
 };

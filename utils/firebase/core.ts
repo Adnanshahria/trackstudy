@@ -3,12 +3,13 @@ import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
 import 'firebase/compat/firestore';
 import { FIREBASE_CONFIG } from '../../constants';
+import { logger } from '../logger';
 
 let firebaseApp: firebase.app.App;
 let firestore: firebase.firestore.Firestore;
 let firebaseAuth: firebase.auth.Auth;
 
-console.log("🔥 Initializing Firebase...");
+logger.debug("Initializing Firebase...");
 
 try {
     // Initialize Firebase only if it hasn't been initialized yet
@@ -19,10 +20,10 @@ try {
     }
 
     const hostname = window.location.hostname;
-    console.log(`%c App running on: ${hostname}`, 'background: #222; color: #bada55; padding: 4px; border-radius: 4px;');
+    logger.debug(`App running on: ${hostname}`);
     
     if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
-        console.log(`%c IMPORTANT: If login fails, ensure 'https://${hostname}' is added to Firebase Console > Authentication > Settings > Authorized Domains`, 'color: orange; font-weight: bold;');
+        logger.info(`If login fails, ensure 'https://${hostname}' is added to Firebase Console > Authentication > Settings > Authorized Domains`);
     }
 
     firebaseAuth = firebase.auth();
@@ -38,14 +39,14 @@ try {
         // Removed { synchronizeTabs: true } as it causes deprecation warnings and is often unstable in basic compat mode
         firestore.enablePersistence().catch(err => {
             if (err.code === 'failed-precondition') {
-                 console.warn('Persistence warning: Multiple tabs open. Persistence disabled for this tab.');
+                 logger.warn('Persistence warning: Multiple tabs open. Persistence disabled for this tab.');
             } else if (err.code === 'unimplemented') {
-                 console.warn('Persistence warning: Browser does not support offline persistence.');
+                 logger.warn('Persistence warning: Browser does not support offline persistence.');
             }
         });
     }
 } catch (error) {
-    console.error("CRITICAL: Firebase Initialization Failed. Check your configuration.", error);
+    logger.error("CRITICAL: Firebase Initialization Failed. Check your configuration.", error);
 }
 
 export { firebaseApp, firestore, firebaseAuth, firebase };

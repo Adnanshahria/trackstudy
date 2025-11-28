@@ -6,6 +6,7 @@ import { useSyncActions } from './sync/useSyncActions';
 import { useDataSync } from './sync/useDataSync';
 import { useDataMigration } from './sync/useDataMigration';
 import { firebaseAuth } from '../utils/firebase/core';
+import { logger } from '../utils/logger';
 import firebase from 'firebase/compat/app';
 
 export const useFirebaseSync = () => {
@@ -24,27 +25,28 @@ export const useFirebaseSync = () => {
     useEffect(() => { localSettingsRef.current = settings; }, [settings]);
     
     // Helper to wait for the custom ID (displayName) to appear
+    // Optimized with reduced polling iterations and faster timeout
     const waitForCustomId = async (user: firebase.User): Promise<string> => {
         if (user.displayName) return user.displayName;
 
-        console.log("⏳ Waiting for Custom ID...");
-        let backoffMs = 250;
-        for (let i = 0; i < 10; i++) {
+        logger.debug("Waiting for Custom ID...");
+        let backoffMs = 150; // Start with lower backoff
+        for (let i = 0; i < 5; i++) { // Reduced from 10 to 5 iterations
             await new Promise(resolve => setTimeout(resolve, backoffMs));
-            backoffMs = Math.min(backoffMs * 1.3, 800);
+            backoffMs = Math.min(backoffMs * 1.5, 400); // Faster exponential growth and lower cap
             try {
                 await user.reload();
                 const refreshed = firebaseAuth.currentUser;
                 if (refreshed?.displayName) {
-                    console.log("✅ Custom ID found:", refreshed.displayName);
+                    logger.debug("Custom ID found:", refreshed.displayName);
                     return refreshed.displayName;
                 }
             } catch (e) {
-                console.warn("Polling reload failed:", e);
+                logger.debug("Polling reload failed");
             }
         }
 
-        console.warn("⚠️ Custom ID timeout. Falling back to UID.");
+        logger.warn("Custom ID timeout. Falling back to UID.");
         return user.uid;
     };
 
@@ -53,7 +55,7 @@ export const useFirebaseSync = () => {
         setSettings(DEFAULT_SETTINGS); 
         
         if (!firebaseAuth) {
-            console.error("Auth not initialized, skipping auth check.");
+            logger.error("Auth not initialized, skipping auth check.");
             setIsAuthResolving(false);
             return;
         }
@@ -70,7 +72,7 @@ export const useFirebaseSync = () => {
                     setUserId(null);
                 }
             } catch (error) {
-                console.error("Auth State Change Error:", error);
+                logger.error("Auth State Change Error:", error);
                 // Fallback to null if something catastrophic happens
                 setUserId(null);
             } finally {

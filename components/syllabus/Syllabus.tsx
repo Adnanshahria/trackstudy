@@ -1,13 +1,13 @@
 
 import React, { useState } from 'react';
-import { calculateProgress } from '../utils/calculations';
-import { UserData, UserSettings } from '../types';
+import { calculateProgress } from '../../utils/calculations';
+import { UserData, UserSettings } from '../../types';
 import { SyllabusHeader } from './SyllabusHeader';
 import { PaperSection } from './PaperSection';
 import { SyllabusModals } from './SyllabusModals';
 import { ConfirmModal } from '../ui/ConfirmModal';
 import { PrintModal } from './modals/PrintModal';
-import { useSyllabusUI } from '../hooks/ui/useSyllabusUI';
+import { useSyllabusUI } from '../../hooks/ui/useSyllabusUI';
 
 interface SyllabusProps {
     activeSubject: string;

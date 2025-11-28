@@ -2,6 +2,7 @@
 import { firestore, firebaseAuth } from './core';
 import { UserData, UserSettings } from '../../types';
 import { DEFAULT_SETTINGS } from '../../constants';
+import { logger } from '../logger';
 
 const FIREBASE_USER_COLLECTION = 'users';
 
@@ -28,7 +29,7 @@ export const ensureUserDoc = async (uid: string, initialSettings?: UserSettings,
     // Custom ID (displayName), we must abort. This happens during race conditions.
     const currentUser = firebaseAuth.currentUser;
     if (currentUser && currentUser.uid === uid && currentUser.displayName && currentUser.displayName !== uid) {
-        console.warn("🛑 Prevented creation of garbage document for raw UID. Waiting for Custom ID.");
+        logger.warn("Prevented creation of garbage document for raw UID. Waiting for Custom ID.");
         return false;
     }
 
@@ -51,6 +52,6 @@ export const ensureUserDoc = async (uid: string, initialSettings?: UserSettings,
             await ref.set(payload, { merge: true });
             return true;
         }
-    } catch (e) { console.error("Error checking user doc:", e); }
+    } catch (e) { logger.error("Error checking user doc:", e); }
     return false;
 };

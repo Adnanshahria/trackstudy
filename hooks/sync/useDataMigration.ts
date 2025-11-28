@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { UserData, UserSettings } from '../../types';
 import { saveUserProgress } from '../../utils/storage';
+import { logger } from '../../utils/logger';
 
 export const useDataMigration = (userData: UserData, setUserData: any, settings: UserSettings, userId: string | null) => {
     useEffect(() => {
@@ -46,14 +47,15 @@ export const useDataMigration = (userData: UserData, setUserData: any, settings:
             });
 
             if (hasUpdates) {
-                console.log(`%c 📦 Migrating ${Object.keys(updates).length} data fields to new format...`, 'color: #bada55');
+                logger.info(`Migrating ${Object.keys(updates).length} data fields to new format...`);
                 setUserData((prev: any) => ({ ...prev, ...updates }));
                 await saveUserProgress(userId, updates);
             }
         };
 
         // We use a timeout to ensure this runs after initial data load
-        const t = setTimeout(migrate, 2000);
+        // Reduced from 2000ms to 1000ms to speed up migration process
+        const t = setTimeout(migrate, 1000);
         return () => clearTimeout(t);
     }, [userId, userData, settings, setUserData]);
 };
