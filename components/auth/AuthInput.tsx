@@ -13,7 +13,7 @@ interface Props {
 
 export const AuthInput: React.FC<Props> = ({ label, icon, type = "text", value, onChange, onEnter, placeholder, rightElement }) => (
     <div className="space-y-1.5 animate-fade-in">
-        <label className="text-[10px] uppercase font-bold text-slate-400 tracking-wider ml-2">{label}</label>
+        <label className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider ml-2">{label}</label>
         <div className="relative group">
             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg opacity-50">{icon}</span>
             <input 

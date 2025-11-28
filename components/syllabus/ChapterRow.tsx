@@ -18,8 +18,8 @@ export const ChapterRow: React.FC<Props> = ({ ch, activeSubject, allItems, userD
                 <span className="line-clamp-2 leading-tight font-semibold" title={ch.name}>{ch.name}</span>
                 {editMode && (
                     <div className="flex items-center gap-1 min-w-fit no-print opacity-100 md:opacity-0 md:group-hover/ch:opacity-100 transition-opacity">
-                        <button onClick={() => actions.setRenameModal({ isOpen: true, key: ch.id, currentName: ch.name, type: 'chapter' })} className="text-[10px] text-slate-400 hover:text-blue-500 transition-colors">✏️</button>
-                        <button onClick={() => actions.onDeleteChapter(activeSubject, ch.id)} className="text-[10px] text-slate-400 hover:text-rose-500 transition-colors">✕</button>
+                        <button onClick={() => actions.setRenameModal({ isOpen: true, key: ch.id, currentName: ch.name, type: 'chapter' })} className="text-[10px] text-slate-500 hover:text-blue-500 transition-colors">✏️</button>
+                        <button onClick={() => actions.onDeleteChapter(activeSubject, ch.id)} className="text-[10px] text-slate-500 hover:text-rose-500 transition-colors">✕</button>
                     </div>
                 )}
             </div>
@@ -33,7 +33,7 @@ export const ChapterRow: React.FC<Props> = ({ ch, activeSubject, allItems, userD
             return (
                 <td key={item.key} className="p-1 text-center relative group/cell border-r border-slate-200/30 dark:border-white/5 print:border-slate-200">
                     <div className="flex justify-center"><StatusButton val={val} onClick={() => actions.onUpdateStatus(key)} /></div>
-                    <button onClick={() => actions.setNoteModal({ isOpen: true, key, text: userData[`note_${key}`] || '' })} className={`absolute top-1 right-1 w-4 h-4 rounded-full flex items-center justify-center text-[8px] transition-transform hover:scale-110 no-print ${hasNote ? 'bg-amber-400 text-white shadow-sm z-10' : 'text-slate-400 opacity-0 group-hover/cell:opacity-100'}`}>{hasNote ? '📝' : '+'}</button>
+                    <button onClick={() => actions.setNoteModal({ isOpen: true, key, text: userData[`note_${key}`] || '' })} className={`absolute top-1 right-1 w-4 h-4 rounded-full flex items-center justify-center text-[8px] transition-transform hover:scale-110 no-print ${hasNote ? 'bg-amber-400 text-white shadow-sm z-10' : 'text-slate-500 opacity-0 group-hover/cell:opacity-100'}`}>{hasNote ? '📝' : '+'}</button>
                 </td>
             );
         })}

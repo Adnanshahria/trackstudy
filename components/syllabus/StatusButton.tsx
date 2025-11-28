@@ -2,7 +2,7 @@ import React from 'react';
 
 export const StatusButton: React.FC<{ val: number; onClick: () => void }> = ({ val, onClick }) => {
     let bg = "bg-white dark:bg-white/5 border-slate-200 dark:border-white/10 print:border-gray-300 hover:border-blue-400 dark:hover:border-blue-500/50";
-    let text = "text-slate-400 dark:text-slate-500 print:text-gray-400";
+    let text = "text-slate-600 dark:text-slate-400 print:text-gray-600";
     let label = (val * 20) + '%';
     let fill = val * 20;
 

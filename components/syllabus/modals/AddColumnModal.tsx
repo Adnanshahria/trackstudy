@@ -18,7 +18,7 @@ export const AddColumnModal = ({ onClose, onAdd }: { onClose: () => void, onAdd:
         <Modal isOpen={true} onClose={onClose} title="Add New Column">
              <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-1">
-                    <label className="text-xs text-slate-500">Column Name</label>
+                    <label className="text-xs text-slate-600 dark:text-slate-400">Column Name</label>
                     <input 
                         type="text"
                         value={name}
@@ -28,7 +28,7 @@ export const AddColumnModal = ({ onClose, onAdd }: { onClose: () => void, onAdd:
                     />
                 </div>
                 <div className="flex flex-col gap-2">
-                    <label className="text-xs text-slate-500">Color</label>
+                    <label className="text-xs text-slate-600 dark:text-slate-400">Color</label>
                     <div className="flex gap-2 flex-wrap">
                         {colors.map(c => (
                             <button 

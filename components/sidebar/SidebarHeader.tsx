@@ -9,7 +9,7 @@ interface Props {
 
 export const SidebarHeader: React.FC<Props> = ({ isEditing, setIsEditing, setModals }) => (
     <div className="flex justify-between items-center mb-4">
-        <h3 className="font-bold text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
+        <h3 className="font-bold text-xs text-slate-600 dark:text-slate-300 uppercase tracking-wider flex items-center gap-2">
             <span className="w-1.5 h-4 bg-blue-500 rounded-full"></span> Subjects
         </h3>
         <div className="flex gap-1">
@@ -20,16 +20,16 @@ export const SidebarHeader: React.FC<Props> = ({ isEditing, setIsEditing, setMod
              >
                 +
              </button>
-             <button 
-                onClick={() => setIsEditing(!isEditing)} 
-                className={`p-1 rounded-lg transition-colors ${isEditing ? 'text-blue-600 bg-blue-50 dark:bg-blue-500/10' : 'text-slate-400 hover:text-blue-600 hover:bg-slate-100 dark:hover:bg-white/5'}`}
-                title="Edit Subjects"
-             >
+             <button
+                              onClick={() => setIsEditing(!isEditing)}
+                              className={`p-1 rounded-lg transition-colors ${isEditing ? 'text-blue-600 bg-blue-50 dark:bg-blue-500/10' : 'text-slate-500 hover:text-blue-600 hover:bg-slate-100 dark:hover:bg-white/5'}`}
+                              title="Edit Subjects"
+                         >
                 ✏️
              </button>
             <button 
                 onClick={() => setModals((m: any) => ({ ...m, subConfig: true }))} 
-                className="text-slate-400 hover:text-blue-600 dark:hover:text-white p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
+                className="text-slate-500 hover:text-blue-600 dark:hover:text-white p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
                 title="Configure Progress Logic"
             >
                 ⚙️

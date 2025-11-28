@@ -60,7 +60,7 @@ export const SubjectItem: React.FC<Props> = ({ subKey, data, isActive, isEditing
             <div className="flex flex-col justify-center gap-1.5 min-w-0 h-[42px]">
                 <div className="flex items-center gap-2 w-full h-[20px]">
                     <span className={`font-bold text-sm truncate w-full leading-tight ${styles.text}`} title={displayName}>{displayName}</span>
-                    {isEditing && <button onClick={(e) => { e.stopPropagation(); onRename(); }} className="text-[10px] text-slate-400 hover:text-blue-500 p-1 shrink-0 bg-white/50 dark:bg-black/20 rounded">✏️</button>}
+                    {isEditing && <button onClick={(e) => { e.stopPropagation(); onRename(); }} className="text-[10px] text-slate-500 hover:text-blue-500 p-1 shrink-0 bg-white/50 dark:bg-black/20 rounded">✏️</button>}
                 </div>
                 <div className="h-1.5 bg-slate-200/50 dark:bg-black/20 rounded-full overflow-hidden w-full">
                     <div className={`h-full rounded-full bg-gradient-to-r ${styles.bar} shadow-[0_0_10px_rgba(0,0,0,0.1)] relative`} style={{ width: `${Math.max(2, progress.overall)}%` }}>

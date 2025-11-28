@@ -55,7 +55,7 @@ export const CountdownCard: React.FC<Props> = ({ countdown, label, onEdit }) => 
                             <Unit val={countdown.m} label="M" isPast={isPast} />
                         </>
                     ) : (
-                        <div className="text-sm font-bold text-slate-400">Loading...</div>
+                        <div className="text-sm font-bold text-slate-500 dark:text-slate-400">Loading...</div>
                     )}
                 </div>
             </div>

@@ -59,13 +59,13 @@ export const MenuDropdown: React.FC<MenuDropdownProps> = ({ userId, userData, th
                 </div>
 
                 <div className="bg-slate-50/50 dark:bg-white/5 rounded-2xl p-1 border border-slate-200/50 dark:border-white/5 shadow-sm">
-                    <div className="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">General</div>
+                    <div className="px-3 py-1 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">General</div>
                     <MenuItem onClick={onOpenGuide} icon="📖" text="App Guide" colorClass="bg-blue-100 dark:bg-blue-500/20 text-blue-600" />
                     <MenuItem onClick={onOpenAppearance} icon="🎨" text="Appearance" colorClass="bg-pink-100 dark:bg-pink-500/20 text-pink-600" />
                 </div>
 
                 <div className="bg-slate-50/50 dark:bg-white/5 rounded-2xl p-1 border border-slate-200/50 dark:border-white/5 shadow-sm">
-                    <div className="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">System</div>
+                    <div className="px-3 py-1 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">System</div>
                     <MenuItem 
                         onClick={handleForceSync} 
                         icon={isSyncing ? "⏳" : "🔄"} 

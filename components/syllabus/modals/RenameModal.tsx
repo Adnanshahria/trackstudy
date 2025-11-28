@@ -7,7 +7,7 @@ export const RenameModal = ({ isOpen, onClose, currentName, type, onSave, setNam
         <Modal isOpen={isOpen} onClose={onClose} title={type === 'chapter' ? "Rename Chapter" : "Rename Column"}>
             <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-bold text-slate-500">New Name</label>
+                    <label className="text-xs font-bold text-slate-600 dark:text-slate-400">New Name</label>
                     <input 
                         type="text"
                         value={currentName}

@@ -36,7 +36,7 @@ export const CountdownEditModal: React.FC<Props> = ({ isOpen, onClose, initialTa
         <Modal isOpen={isOpen} onClose={onClose} title="Countdown Settings">
             <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-1">
-                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Event Label</label>
+                    <label className="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Event Label</label>
                     <input 
                         type="text" 
                         value={tempLabel} 
@@ -46,7 +46,7 @@ export const CountdownEditModal: React.FC<Props> = ({ isOpen, onClose, initialTa
                     />
                 </div>
                 <div className="flex flex-col gap-1">
-                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Target Date & Time</label>
+                    <label className="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Target Date & Time</label>
                     <input 
                         type="datetime-local" 
                         value={tempTarget} 

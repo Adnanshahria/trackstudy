@@ -20,7 +20,7 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, 
                     <h3 className="font-bold text-sm uppercase tracking-wider text-slate-700 dark:text-slate-200 drop-shadow-sm">{title}</h3>
                     <button 
                         onClick={onClose} 
-                        className="w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center text-slate-400 hover:text-white transition-colors focus:outline-none focus:bg-white/20"
+                        className="w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center text-slate-500 hover:text-white transition-colors focus:outline-none focus:bg-white/20"
                     >
                         ✕
                     </button>

@@ -16,7 +16,7 @@ export const DeveloperModal: React.FC<DeveloperModalProps> = ({ isOpen, onClose 
                     <div>
                         <div className="w-10 h-10 rounded-xl bg-black dark:bg-white flex items-center justify-center text-white dark:text-slate-900 font-black shadow-[0_0_15px_rgba(0,0,0,0.3)] dark:shadow-[0_0_15px_rgba(255,255,255,0.4)] mb-2">TS</div>
                         <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-0.5">Mohammed Adnan Shahria</h2>
-                        <div className="flex gap-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                        <div className="flex gap-2 text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                             <span>Developer</span>
                             <span>•</span>
                             <span>Founder</span>
@@ -26,23 +26,23 @@ export const DeveloperModal: React.FC<DeveloperModalProps> = ({ isOpen, onClose 
 
                 <div className="grid grid-cols-2 gap-3">
                     <div className="p-4 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-white/10">
-                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Role</label>
+                        <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1">Role</label>
                         <div className="text-sm font-bold text-slate-700 dark:text-slate-200">Head Of Dev Department</div>
                     </div>
                     <div className="p-4 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-white/10">
-                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Version</label>
+                        <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1">Version</label>
                         <div className="text-sm font-mono text-slate-700 dark:text-slate-200">v38.3.6 (prime)</div>
                     </div>
                 </div>
 
                 <div className="p-5 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-white/10">
-                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-3">Contact</label>
+                    <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-3">Contact</label>
                     <div className="grid grid-cols-1 gap-3">
                         <a href="mailto:adnanshahria2006@gmail.com" className="flex items-center gap-3 p-3 bg-blue-500/5 hover:bg-blue-500/10 border border-blue-500/20 rounded-xl group transition-all">
                             <span className="w-8 h-8 rounded-lg bg-blue-500 flex items-center justify-center text-white shadow-[0_0_10px_rgba(59,130,246,0.5)] group-hover:scale-110 transition-transform">✉️</span>
                             <div>
                                 <div className="text-xs font-bold text-blue-600 dark:text-blue-400">Send Email</div>
-                                <div className="text-[10px] text-slate-500 dark:text-slate-400">Compose to Adnan</div>
+                                <div className="text-[10px] text-slate-600 dark:text-slate-400">Compose to Adnan</div>
                             </div>
                         </a>
                         <div className="grid grid-cols-2 gap-3">

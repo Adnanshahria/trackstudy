@@ -8,7 +8,7 @@ export const AddChapterModal = ({ paper, onClose, onAdd }: { paper: 1 | 2, onClo
         <Modal isOpen={true} onClose={onClose} title={`Add Chapter to Paper ${paper}`}>
             <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-1">
-                    <label className="text-xs text-slate-500">Chapter Name</label>
+                    <label className="text-xs text-slate-600 dark:text-slate-400">Chapter Name</label>
                     <input 
                         type="text"
                         value={name}

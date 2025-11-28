@@ -27,7 +27,7 @@ export const AppearanceModal: React.FC<Props> = ({ isOpen, onClose, settings, on
                 <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/5">
                     <div className="flex flex-col">
                         <span className="text-sm font-bold text-slate-700 dark:text-slate-200">Theme Mode</span>
-                        <span className="text-[10px] text-slate-500 dark:text-slate-400">Switch between Light and Dark</span>
+                        <span className="text-[10px] text-slate-600 dark:text-slate-400">Switch between Light and Dark</span>
                     </div>
                     <button 
                         onClick={() => onUpdateSettings({ ...settings, theme: settings.theme === 'dark' ? 'light' : 'dark' })}
@@ -53,7 +53,7 @@ export const AppearanceModal: React.FC<Props> = ({ isOpen, onClose, settings, on
                             </button>
                         ))}
                     </div>
-                    <p className="text-[10px] text-slate-400 mt-2">Changes the neon glow color of all glass cards and panels.</p>
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-2">Changes the neon glow color of all glass cards and panels.</p>
                 </div>
             </div>
         </Modal>

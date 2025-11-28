@@ -15,7 +15,7 @@ export const ProgressCard: React.FC<Props> = ({ compositeData, onEdit, isEditing
             <div className="relative z-10">
                 <div className="flex justify-between items-start mb-1.5">
                     <div>
-                        <h2 className="text-[9px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-0.5">Weighted</h2>
+                        <h2 className="text-[9px] font-bold uppercase tracking-widest text-slate-600 dark:text-slate-400 mb-0.5">Weighted</h2>
                         <div className="text-3xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-slate-800 to-slate-600 dark:from-white dark:to-slate-300 drop-shadow-sm">
                             {compositeData.composite.toFixed(1)}<span className="text-lg">%</span>
                         </div>

@@ -21,7 +21,7 @@ export const AddSubjectModal = ({ onClose, onAdd }: { onClose: () => void, onAdd
         <Modal isOpen={true} onClose={onClose} title="Add New Subject">
             <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-1">
-                    <label className="text-xs text-slate-500">Subject Name</label>
+                    <label className="text-xs text-slate-600 dark:text-slate-400">Subject Name</label>
                     <input 
                         type="text"
                         value={name}
@@ -31,7 +31,7 @@ export const AddSubjectModal = ({ onClose, onAdd }: { onClose: () => void, onAdd
                     />
                 </div>
                 <div className="flex flex-col gap-1">
-                    <label className="text-xs text-slate-500">Icon</label>
+                    <label className="text-xs text-slate-600 dark:text-slate-400">Icon</label>
                     <div className="flex gap-2 flex-wrap">
                         {emojis.map(e => (
                              <button 
@@ -43,7 +43,7 @@ export const AddSubjectModal = ({ onClose, onAdd }: { onClose: () => void, onAdd
                     </div>
                 </div>
                  <div className="flex flex-col gap-1">
-                    <label className="text-xs text-slate-500">Color Theme</label>
+                    <label className="text-xs text-slate-600 dark:text-slate-400">Color Theme</label>
                     <div className="flex gap-2">
                          {colors.map(c => (
                              <button 

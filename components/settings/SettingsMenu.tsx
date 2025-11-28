@@ -25,7 +25,7 @@ export const SettingsMenu: React.FC<SettingsMenuProps> = (props) => {
         <div className="relative" ref={menuRef}>
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className={`w-10 h-10 flex items-center justify-center rounded-xl transition-all duration-300 shadow-lg border border-slate-700/50 ${isOpen ? 'bg-blue-600 text-white ring-4 ring-blue-500/20' : 'bg-slate-900 dark:bg-black text-white hover:scale-105 hover:bg-slate-800'}`}
+                className={`w-10 h-10 flex items-center justify-center rounded-xl transition-all duration-300 shadow-lg border ${isOpen ? 'bg-blue-600 text-white ring-4 ring-blue-500/20' : 'bg-slate-900 dark:bg-black text-white hover:scale-105 hover:bg-slate-800 border-slate-700/50'}`}
                 title="Settings & Menu"
             >
                 <span className={`text-lg transition-transform duration-500 ${isOpen ? 'rotate-90' : ''}`}>⚙️</span>

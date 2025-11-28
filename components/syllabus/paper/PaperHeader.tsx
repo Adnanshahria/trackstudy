@@ -18,8 +18,8 @@ export const PaperHeader: React.FC<Props> = ({ paper, pVal, isOpen, activeSubjec
             <span className="text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-200/50 dark:bg-black/30 px-3 py-1 rounded-full ml-2 border border-black/5 dark:border-white/10">{pVal.toFixed(0)}% Done</span>
         </div>
         <div className="flex items-center gap-3 no-print">
-            <button onClick={(e) => { e.stopPropagation(); onToggleEdit(); }} className={`w-9 h-9 flex items-center justify-center rounded-full transition-all ${editMode ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-blue-500'}`}>✏️</button>
-            <button onClick={() => onTogglePaper(`${activeSubject}-p${paper}`)} className={`w-9 h-9 rounded-full border border-slate-200 dark:border-white/10 flex items-center justify-center transition-all ${isOpen ? 'bg-blue-600 text-white rotate-180' : 'text-slate-400'}`}>▼</button>
+            <button onClick={(e) => { e.stopPropagation(); onToggleEdit(); }} className={`w-9 h-9 flex items-center justify-center rounded-full transition-all ${editMode ? 'bg-blue-600 text-white' : 'text-slate-500 hover:text-blue-500'}`}>✏️</button>
+            <button onClick={() => onTogglePaper(`${activeSubject}-p${paper}`)} className={`w-9 h-9 rounded-full border border-slate-200 dark:border-white/10 flex items-center justify-center transition-all ${isOpen ? 'bg-blue-600 text-white rotate-180' : 'text-slate-500 hover:text-blue-500'}`}>▼</button>
         </div>
     </div>
 );
