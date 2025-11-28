@@ -3,6 +3,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { UserData, UserSettings } from '../../types';
 import { DEFAULT_SETTINGS, INITIAL_SYLLABUS_DATA } from '../../constants';
 import { dbPut, dbGet, initFirebase } from '../../utils/storage';
+import { logger } from '../../utils/logger';
 
 export const useDataSync = (
     userId: string | null,
@@ -41,7 +42,7 @@ export const useDataSync = (
                     if (cachedSettings) setSettings(prev => ({ ...prev, ...cachedSettings }));
                 }
             } catch (e) {
-                console.warn("Local cache load failed", e);
+                logger.debug("Local cache load failed");
             }
 
             try {
@@ -73,7 +74,7 @@ export const useDataSync = (
                 else unsubscribe();
 
             } catch (e) {
-                console.error("Sync init failed", e);
+                logger.error("Sync init failed", e);
                 if (isMounted.current) setIsLoading(false);
             }
         };

@@ -4,6 +4,7 @@ import { firestore, firebaseAuth } from './core';
 import { ensureUserDoc } from './helpers';
 import { DEFAULT_SETTINGS } from '../../constants';
 import { debounce } from '../debounce';
+import { logger } from '../logger';
 
 const FIREBASE_USER_COLLECTION = 'users';
 
@@ -34,13 +35,13 @@ export const initFirebase = async (
                 });
             }
         }, (error) => {
-            console.error("Firestore listener error", error);
+            logger.error("Firestore listener error", error);
             onStatus('disconnected');
         });
 
         return unsub;
     } catch (e) {
-        console.error("Init Firebase failed", e);
+        logger.error("Init Firebase failed", e);
         onStatus('disconnected');
         return () => {};
     }
