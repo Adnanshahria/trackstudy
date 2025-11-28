@@ -26,7 +26,7 @@ export const CountdownCard: React.FC<Props> = ({ countdown, label, onEdit }) => 
     const isPast = countdown?.isPast || false;
 
     return (
-        <div className="glass-card h-full p-3 flex flex-col justify-center items-center relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500/5 via-purple-500/5 to-pink-500/5 group/timer transition-colors">
+        <div className="glass-card h-full p-3 flex flex-col justify-center items-center relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500/5 via-purple-500/5 to-pink-500/5 group/timer transition-all duration-300 hover:shadow-lg">
              <button 
                 onClick={(e) => { e.stopPropagation(); onEdit(); }} 
                 className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center rounded-full bg-slate-200/50 dark:bg-white/10 hover:bg-blue-500 hover:text-white text-slate-500 dark:text-slate-300 transition-all backdrop-blur-md opacity-50 group-hover/timer:opacity-100 z-20 cursor-pointer shadow-sm text-xs"

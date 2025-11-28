@@ -22,7 +22,7 @@ export const MenuDropdown: React.FC<MenuDropdownProps> = ({ userId, userData, th
         <button 
             onClick={(e) => { if(!disabled) { onClick(e); if(!disabled) onClose(); } }} 
             disabled={disabled}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-white dark:hover:bg-white/10 rounded-lg transition-all text-left group ${disabled ? 'opacity-50 cursor-wait' : ''}`}
+            className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-white dark:hover:bg-white/10 rounded-lg transition-all text-left group hover:pl-4 ${disabled ? 'opacity-50 cursor-wait' : ''}`}
         >
             <span className={`p-1.5 rounded-lg ${colorClass} transition-colors shadow-sm`}>{icon}</span>
             <div className="flex flex-col leading-none">

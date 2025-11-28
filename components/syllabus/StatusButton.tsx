@@ -12,7 +12,7 @@ export const StatusButton: React.FC<{ val: number; onClick: () => void }> = ({ v
     return (
         <button 
             onClick={onClick}
-            className={`relative overflow-hidden w-12 h-8 rounded-lg border flex items-center justify-center text-[10px] font-bold transition-all duration-200 active:scale-90 ${bg} ${text}`}
+            className={`relative overflow-hidden w-12 h-8 rounded-lg border flex items-center justify-center text-[10px] font-bold transition-all duration-200 hover:scale-105 active:scale-90 hover:shadow-md ${bg} ${text}`}
         >
             {val !== 5 && val !== 6 && (
                 <div 

@@ -11,7 +11,7 @@ interface Props {
 
 export const ProgressCard: React.FC<Props> = ({ compositeData, onEdit, isEditing, children }) => {
     return (
-        <div className="glass-card relative overflow-hidden group p-3 rounded-2xl transition-all duration-300 h-full flex flex-col justify-between">
+        <div className="glass-card relative overflow-hidden group p-3 rounded-2xl transition-all duration-300 h-full flex flex-col justify-between hover:shadow-lg">
             <div className="relative z-10">
                 <div className="flex justify-between items-start mb-1.5">
                     <div>
