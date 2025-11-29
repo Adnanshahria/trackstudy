@@ -6,6 +6,13 @@ TrackStudy is a comprehensive study tracking dashboard built with React, Vite, a
 **Current State**: Fully functional study tracking application with Firebase authentication and real-time data synchronization.
 
 ## Recent Changes
+- **2025-11-29**: Note Icons and Print View Refinements
+  - Refined note icons: smaller (14px), positioned top-right (2px offset), semi-transparent (opacity 0.4 default, 1 on hover)
+  - Note icons now have transparent background with thin soft border for minimal distraction
+  - Added padding-right to table cells to prevent text overlap with icons
+  - Print CSS uses CSS Grid for proper layout: Paper 1 left, Paper 2 right (1fr 1fr)
+  - Single paper printing: full width when only one paper selected
+  - Note icons hidden in print view
 - **2025-11-29**: UI/UX Improvements and Print Optimization
   - Moved glow effect from Paper toggle buttons to table headers for better visual hierarchy
   - Compact table columns: reduced min-width (45px) and padding for better space efficiency
