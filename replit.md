@@ -6,6 +6,15 @@ TrackStudy is a comprehensive study tracking dashboard built with React, Vite, a
 **Current State**: Fully functional study tracking application with Firebase authentication and real-time data synchronization.
 
 ## Recent Changes
+- **2025-11-29**: PWABuilder Store Ready Compliance
+  - Added custom TrackStudy logo as 192x192 and 512x512 PNG icons
+  - Icons configured with separate "any" and "maskable" purposes for Play Store
+  - Added mobile (1080x1920) and desktop (1920x1080) screenshots
+  - Updated manifest with: id, scope, detailed description, portrait orientation
+  - Added categories: education, productivity, utilities
+  - Added iarc_rating_id for content rating
+  - Updated apple-touch-icon to use new PNG icon
+  - Service worker properly caches start URL for offline support
 - **2024-11-29**: Major UI and Feature Enhancements
   - Modal transparency updated to 80% opacity with backdrop-blur
   - Add/Note buttons now always visible for better discoverability
