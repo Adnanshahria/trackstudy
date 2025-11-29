@@ -2,44 +2,58 @@
   "id": "/",
   "name": "TrackStudy",
   "short_name": "TrackStudy",
-  "description": "Track your study progress and boost productivity. Master every chapter with your personal weighted study tracker.",
+  "description": "Track your study progress and boost productivity. Master every chapter with your personal weighted study tracker. Set goals, monitor performance, and achieve academic success with detailed progress analytics and streak tracking.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#1A1A1C",
   "theme_color": "#3b82f6",
-  "orientation": "any",
+  "orientation": "portrait",
   "icons": [
     {
       "src": "/icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ],
   "screenshots": [
     {
-      "src": "/screenshots/screenshot1.png",
+      "src": "/screenshots/mobile.png",
       "sizes": "1080x1920",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "TrackStudy Home Screen"
+      "label": "TrackStudy Dashboard - Track your study progress"
     },
     {
-      "src": "/screenshots/screenshot2.png",
+      "src": "/screenshots/desktop.png",
       "sizes": "1920x1080",
       "type": "image/png",
       "form_factor": "wide",
-      "label": "TrackStudy Dashboard"
+      "label": "TrackStudy Sign In - Secure authentication"
     }
   ],
-  "categories": ["education", "productivity"],
+  "categories": ["education", "productivity", "utilities"],
   "iarc_rating_id": "e84b072d-71b3-4d3e-86ae-31a8ce4e53b7",
+  "prefer_related_applications": false,
   "lang": "en",
   "dir": "ltr"
 }
