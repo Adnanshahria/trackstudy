@@ -6,6 +6,15 @@ TrackStudy is a comprehensive study tracking dashboard built with React, Vite, a
 **Current State**: Fully functional study tracking application with Firebase authentication and real-time data synchronization.
 
 ## Recent Changes
+- **2024-11-29**: Major UI and Feature Enhancements
+  - Modal transparency updated to 80% opacity with backdrop-blur
+  - Add/Note buttons now always visible for better discoverability
+  - Glowing headers added for Paper 1/Paper 2 tables
+  - Drag-and-drop subject reordering with stable order persistence
+  - Sync toast notifications (0.35s duration) guarded by authentication
+  - Note Modal ID now displays dynamic format: "Subject / Chapter / Column"
+  - PWA support: manifest.json, service worker, standalone display mode
+  - Fixed subject order duplicates and toast authentication guards
 - **2024-11-29**: Configured for Replit environment
   - Updated Vite dev server to run on port 5000 with host 0.0.0.0
   - Configured workflow for automatic dev server startup
@@ -56,6 +65,9 @@ TrackStudy is a comprehensive study tracking dashboard built with React, Vite, a
 5. **Performance Widgets**: Visual performance indicators and graphs
 6. **Theme Support**: Dark/light mode with glassmorphism design
 7. **Print Support**: Optimized print layouts for syllabus tables
+8. **Drag-and-Drop**: Reorder subjects via drag-and-drop in sidebar
+9. **PWA Support**: Installable as standalone app on mobile/desktop
+10. **Sync Toasts**: Real-time sync confirmation with 0.35s toast notifications
 
 ### Firebase Configuration
 - Firebase project: `my-study-dashboard`
