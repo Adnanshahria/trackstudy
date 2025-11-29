@@ -29,9 +29,9 @@ export const ChapterRow: React.FC<Props> = ({ ch, activeSubject, allItems, userD
             const val = userData[key] ?? 0;
             const hasNote = !!userData[`note_${key}`];
             return (
-                <td key={item.key} className="p-1 text-center relative border-r border-slate-200/30 dark:border-white/5 print:border-slate-200">
+                <td key={item.key} className="p-1 pr-5 text-center relative border-r border-slate-200/30 dark:border-white/5 print:border-slate-200">
                     <div className="flex justify-center"><StatusButton val={val} onClick={() => actions.onUpdateStatus(key)} /></div>
-                    <button onClick={() => actions.setNoteModal({ isOpen: true, key, text: userData[`note_${key}`] || '' })} className={`absolute top-0.5 right-0.5 w-5 h-5 rounded-full flex items-center justify-center text-[9px] transition-transform hover:scale-110 no-print border ${hasNote ? 'bg-amber-400 text-white shadow-sm z-10 border-amber-500' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 border-slate-300 dark:border-slate-500'}`}>{hasNote ? '📝' : '+'}</button>
+                    <button onClick={() => actions.setNoteModal({ isOpen: true, key, text: userData[`note_${key}`] || '' })} className={`note-icon absolute flex items-center justify-center no-print transition-all ${hasNote ? 'bg-amber-400/90 text-white border-amber-500 opacity-100' : 'bg-transparent text-slate-400 dark:text-slate-500 border-slate-300/50 dark:border-slate-600/50 opacity-40 hover:opacity-100'}`} style={{ top: '2px', right: '2px', width: '14px', height: '14px', fontSize: '10px', borderRadius: '3px', borderWidth: '1px', borderStyle: 'solid' }}>{hasNote ? '📝' : '+'}</button>
                 </td>
             );
         })}

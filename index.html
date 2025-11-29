@@ -145,12 +145,25 @@
       /* Print Optimization */
       @media print {
         @page { size: landscape; margin: 6mm; }
+        
+        /* Base print styles */
         body { background: white !important; color: black !important; zoom: 0.6; padding: 0; margin: 0; }
-        .no-print { display: none !important; }
-        #syllabus-print-container { display: block !important; width: 100%; position: static; height: auto !important; overflow: visible !important; }
+        
+        /* Hide UI Elements: Navbar, Floating Buttons, Edit Toggles, Sidebar */
+        .no-print,
+        [class*="floating"],
+        [class*="edit-toggle"],
+        .sidebar,
+        #sidebar { display: none !important; }
+        
+        /* Force print color accuracy */
         * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+        
+        /* Reset glass styling for print */
         .glass-panel, .glass-card { border: 1px solid #ccc !important; box-shadow: none !important; background: white !important; }
         .custom-scrollbar { overflow: visible !important; max-height: none !important; }
+        
+        /* Table styling for print */
         table { page-break-inside: auto; width: 100% !important; font-size: 9px !important; }
         tr { page-break-inside: avoid; page-break-after: auto; }
         thead { display: table-header-group; }
@@ -160,24 +173,34 @@
         thead tr { font-weight: bold !important; background: #f3f4f6 !important; }
         thead th { font-weight: 700 !important; }
         
-        /* Both Papers: Side-by-side grid layout */
+        /* Print Container - CSS Grid Layout for Both Papers */
         .print-grid { 
           display: grid !important; 
-          grid-template-columns: 1fr 1fr; 
-          gap: 0.75rem; 
-          width: 100%; 
+          grid-template-columns: 1fr 1fr !important; 
+          gap: 10px !important; 
+          width: 100% !important; 
           page-break-inside: avoid; 
         }
         
-        /* Single Paper Selection: Hide inactive paper, full width */
+        /* Paper 1 on Left, Paper 2 on Right */
+        .paper-section-1 { grid-column: 1; }
+        .paper-section-2 { grid-column: 2; }
+        
+        /* Single Paper Selection: Print Paper 1 Only - Full Width */
         .print-show-p1 .paper-section-2 { display: none !important; }
         .print-show-p1 .print-grid { grid-template-columns: 1fr !important; }
+        .print-show-p1 .paper-section-1 { grid-column: 1 / -1; }
         
+        /* Single Paper Selection: Print Paper 2 Only - Full Width */
         .print-show-p2 .paper-section-1 { display: none !important; }
         .print-show-p2 .print-grid { grid-template-columns: 1fr !important; }
+        .print-show-p2 .paper-section-2 { grid-column: 1 / -1; }
         
-        /* Subject header styling for print */
+        /* Avoid page breaks within paper sections */
         .print-grid > div { break-inside: avoid; }
+        
+        /* Hide note icons in print */
+        .note-icon { display: none !important; }
       }
     </style>
   <script type="importmap">
