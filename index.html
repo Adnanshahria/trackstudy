@@ -5,6 +5,21 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     
+    <!-- Universal Path Normalization - MUST be first script -->
+    <script>
+      (function() {
+        var loc = window.location;
+        var path = loc.pathname;
+        // If path has no extension and doesn't end with slash, redirect to add trailing slash
+        // This ensures relative paths (./assets) resolve correctly on subdirectory hosts like GitHub Pages
+        if (path !== '/' && !path.endsWith('/') && !path.includes('.')) {
+          loc.replace(loc.protocol + '//' + loc.host + path + '/' + loc.search + loc.hash);
+        }
+        // Compute and store the base path for runtime use
+        window.__APP_BASE__ = path.endsWith('/') ? path : path + '/';
+      })();
+    </script>
+    
     <!-- SEO & Branding -->
     <title>TrackStudy | Personal Study Tracker</title>
     <meta name="description" content="Track your syllabus, monitor weighted progress, and maintain study streaks with the TrackStudy dashboard. Built by Mohammed Adnan Shahria." />
@@ -222,7 +237,8 @@
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js')
+          var swPath = (window.__APP_BASE__ || './') + 'sw.js';
+          navigator.serviceWorker.register(swPath)
             .then((reg) => console.log('SW registered:', reg.scope))
             .catch((err) => console.log('SW registration failed:', err));
         });
