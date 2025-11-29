@@ -37,16 +37,16 @@
   ],
   "screenshots": [
     {
-      "src": "/screenshots/mobile.png",
+      "src": "/screenshots/mobile.webp",
       "sizes": "1080x1920",
-      "type": "image/png",
+      "type": "image/webp",
       "form_factor": "narrow",
       "label": "TrackStudy Dashboard - Track your study progress"
     },
     {
-      "src": "/screenshots/desktop.png",
+      "src": "/screenshots/desktop.webp",
       "sizes": "1920x1080",
-      "type": "image/png",
+      "type": "image/webp",
       "form_factor": "wide",
       "label": "TrackStudy Sign In - Secure authentication"
     }
