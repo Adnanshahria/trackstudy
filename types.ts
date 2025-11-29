@@ -37,7 +37,7 @@ export interface ProgressBarConfig {
 export interface UserSettings {
   theme: 'dark' | 'light';
   soundVolume: number;
-  glowColor: 'red' | 'green' | 'violet' | 'none'; // New Setting
+  glowColor: 'red' | 'green' | 'violet' | 'none';
   weights: WeightConfig;
   subjectWeights?: Record<string, WeightConfig>;
   progressBars: ProgressBarConfig[];
@@ -50,6 +50,7 @@ export interface UserSettings {
   syllabus: SyllabusData; 
   countdownTarget?: string;
   countdownLabel?: string;
+  subjectOrder?: string[];
 }
 
 export interface UserData {

@@ -11,10 +11,10 @@ interface Props {
 }
 
 export const PaperHeader: React.FC<Props> = ({ paper, pVal, isOpen, activeSubject, onTogglePaper, editMode, onToggleEdit }) => (
-    <div className="relative flex items-center justify-between p-4 bg-slate-50/50 dark:bg-white/5 hover:bg-white dark:hover:bg-white/10 transition-colors z-10 print:bg-gray-100">
+    <div className="relative flex items-center justify-between p-4 bg-slate-50/50 dark:bg-white/5 hover:bg-white dark:hover:bg-white/10 transition-colors z-10 print:bg-gray-100 paper-header-border-glow border-b-2">
         <div className="font-bold text-lg flex items-center gap-4 text-slate-800 dark:text-slate-200 cursor-pointer flex-1 select-none" onClick={() => onTogglePaper(`${activeSubject}-p${paper}`)}>
-            <span className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-500/20 dark:to-indigo-500/20 flex items-center justify-center text-blue-600 dark:text-blue-400 font-serif font-black italic shadow-inner">P{paper}</span>
-            <span>Paper {paper}</span>
+            <span className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-500/20 dark:to-indigo-500/20 flex items-center justify-center text-blue-600 dark:text-blue-400 font-serif font-black italic shadow-inner paper-header-border-glow">P{paper}</span>
+            <span className="paper-header-glow">Paper {paper}</span>
             <span className="text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-200/50 dark:bg-black/30 px-3 py-1 rounded-full ml-2 border border-black/5 dark:border-white/10">{pVal.toFixed(0)}% Done</span>
         </div>
         <div className="flex items-center gap-3 no-print">

@@ -33,7 +33,7 @@ export const ChapterRow: React.FC<Props> = ({ ch, activeSubject, allItems, userD
             return (
                 <td key={item.key} className="p-1 text-center relative group/cell border-r border-slate-200/30 dark:border-white/5 print:border-slate-200">
                     <div className="flex justify-center"><StatusButton val={val} onClick={() => actions.onUpdateStatus(key)} /></div>
-                    <button onClick={() => actions.setNoteModal({ isOpen: true, key, text: userData[`note_${key}`] || '' })} className={`absolute top-1 right-1 w-4 h-4 rounded-full flex items-center justify-center text-[8px] transition-transform hover:scale-110 no-print ${hasNote ? 'bg-amber-400 text-white shadow-sm z-10' : 'text-slate-400 opacity-0 group-hover/cell:opacity-100'}`}>{hasNote ? '📝' : '+'}</button>
+                    <button onClick={() => actions.setNoteModal({ isOpen: true, key, text: userData[`note_${key}`] || '' })} className={`absolute top-1 right-1 w-4 h-4 rounded-full flex items-center justify-center text-[8px] transition-transform hover:scale-110 no-print ${hasNote ? 'bg-amber-400 text-white shadow-sm z-10' : 'text-slate-400 opacity-60 hover:opacity-100'}`}>{hasNote ? '📝' : '+'}</button>
                 </td>
             );
         })}

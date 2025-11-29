@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { calculateGlobalComposite } from './utils/calculations';
 import { Sidebar } from './components/Sidebar';
 import { Syllabus } from './components/Syllabus';
@@ -14,10 +14,12 @@ import { LandingHeader } from './components/layout/LandingHeader';
 import { DashboardHeader } from './components/layout/DashboardHeader';
 import { WelcomeHero } from './components/layout/WelcomeHero';
 import { SkeletonDashboard } from './components/layout/SkeletonDashboard';
+import { Toast } from './components/ui/Toast';
 import { useFirebaseSync } from './hooks/useFirebaseSync';
 import { useDataManager } from './hooks/useDataManager';
 import { useAuthHandlers } from './hooks/useAuthHandlers';
 import { useAppearance } from './hooks/ui/useAppearance';
+import { useToast, ToastContext } from './hooks/useToast';
 
 function App() {
   const { userId, setUserId, isAuthResolving, userData, settings, isLoading, connectionStatus, handleStatusUpdate, handleNoteUpdate, handleSettingsUpdate, toggleTheme, handleLogout, forceSync } = useFirebaseSync();
@@ -26,13 +28,45 @@ function App() {
   const [showAppGuide, setShowAppGuide] = useState(false);
   const [showAppearance, setShowAppearance] = useState(false);
   
-  // State to handle the transition gap between login success and data load
+  const { toast, showToast, hideToast } = useToast();
+  
   const [postLoginLoading, setPostLoginLoading] = useState(false);
   
   const auth = useAuthHandlers(setUserId, () => setPostLoginLoading(true));
-  const dataMgr = useDataManager(settings, handleSettingsUpdate, activeSubject, setActiveSubject);
 
   useAppearance(settings);
+
+  const wrappedStatusUpdate = useCallback(async (key: string) => {
+    if (!userId) return;
+    try {
+      await handleStatusUpdate(key);
+      showToast('success');
+    } catch (error) {
+      showToast('error');
+    }
+  }, [handleStatusUpdate, showToast, userId]);
+
+  const wrappedNoteUpdate = useCallback(async (key: string, text: string) => {
+    if (!userId) return;
+    try {
+      await handleNoteUpdate(key, text);
+      showToast('success');
+    } catch (error) {
+      showToast('error');
+    }
+  }, [handleNoteUpdate, showToast, userId]);
+
+  const wrappedSettingsUpdate = useCallback(async (newSettings: any) => {
+    if (!userId) return;
+    try {
+      await handleSettingsUpdate(newSettings);
+      showToast('success');
+    } catch (error) {
+      showToast('error');
+    }
+  }, [handleSettingsUpdate, showToast, userId]);
+  
+  const dataMgr = useDataManager(settings, wrappedSettingsUpdate, activeSubject, setActiveSubject);
 
   // When userId resolves OR postLoginLoading becomes true, check if we can stop loading
   // CRITICAL FIX: Added 'postLoginLoading' to dependencies.
@@ -115,15 +149,15 @@ function App() {
                                     onChangeSubject={setActiveSubject}
                                     userData={userData}
                                     settings={settings}
-                                    onUpdateSettings={handleSettingsUpdate}
+                                    onUpdateSettings={wrappedSettingsUpdate}
                                     onDeleteSubject={dataMgr.handleDeleteSubject}
                                     compositeData={compositeData}
                                     onUpdateWeights={dataMgr.handleWeightUpdate}
-                                    onUpdateCountdown={(t, l) => handleSettingsUpdate({ ...settings, countdownTarget: t, countdownLabel: l })}
+                                    onUpdateCountdown={(t, l) => wrappedSettingsUpdate({ ...settings, countdownTarget: t, countdownLabel: l })}
                                 />
                             </div>
                             <div id="syllabus-print-container" className="lg:h-full lg:overflow-y-auto custom-scrollbar pr-1 pb-20 lg:pb-0">
-                                <MemoizedSyllabus activeSubject={activeSubject} userData={userData} settings={settings} onUpdateStatus={handleStatusUpdate} onUpdateNote={handleNoteUpdate} onTogglePaper={(key) => handleSettingsUpdate({ ...settings, syllabusOpenState: { ...settings.syllabusOpenState, [key]: !settings.syllabusOpenState[key] } })} onRenameColumn={dataMgr.onRenameColumn} onAddColumn={dataMgr.onAddColumn} onAddChapter={dataMgr.onAddChapter} onDeleteChapter={dataMgr.onDeleteChapter} onDeleteColumn={dataMgr.onDeleteColumn} onRenameChapter={dataMgr.handleRenameChapter} />
+                                <MemoizedSyllabus activeSubject={activeSubject} userData={userData} settings={settings} onUpdateStatus={wrappedStatusUpdate} onUpdateNote={wrappedNoteUpdate} onTogglePaper={(key) => wrappedSettingsUpdate({ ...settings, syllabusOpenState: { ...settings.syllabusOpenState, [key]: !settings.syllabusOpenState[key] } })} onRenameColumn={dataMgr.onRenameColumn} onAddColumn={dataMgr.onAddColumn} onAddChapter={dataMgr.onAddChapter} onDeleteChapter={dataMgr.onDeleteChapter} onDeleteColumn={dataMgr.onDeleteColumn} onRenameChapter={dataMgr.handleRenameChapter} />
                             </div>
                         </div>
                     )}
@@ -136,7 +170,14 @@ function App() {
         <AuthModal isOpen={auth.showLoginModal} onClose={() => auth.setShowLoginModal(false)} {...auth} isCheckingUser={auth.isCheckingUser} modalError={auth.modalError} modalSuccess={auth.modalSuccess} />
         <DeveloperModal isOpen={showDevModal} onClose={() => setShowDevModal(false)} />
         <AppGuideModal isOpen={showAppGuide} onClose={() => setShowAppGuide(false)} />
-        <AppearanceModal isOpen={showAppearance} onClose={() => setShowAppearance(false)} settings={settings} onUpdateSettings={handleSettingsUpdate} />
+        <AppearanceModal isOpen={showAppearance} onClose={() => setShowAppearance(false)} settings={settings} onUpdateSettings={wrappedSettingsUpdate} />
+        
+        <Toast 
+            message={toast.message}
+            type={toast.type}
+            isVisible={toast.isVisible}
+            onHide={hideToast}
+        />
     </div>
   );
 }

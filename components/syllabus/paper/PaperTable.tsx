@@ -28,7 +28,7 @@ export const PaperTable: React.FC<Props> = ({ paper, chapters, allItems, userDat
                             <div className="flex flex-col items-center justify-center gap-1"><span className="font-bold">{t.name}</span>{editMode && <div className="flex gap-1 no-print"><button onClick={() => setRenameModal({ isOpen: true, key: t.key, currentName: t.name, type: 'column' })} className="text-slate-400 hover:text-blue-500 transition-colors">✏️</button><button onClick={() => onDeleteColumn(activeSubject, t.key)} className="text-slate-400 hover:text-rose-500 transition-colors">✕</button></div>}</div>
                         </th>
                     ))}
-                    {editMode && <th className="p-2 text-center w-12 bg-blue-500/5 sticky right-0 z-30 no-print"><button onClick={() => setAddColumnModal(true)} className="w-8 h-8 rounded-full bg-blue-500/10 text-blue-500">+</button></th>}
+                    <th className="p-2 text-center w-12 bg-blue-500/5 sticky right-0 z-30 no-print"><button onClick={() => setAddColumnModal(true)} className={`w-8 h-8 rounded-full transition-all ${editMode ? 'bg-blue-500/20 text-blue-500 hover:bg-blue-500/30' : 'bg-slate-200/50 dark:bg-white/5 text-slate-400 opacity-60 hover:opacity-100 hover:text-blue-500'}`}>+</button></th>
                 </tr>
             </thead>
             <tbody className="text-sm print:text-xs">

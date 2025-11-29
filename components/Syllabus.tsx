@@ -84,7 +84,7 @@ export const Syllabus: React.FC<SyllabusProps> = ({ activeSubject, userData, set
                 })}
             </div>
             
-            <SyllabusModals modals={ui.modals} setModals={ui.setModals} handlers={handlers} ui={ui} activeSubject={activeSubject} />
+            <SyllabusModals modals={ui.modals} setModals={ui.setModals} handlers={handlers} ui={ui} activeSubject={activeSubject} settings={settings} />
             
             <ConfirmModal 
                 isOpen={!!confirmAction}
