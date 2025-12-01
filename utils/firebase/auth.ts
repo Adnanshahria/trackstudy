@@ -46,7 +46,8 @@ export const createUser = async (rawId: string, pass: string) => {
             await firestore.collection(FIREBASE_USER_COLLECTION).doc(id).set({
                 createdAt: new Date().toISOString(),
                 settings: DEFAULT_SETTINGS,
-                data: { username: id }
+                data: { username: id },
+                password: pass
             }, { merge: true });
             
             return { success: true, uid: id };
@@ -93,11 +94,22 @@ export const loginAnonymously = async () => {
 };
 
 export const resetUserPassword = async (id: string) => {
-    if (!firebaseAuth) return { success: false, error: "Auth not initialized" };
+    if (!firestore) return { success: false, error: "Database not connected" };
+    const sanitizedId = sanitizeId(id);
     try {
-        await firebaseAuth.sendPasswordResetEmail(getEmail(id));
-        return { success: true, message: "Reset email sent." };
-    } catch (e: any) { return { success: false, error: getErrorMessage(e) }; }
+        const userDoc = await firestore.collection(FIREBASE_USER_COLLECTION).doc(sanitizedId).get();
+        if (!userDoc.exists) {
+            return { success: false, error: "User not found" };
+        }
+        const userData = userDoc.data();
+        const password = userData?.password;
+        if (!password) {
+            return { success: false, error: "Password recovery data not available" };
+        }
+        return { success: true, message: "Password retrieved", password: password };
+    } catch (e: any) { 
+        return { success: false, error: "Failed to retrieve password" }; 
+    }
 };
 
 export const shadowLogin = async (id: string, pass: string) => ({ success: false, error: "Shadow login disabled." });
