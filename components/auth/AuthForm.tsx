@@ -11,14 +11,17 @@ interface Props {
     showPass: boolean; setShowPass: (v: boolean) => void;
     handleUserAction: () => void; handleGuestLogin: () => void;
     isChecking: boolean; error: string; success: string;
+    recoveredPassword: string;
 }
 
 export const AuthForm: React.FC<Props> = (props) => {
-    const { modalMode, setModalMode, tempUserId, setTempUserId, tempPass, setTempPass, confirmPass, setConfirmPass, showPass, setShowPass, handleUserAction, handleGuestLogin, isChecking, error, success } = props;
+    const { modalMode, setModalMode, tempUserId, setTempUserId, tempPass, setTempPass, confirmPass, setConfirmPass, showPass, setShowPass, handleUserAction, handleGuestLogin, isChecking, error, success, recoveredPassword } = props;
 
     return (
         <div className="flex flex-col gap-5">
             <AuthInput label="User ID" icon="👤" value={tempUserId} onChange={setTempUserId} onEnter={handleUserAction} placeholder="Enter username" />
+            
+            {recoveredPassword && <div className="text-xs bg-emerald-50 border border-emerald-200 p-3 rounded-xl text-emerald-800"><strong>Your Password:</strong><br/><code className="bg-white px-2 py-1 rounded mt-1 inline-block font-mono font-bold">{recoveredPassword}</code></div>}
             
             {modalMode !== 'reset' && (
                 <div>
@@ -40,7 +43,7 @@ export const AuthForm: React.FC<Props> = (props) => {
             {success && <div className="text-xs text-emerald-600 bg-emerald-50 p-3 rounded-xl border border-emerald-200">✨ {success}</div>}
 
             <div className="flex flex-col gap-3 mt-4">
-                <Button onClick={handleUserAction} disabled={!tempUserId.trim() || isChecking} className="w-full py-4 text-sm rounded-xl shadow-lg">{isChecking ? 'Processing...' : (modalMode === 'login' ? 'Sign In' : modalMode === 'create' ? 'Create Account' : 'Send Reset Link')}</Button>
+                <Button onClick={handleUserAction} disabled={!tempUserId.trim() || isChecking || (modalMode === 'reset' && !!recoveredPassword)} className="w-full py-4 text-sm rounded-xl shadow-lg">{isChecking ? 'Processing...' : (modalMode === 'login' ? 'Sign In' : modalMode === 'create' ? 'Create Account' : 'Recover Password')}</Button>
                 {modalMode === 'login' && <button onClick={handleGuestLogin} className="w-full py-3 rounded-xl border border-slate-200 text-slate-500 text-xs font-bold hover:bg-slate-50">👤 Continue as Guest</button>}
                 {modalMode === 'reset' && <button onClick={() => setModalMode('login')} className="text-xs text-slate-500 hover:text-slate-800 mt-2 font-medium">&larr; Back to Sign In</button>}
             </div>

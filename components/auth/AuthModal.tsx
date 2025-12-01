@@ -21,6 +21,7 @@ interface AuthModalProps {
     modalError: string;
     modalSuccess: string;
     resetModalState: () => void;
+    recoveredPassword: string;
 }
 
 export const AuthModal: React.FC<AuthModalProps> = (props) => {
@@ -44,6 +45,7 @@ export const AuthModal: React.FC<AuthModalProps> = (props) => {
                     showPass={props.showPassword} setShowPass={props.setShowPassword}
                     handleUserAction={props.handleUserAction} handleGuestLogin={props.handleGuestLogin}
                     isChecking={props.isCheckingUser} error={props.modalError} success={props.modalSuccess}
+                    recoveredPassword={props.recoveredPassword}
                 />
                 
                 {/* Helpful Hint for Database Deletion Scenario */}

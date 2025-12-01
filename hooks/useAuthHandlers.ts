@@ -15,6 +15,7 @@ export const useAuthHandlers = (setUserId: (id: string) => void, onSuccess?: () 
     const [modalError, setModalError] = useState('');
     const [modalSuccess, setModalSuccess] = useState('');
     const [isCheckingUser, setIsCheckingUser] = useState(false);
+    const [recoveredPassword, setRecoveredPassword] = useState('');
 
     const resetModalState = useCallback(() => { 
         setTempUserId(''); 
@@ -22,7 +23,8 @@ export const useAuthHandlers = (setUserId: (id: string) => void, onSuccess?: () 
         setConfirmPassword(''); 
         setShowPassword(false); 
         setModalError(''); 
-        setModalSuccess(''); 
+        setModalSuccess('');
+        setRecoveredPassword('');
     }, []);
 
     const handleUserAction = async () => {
@@ -66,9 +68,9 @@ export const useAuthHandlers = (setUserId: (id: string) => void, onSuccess?: () 
         try {
             if (modalMode === 'reset') {
                 const result = await authService.resetPassword(trimmedId);
-                if (result.success) { 
-                    setModalSuccess('Reset link sent.'); 
-                    setTimeout(() => setModalMode('login'), 4000); 
+                if (result.success && result.password) { 
+                    setRecoveredPassword(result.password);
+                    setModalSuccess('Password recovered. Use it to sign in.'); 
                 } else { 
                     setModalError(result.error || 'Reset failed.'); 
                 }
@@ -119,5 +121,5 @@ export const useAuthHandlers = (setUserId: (id: string) => void, onSuccess?: () 
         }
     };
 
-    return { showLoginModal, setShowLoginModal, modalMode, setModalMode, tempUserId, setTempUserId, tempPassword, setTempPassword, confirmPassword, setConfirmPassword, showPassword, setShowPassword, modalError, modalSuccess, isCheckingUser, handleUserAction, handleGuestLogin, resetModalState };
+    return { showLoginModal, setShowLoginModal, modalMode, setModalMode, tempUserId, setTempUserId, tempPassword, setTempPassword, confirmPassword, setConfirmPassword, showPassword, setShowPassword, modalError, modalSuccess, isCheckingUser, handleUserAction, handleGuestLogin, resetModalState, recoveredPassword, setRecoveredPassword };
 };
