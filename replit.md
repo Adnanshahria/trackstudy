@@ -6,6 +6,13 @@ TrackStudy is a comprehensive study tracking dashboard built with React, Vite, a
 **Current State**: Fully functional study tracking application with Firebase authentication and real-time data synchronization.
 
 ## Recent Changes
+- **2025-12-01**: Password Recovery & Change Features Fixed
+  - FIXED: Password change now updates BOTH Firebase Auth AND Firestore (previously only Firestore)
+  - FIXED: Forgot password now properly retrieves saved passwords
+  - NEW: Change password now requires old password for verification before updating auth credentials
+  - NEW: Added frosted glass button styling around all clickable buttons (login, guest, back buttons)
+  - NEW: Improved password recovery display with frosted glass container
+  - IMPROVED: Better error messages for user guidance during password operations
 - **2025-12-01**: Security and Logic Audit Complete
   - SECURITY FIX: Removed plaintext password storage in Firebase auth
   - Fixed status cycle logic (now correctly 0-5 range instead of 0-6)

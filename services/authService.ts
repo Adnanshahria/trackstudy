@@ -10,8 +10,8 @@ export const authService = {
     resetPassword: async (id: string) => {
         return await resetUserPassword(id);
     },
-    changePassword: async (id: string, newPass: string) => {
-        return await changeUserPassword(id, newPass);
+    changePassword: async (id: string, oldPass: string, newPass: string) => {
+        return await changeUserPassword(id, oldPass, newPass);
     },
     guestLogin: async () => {
         return await loginAnonymously();

@@ -33,7 +33,7 @@ export const AuthForm: React.FC<Props> = (props) => {
             {modalMode !== 'reset' && (
                 <div>
                     <div className="flex justify-between items-center ml-2 mb-1.5">
-                        <label className="text-[10px] uppercase font-bold text-slate-400">{modalMode === 'change' ? 'New Password' : 'Password'}</label>
+                        <label className="text-[10px] uppercase font-bold text-slate-400">{modalMode === 'change' ? 'Old Password' : 'Password'}</label>
                         {modalMode === 'login' && (
                             <div className="flex gap-2">
                                 <button onClick={() => setModalMode('change')} className="px-3 py-1 rounded-lg text-[10px] font-bold text-white bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transition-all duration-200 shadow-md hover:shadow-lg">Change Password</button>
@@ -49,7 +49,8 @@ export const AuthForm: React.FC<Props> = (props) => {
                 </div>
             )}
             
-            {(modalMode === 'create' || modalMode === 'change') && <AuthInput label={modalMode === 'change' ? 'Confirm New Password' : 'Confirm Password'} icon="✅" type="password" value={confirmPass} onChange={setConfirmPass} onEnter={handleUserAction} />}
+            {modalMode === 'change' && <AuthInput label="New Password" icon="✨" type="password" value={confirmPass} onChange={setConfirmPass} onEnter={handleUserAction} />}
+            {modalMode === 'create' && <AuthInput label="Confirm Password" icon="✅" type="password" value={confirmPass} onChange={setConfirmPass} onEnter={handleUserAction} />}
 
             {error && <div className="text-xs text-rose-600 bg-rose-50 p-3 rounded-xl border border-rose-200">⚠️ {error}</div>}
             {success && <div className="text-xs text-emerald-600 bg-emerald-50 p-3 rounded-xl border border-emerald-200">✨ {success}</div>}

@@ -64,16 +64,12 @@ export const useAuthHandlers = (setUserId: (id: string) => void, onSuccess?: () 
         }
         
         if (modalMode === 'change') {
-            if (trimmedPass !== confirmPassword) {
-                setModalError('Passwords do not match.');
+            if (confirmPassword.length < MIN_PASSWORD_LENGTH) {
+                setModalError(`New password must be at least ${MIN_PASSWORD_LENGTH} characters.`);
                 return;
             }
-            if (trimmedPass.length < MIN_PASSWORD_LENGTH) {
-                setModalError(`Password must be at least ${MIN_PASSWORD_LENGTH} characters.`);
-                return;
-            }
-            if (trimmedPass.length > MAX_INPUT_LENGTH) {
-                setModalError('Password is too long.');
+            if (confirmPassword.length > MAX_INPUT_LENGTH) {
+                setModalError('New password is too long.');
                 return;
             }
         }
@@ -90,10 +86,11 @@ export const useAuthHandlers = (setUserId: (id: string) => void, onSuccess?: () 
                     setModalError(result.error || 'Reset failed.'); 
                 }
             } else if (modalMode === 'change') {
-                const result = await authService.changePassword(trimmedId, trimmedPass);
+                // oldPasswordField is being reused for the old password input
+                const result = await authService.changePassword(trimmedId, trimmedPass, confirmPassword);
                 if (result.success) {
                     setModalSuccess('Password changed successfully!');
-                    setTimeout(() => setModalMode('login'), 2000);
+                    setTimeout(() => { setModalMode('login'); resetModalState(); }, 2000);
                 } else {
                     setModalError(result.error || 'Password change failed.');
                 }

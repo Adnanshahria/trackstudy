@@ -103,28 +103,55 @@ export const resetUserPassword = async (id: string) => {
         }
         const userData = userDoc.data();
         const password = userData?.password;
-        if (!password) {
+        if (!password || password.trim() === '') {
             return { success: false, error: "Password recovery data not available" };
         }
         return { success: true, message: "Password retrieved", password: password };
     } catch (e: any) { 
+        console.error("Reset password error:", e);
         return { success: false, error: "Failed to retrieve password" }; 
     }
 };
 
-export const changeUserPassword = async (id: string, newPassword: string) => {
-    if (!firestore) return { success: false, error: "Database not connected" };
+export const changeUserPassword = async (id: string, oldPassword: string, newPassword: string) => {
+    if (!firebaseAuth || !firestore) return { success: false, error: "Database not connected" };
     const sanitizedId = sanitizeId(id);
+    const email = getEmail(id);
+    
     try {
+        // Verify user exists in Firestore
         const userDoc = await firestore.collection(FIREBASE_USER_COLLECTION).doc(sanitizedId).get();
         if (!userDoc.exists) {
             return { success: false, error: "User not found" };
         }
+        
+        // Sign in user with old password to get authenticated context
+        let authUser;
+        try {
+            const authResult = await firebaseAuth.signInWithEmailAndPassword(email, oldPassword);
+            authUser = authResult.user;
+        } catch (authError: any) {
+            return { success: false, error: "Incorrect old password. Cannot verify identity." };
+        }
+        
+        // Update Firebase Auth password
+        try {
+            if (authUser) {
+                await authUser.updatePassword(newPassword);
+            }
+        } catch (updateError: any) {
+            return { success: false, error: `Auth update failed: ${getErrorMessage(updateError)}` };
+        }
+        
+        // Update Firestore backup
         await firestore.collection(FIREBASE_USER_COLLECTION).doc(sanitizedId).update({
-            password: newPassword
+            password: newPassword,
+            updatedAt: new Date().toISOString()
         });
+        
         return { success: true, message: "Password changed successfully" };
     } catch (e: any) { 
+        console.error("Change password error:", e);
         return { success: false, error: "Failed to change password" }; 
     }
 };
