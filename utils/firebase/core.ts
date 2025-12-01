@@ -20,10 +20,13 @@ try {
     }
 
     const hostname = window.location.hostname;
+    const protocol = window.location.protocol;
+    const fullDomain = `${protocol}//${hostname}`;
     logger.debug(`App running on: ${hostname}`);
     
+    // Firebase domain whitelist check
     if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
-        logger.info(`If login fails, ensure 'https://${hostname}' is added to Firebase Console > Authentication > Settings > Authorized Domains`);
+        logger.info(`📝 For authentication to work, ensure '${hostname}' is added to Firebase Console > Authentication > Settings > Authorized Domains. You can also deploy to: Vercel, Netlify, GitHub Pages, or any domain.`);
     }
 
     firebaseAuth = firebase.auth();
