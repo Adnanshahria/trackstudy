@@ -6,6 +6,12 @@ TrackStudy is a comprehensive study tracking dashboard built with React, Vite, a
 **Current State**: Fully functional study tracking application with Firebase authentication and real-time data synchronization.
 
 ## Recent Changes
+- **2025-12-02**: Firebase Domain Authorization & Mobile Chrome Fix
+  - ✅ Fixed mobile Chrome desktop mode - now shows proper side-by-side layout (lg: breakpoint = 1024px)
+  - ✅ Mobile Chrome was reporting 1000px viewport, so xl:(1280px) wasn't triggering - lowered to lg:
+  - ✅ Added Firebase Domain Error screen with setup instructions
+  - ✅ Users deploying to new domains see helpful error + step-by-step Firebase whitelist guide
+  - ✅ "Continue as Guest" option for offline exploration without Firebase
 - **2025-12-01**: Responsive Design Consolidated - Mobile & Desktop Only
   - ✅ Removed tablet breakpoint view (lg:)
   - ✅ Implemented true desktop-only view using xl: breakpoint (1280px)

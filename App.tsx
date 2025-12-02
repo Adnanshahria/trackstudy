@@ -14,6 +14,7 @@ import { LandingHeader } from './components/layout/LandingHeader';
 import { DashboardHeader } from './components/layout/DashboardHeader';
 import { WelcomeHero } from './components/layout/WelcomeHero';
 import { SkeletonDashboard } from './components/layout/SkeletonDashboard';
+import { FirebaseDomainError } from './components/layout/FirebaseDomainError';
 import { Toast } from './components/ui/Toast';
 import { useFirebaseSync } from './hooks/useFirebaseSync';
 import { useDataManager } from './hooks/useDataManager';
@@ -27,6 +28,7 @@ function App() {
   const [showDevModal, setShowDevModal] = useState(false);
   const [showAppGuide, setShowAppGuide] = useState(false);
   const [showAppearance, setShowAppearance] = useState(false);
+  const [bypassAuth, setBypassAuth] = useState(false);
   
   const { toast, showToast, hideToast } = useToast();
   
@@ -98,6 +100,11 @@ function App() {
 
   if (isAuthResolving || postLoginLoading) {
       return <SkeletonDashboard />;
+  }
+
+  // Show Firebase domain error if auth resolved but no user and not bypassing
+  if (!userId && !bypassAuth && isAuthResolving === false) {
+      return <FirebaseDomainError onContinueAsGuest={() => setBypassAuth(true)} />;
   }
 
   return (
