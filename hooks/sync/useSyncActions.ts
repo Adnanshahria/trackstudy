@@ -1,6 +1,7 @@
 import React from 'react';
 import { UserData, UserSettings } from '../../types';
-import { saveUserProgress, saveSettings, cleanupStorage } from '../../utils/storage';
+import { saveUserProgress, saveSettings, cleanupStorage, firebaseAuth } from '../../utils/storage';
+import { logger } from '../../utils/logger';
 import { DEFAULT_SETTINGS } from '../../constants';
 
 export const useSyncActions = (
@@ -56,13 +57,24 @@ export const useSyncActions = (
         handleSettingsUpdate({ ...settings, theme: settings.theme === 'dark' ? 'light' : 'dark' });
     };
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
+        // CRITICAL FIX: Clear UI state FIRST to prevent zombie listeners
         setUserId(null);
         setUserData({});
         setSettings(DEFAULT_SETTINGS);
         localDataRef.current = {};
         localSettingsRef.current = DEFAULT_SETTINGS;
         cleanupStorage();
+        
+        // THEN sign out from Firebase to properly disconnect
+        try {
+            if (firebaseAuth) {
+                await firebaseAuth.signOut();
+                logger.debug("Firebase signOut successful");
+            }
+        } catch (error) {
+            logger.error("Firebase signOut error:", error);
+        }
     };
 
     return { handleStatusUpdate, handleNoteUpdate, handleSettingsUpdate, toggleTheme, handleLogout };

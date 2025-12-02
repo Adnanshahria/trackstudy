@@ -41,6 +41,19 @@ export const MenuDropdown: React.FC<MenuDropdownProps> = ({ userId, userData, th
         }, 500); 
     };
 
+    const handleLogoutClick = async (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setIsSyncing(true);
+        try {
+            await onLogout();
+        } catch (error) {
+            console.error("Logout error:", error);
+        } finally {
+            setIsSyncing(false);
+            onClose();
+        }
+    };
+
     const displayName = userData?.username || (userId?.includes('@') ? userId.split('@')[0] : userId || 'Guest User');
     const displayInitial = displayName.charAt(0).toUpperCase();
 
@@ -78,7 +91,7 @@ export const MenuDropdown: React.FC<MenuDropdownProps> = ({ userId, userData, th
 
                 {userId && (
                     <div className="bg-rose-50/50 dark:bg-rose-500/10 rounded-2xl p-1 border border-rose-200/50 dark:border-rose-500/20 shadow-sm">
-                        <MenuItem onClick={onLogout} icon="🚪" text="Log Out" colorClass="bg-rose-100 dark:bg-rose-500/20 text-rose-600" />
+                        <MenuItem onClick={handleLogoutClick} icon={isSyncing ? "⏳" : "🚪"} text={isSyncing ? "Logging out..." : "Log Out"} colorClass="bg-rose-100 dark:bg-rose-500/20 text-rose-600" disabled={isSyncing} />
                     </div>
                 )}
             </div>

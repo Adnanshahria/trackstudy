@@ -6,7 +6,7 @@ import { UserData } from '../../types';
 interface SettingsMenuProps {
     userId: string | null;
     userData?: UserData;
-    onLogout: () => void;
+    onLogout: () => Promise<void>;
     onToggleTheme: () => void;
     theme: 'dark' | 'light';
     onOpenGuide: () => void;

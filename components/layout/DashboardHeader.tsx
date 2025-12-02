@@ -3,7 +3,7 @@ import React from 'react';
 import { SettingsMenu } from '../settings/SettingsMenu';
 import { UserData } from '../../types';
 
-export const DashboardHeader: React.FC<{ onDev: () => void, status: string, userId: string, userData: UserData, onLogout: () => void, onToggleTheme: () => void, theme: any, onGuide: () => void, onAppearance: () => void, onForceSync: () => void }> = ({ onDev, status, userId, userData, onLogout, onToggleTheme, theme, onGuide, onAppearance, onForceSync }) => (
+export const DashboardHeader: React.FC<{ onDev: () => void, status: string, userId: string, userData: UserData, onLogout: () => Promise<void>, onToggleTheme: () => void, theme: any, onGuide: () => void, onAppearance: () => void, onForceSync: () => void }> = ({ onDev, status, userId, userData, onLogout, onToggleTheme, theme, onGuide, onAppearance, onForceSync }) => (
     <div className="flex flex-row justify-between items-center mb-6 no-print gap-4">
         <div onClick={onDev} className="glass-panel py-2 px-3 lg:px-4 rounded-2xl flex items-center gap-3 transition-all hover:bg-white/50 dark:hover:bg-white/5 cursor-pointer select-none shadow-lg shadow-blue-500/5 dark:shadow-black/20 border border-slate-200 dark:border-white/10 max-w-[70%] group">
             <div className="w-9 h-9 lg:w-10 lg:h-10 shrink-0 rounded-xl bg-black dark:bg-white flex items-center justify-center text-white dark:text-slate-900 font-black shadow-lg group-hover:scale-105 transition-transform text-sm lg:text-base ring-1 ring-white/20">TS</div>
