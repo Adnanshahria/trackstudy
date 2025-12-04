@@ -102,10 +102,7 @@ function App() {
       return <SkeletonDashboard />;
   }
 
-  // Show Firebase domain error if auth resolved but no user and not bypassing
-  if (!userId && !bypassAuth && isAuthResolving === false) {
-      return <FirebaseDomainError onContinueAsGuest={() => setBypassAuth(true)} />;
-  }
+
 
   return (
     <div className="min-h-screen lg:h-screen w-screen lg:overflow-hidden flex flex-col text-slate-800 dark:text-slate-200 selection:bg-blue-500/30 selection:text-blue-600 dark:selection:text-blue-200 transition-colors duration-300 bg-slate-50 dark:bg-[#1A1A1C]">
