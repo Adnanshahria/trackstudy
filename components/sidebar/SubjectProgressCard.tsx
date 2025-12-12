@@ -9,9 +9,10 @@ interface Props {
     settings: UserSettings;
     userData: UserData;
     onConfig: () => void;
+    onChangeSubject: (key: string) => void;
 }
 
-export const SubjectProgressCard: React.FC<Props> = ({ activeSubject, settings, userData, onConfig }) => {
+export const SubjectProgressCard: React.FC<Props> = ({ activeSubject, settings, userData, onConfig, onChangeSubject }) => {
     const subject = settings.syllabus[activeSubject];
     if (!subject) return null;
 
@@ -29,7 +30,12 @@ export const SubjectProgressCard: React.FC<Props> = ({ activeSubject, settings, 
         settings.syllabus
     );
 
-    const displayName = settings.customNames?.[activeSubject] || subject.name;
+    // Get all subjects for dropdown
+    const allSubjects = Object.entries(settings.syllabus).map(([key, data]) => ({
+        key,
+        name: settings.customNames?.[key] || data.name,
+        icon: data.icon
+    }));
 
     // Color based on subject
     const colorMap: Record<string, string> = {
@@ -47,8 +53,8 @@ export const SubjectProgressCard: React.FC<Props> = ({ activeSubject, settings, 
         <div className="glass-panel rounded-3xl p-5 shadow-sm shrink-0">
             <div className="flex justify-between items-center mb-4">
                 <h3 className="font-bold text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
-                    <span className="text-lg">{subject.icon}</span>
-                    {displayName} Progress
+                    <span className="w-1.5 h-4 bg-cyan-500 rounded-full"></span>
+                    Subject Progress
                 </h3>
                 <button
                     onClick={onConfig}
@@ -57,6 +63,22 @@ export const SubjectProgressCard: React.FC<Props> = ({ activeSubject, settings, 
                 >
                     ⚙️
                 </button>
+            </div>
+
+            {/* Native Dropdown for Subject Selection */}
+            <div className="mb-4">
+                <select
+                    value={activeSubject}
+                    onChange={(e) => onChangeSubject(e.target.value)}
+                    className="w-full p-3 bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl text-sm font-bold text-slate-700 dark:text-slate-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none"
+                    style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center', backgroundSize: '20px' }}
+                >
+                    {allSubjects.map(sub => (
+                        <option key={sub.key} value={sub.key}>
+                            {sub.icon} {sub.name}
+                        </option>
+                    ))}
+                </select>
             </div>
 
             <div className="flex flex-col gap-3">

@@ -88,6 +88,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeSubject, onChangeSubject
                 settings={settings}
                 userData={userData}
                 onConfig={() => setModals({ ...modals, subConfig: true })}
+                onChangeSubject={onChangeSubject}
             />
 
             {/* Modals */}
