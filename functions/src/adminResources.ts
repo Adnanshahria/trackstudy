@@ -38,11 +38,15 @@ export const adminUpdateResourceLabel = functions.https.onCall(
         }
 
         // 2. Admin authorization check
-        // Check for admin custom claim or specific admin UIDs
+        // Check for admin custom claim or specific admin displayNames
         const isAdmin = context.auth.token.admin === true;
-        // Alternatively, check hardcoded admin UIDs for simplicity:
-        const adminUids = ['admin_uid_here']; // Replace with actual admin UIDs
-        const isHardcodedAdmin = adminUids.includes(context.auth.uid);
+        // Admin displayNames (matches the client-side ADMIN_DISPLAY_NAMES)
+        const adminDisplayNames = ['adnan', 'Adnan', 'admin', 'asmedical'];
+        // Note: In Firebase Functions, we can check both UID and custom token claims
+        // The client uses displayName, so if you have the displayName in a custom claim, use that
+        const isHardcodedAdmin = adminDisplayNames.includes(context.auth.uid) ||
+            adminDisplayNames.includes(context.auth.token.name || '') ||
+            adminDisplayNames.includes(context.auth.token.email?.split('@')[0] || '');
 
         if (!isAdmin && !isHardcodedAdmin) {
             throw new functions.https.HttpsError(

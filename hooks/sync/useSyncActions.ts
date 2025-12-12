@@ -46,8 +46,8 @@ export const useSyncActions = (
                         });
                     }
                 }
-            } catch (logErr) {
-                console.warn('Tick log creation failed:', logErr);
+            } catch (logErr: any) {
+                console.error('❌ TICK LOG FAILED:', logErr?.code || 'unknown', logErr?.message || logErr);
             }
         } catch (error) {
             console.error('Status update failed:', error);

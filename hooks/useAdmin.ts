@@ -12,9 +12,13 @@ interface UseAdminResult {
     checkAdminStatus: () => Promise<boolean>;
 }
 
-// Hardcoded admin UIDs (update with your actual admin UIDs)
-const ADMIN_UIDS: string[] = [
-    // Add your UID here
+// Admin display names (the app uses displayName as userId, not Firebase UID)
+// Add your username/displayName here to grant admin access
+const ADMIN_DISPLAY_NAMES: string[] = [
+    'adnan',
+    'Adnan',
+    'admin',
+    'asmedical', // Based on the Firebase data screenshot
 ];
 
 export const useAdmin = (): UseAdminResult => {
@@ -31,15 +35,17 @@ export const useAdmin = (): UseAdminResult => {
             return false;
         }
 
-        setUserId(user.uid);
+        // Get the displayName (which is the userId in this app)
+        const displayName = user.displayName;
+        setUserId(displayName || user.uid);
 
-        // Check hardcoded admin UIDs
-        if (ADMIN_UIDS.includes(user.uid)) {
+        // Check against hardcoded admin display names
+        if (displayName && ADMIN_DISPLAY_NAMES.includes(displayName)) {
             setIsAdmin(true);
             return true;
         }
 
-        // Check custom claims
+        // Also check custom claims as fallback
         try {
             const tokenResult = await user.getIdTokenResult();
             const hasAdminClaim = tokenResult.claims.admin === true;

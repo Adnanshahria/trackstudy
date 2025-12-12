@@ -3,7 +3,7 @@ import React from 'react';
 import { SettingsMenu } from '../settings/SettingsMenu';
 import { UserData } from '../../types';
 
-export const DashboardHeader: React.FC<{ onDev: () => void, status: string, userId: string, userData: UserData, onLogout: () => Promise<void>, onToggleTheme: () => void, theme: any, onGuide: () => void, onAppearance: () => void, onForceSync: () => void }> = ({ onDev, status, userId, userData, onLogout, onToggleTheme, theme, onGuide, onAppearance, onForceSync }) => (
+export const DashboardHeader: React.FC<{ onDev: () => void, status: string, userId: string, userData: UserData, onLogout: () => Promise<void>, onToggleTheme: () => void, theme: any, onGuide: () => void, onAppearance: () => void, onForceSync: () => void, onOpenAdmin?: () => void }> = ({ onDev, status, userId, userData, onLogout, onToggleTheme, theme, onGuide, onAppearance, onForceSync, onOpenAdmin }) => (
     <div className="flex flex-row justify-between items-center mb-6 no-print gap-4">
         <div onClick={onDev} className="glass-panel py-2 px-3 lg:px-4 rounded-2xl flex items-center gap-3 transition-all hover:bg-white/50 dark:hover:bg-white/5 cursor-pointer select-none shadow-lg shadow-blue-500/5 dark:shadow-black/20 border border-slate-200 dark:border-white/10 max-w-[70%] group">
             <img src="./icons/icon-192.png" alt="TrackStudy" className="w-9 h-9 lg:w-10 lg:h-10 shrink-0 rounded-xl shadow-lg group-hover:scale-105 transition-transform ring-1 ring-white/20 object-cover" />
@@ -19,7 +19,7 @@ export const DashboardHeader: React.FC<{ onDev: () => void, status: string, user
         </div>
 
         <div className="flex items-center gap-4 shrink-0">
-            <SettingsMenu userId={userId} userData={userData} onLogout={onLogout} onToggleTheme={onToggleTheme} theme={theme} onOpenGuide={onGuide} onOpenDevModal={onDev} onOpenAppearance={onAppearance} onForceSync={onForceSync} />
+            <SettingsMenu userId={userId} userData={userData} onLogout={onLogout} onToggleTheme={onToggleTheme} theme={theme} onOpenGuide={onGuide} onOpenDevModal={onDev} onOpenAppearance={onAppearance} onForceSync={onForceSync} onOpenAdmin={onOpenAdmin} />
         </div>
     </div>
 );
