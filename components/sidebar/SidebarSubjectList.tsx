@@ -1,5 +1,5 @@
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { SubjectItem } from './SubjectItem';
 import { SubjectData, UserData, UserSettings } from '../../types';
 
@@ -18,14 +18,23 @@ export const SidebarSubjectList: React.FC<Props> = ({ settings, activeSubject, i
     const [draggedKey, setDraggedKey] = useState<string | null>(null);
     const [dragOverKey, setDragOverKey] = useState<string | null>(null);
     const dragCounter = useRef(0);
+    const hasPersistedOrder = useRef(false);
 
     const syllabusKeys = Object.keys(settings.syllabus);
     const existingOrder = settings.subjectOrder || [];
-    
+
     const validOrder = existingOrder.filter(key => settings.syllabus[key]);
     const newKeys = syllabusKeys.filter(key => !validOrder.includes(key));
     const finalOrder = [...validOrder, ...newKeys];
-    
+
+    // Persist the order if it doesn't exist yet (one-time initialization)
+    useEffect(() => {
+        if (!settings.subjectOrder && syllabusKeys.length > 0 && !hasPersistedOrder.current) {
+            hasPersistedOrder.current = true;
+            onUpdateSettings({ ...settings, subjectOrder: finalOrder });
+        }
+    }, [settings.subjectOrder, syllabusKeys.length]);
+
     const orderedSubjects = finalOrder
         .map(key => [key, settings.syllabus[key]] as [string, SubjectData])
         .filter(([_, data]) => data !== undefined);
@@ -60,7 +69,7 @@ export const SidebarSubjectList: React.FC<Props> = ({ settings, activeSubject, i
     const handleDrop = (e: React.DragEvent, targetKey: string) => {
         e.preventDefault();
         dragCounter.current = 0;
-        
+
         if (!draggedKey || draggedKey === targetKey) {
             setDraggedKey(null);
             setDragOverKey(null);
@@ -97,24 +106,21 @@ export const SidebarSubjectList: React.FC<Props> = ({ settings, activeSubject, i
                     onDragOver={handleDragOver}
                     onDrop={(e) => handleDrop(e, key)}
                     onDragEnd={handleDragEnd}
-                    className={`transition-all duration-200 ${
-                        draggedKey === key ? 'opacity-50 scale-95' : ''
-                    } ${
-                        dragOverKey === key ? 'transform translate-y-2' : ''
-                    } ${
-                        isEditing ? 'cursor-grab active:cursor-grabbing' : ''
-                    }`}
+                    className={`transition-all duration-200 ${draggedKey === key ? 'opacity-50 scale-95' : ''
+                        } ${dragOverKey === key ? 'transform translate-y-2' : ''
+                        } ${isEditing ? 'cursor-grab active:cursor-grabbing' : ''
+                        }`}
                 >
                     {dragOverKey === key && draggedKey !== key && (
                         <div className="h-1 bg-blue-500 rounded-full mb-2 animate-pulse" />
                     )}
-                    <SubjectItem 
-                        subKey={key} data={data} 
-                        isActive={activeSubject === key} isEditing={isEditing} 
-                        userData={userData} settings={settings} 
-                        onChangeSubject={onChangeSubject} 
-                        onRename={() => setModals((m: any) => ({ ...m, rename: { key, name: settings.customNames?.[key] || data.name } }))} 
-                        onDelete={() => onDeleteSubject(key)} 
+                    <SubjectItem
+                        subKey={key} data={data}
+                        isActive={activeSubject === key} isEditing={isEditing}
+                        userData={userData} settings={settings}
+                        onChangeSubject={onChangeSubject}
+                        onRename={() => setModals((m: any) => ({ ...m, rename: { key, name: settings.customNames?.[key] || data.name } }))}
+                        onDelete={() => onDeleteSubject(key)}
                     />
                 </div>
             ))}
