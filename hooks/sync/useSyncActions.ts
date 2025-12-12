@@ -25,6 +25,30 @@ export const useSyncActions = (
             const newData = { ...userData, [key]: next, [`timestamp_${key}`]: timestamp };
             setUserData(newData);
             await saveUserProgress(userId, { [key]: next, [`timestamp_${key}`]: timestamp });
+
+            // Create tick log directly (client-side)
+            try {
+                const { firestore } = await import('../utils/firebase/core');
+                if (firestore && key.startsWith('s_')) {
+                    const parts = key.slice(2).split('_');
+                    if (parts.length >= 3) {
+                        await firestore.collection('tickLogs').add({
+                            boxId: key,
+                            subjectId: parts[0],
+                            chapterId: parts[1],
+                            fieldKey: parts.slice(2).join('_'),
+                            userId: userId,
+                            timestamp: new Date(),
+                            iso: timestamp,
+                            percentBefore: validated * 20,
+                            percentAfter: next * 20,
+                            source: 'manual'
+                        });
+                    }
+                }
+            } catch (logErr) {
+                console.warn('Tick log creation failed:', logErr);
+            }
         } catch (error) {
             console.error('Status update failed:', error);
         }
@@ -65,7 +89,7 @@ export const useSyncActions = (
         localDataRef.current = {};
         localSettingsRef.current = DEFAULT_SETTINGS;
         cleanupStorage();
-        
+
         // THEN sign out from Firebase to properly disconnect
         try {
             if (firebaseAuth) {
