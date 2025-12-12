@@ -69,9 +69,15 @@ export const useSyncActions = (
     const handleSettingsUpdate = async (newSettings: UserSettings) => {
         if (!newSettings || typeof newSettings !== 'object') return;
         try {
+            // DEBUG: Log what we're about to save
+            console.log('[DEBUG SAVE] subjectConfigs being saved:', JSON.stringify(newSettings.subjectConfigs, null, 2));
             setSettings(newSettings);
-            if (!userId) return;
+            if (!userId) {
+                console.warn('[DEBUG SAVE] No userId, settings NOT saved to Firestore!');
+                return;
+            }
             await saveSettings(userId, newSettings);
+            console.log('[DEBUG SAVE] Settings saved successfully to Firestore');
         } catch (error) {
             console.error('Settings update failed:', error);
         }
