@@ -169,7 +169,7 @@ function App() {
                     />
                   </div>
                   <div id="syllabus-print-container" className="lg:h-full lg:overflow-y-auto custom-scrollbar pr-1 pb-20 lg:pb-0">
-                    <MemoizedSyllabus activeSubject={activeSubject} userData={userData} settings={settings} userId={userId} onUpdateStatus={wrappedStatusUpdate} onUpdateNote={wrappedNoteUpdate} onTogglePaper={(key) => wrappedSettingsUpdate({ ...settings, syllabusOpenState: { ...settings.syllabusOpenState, [key]: !settings.syllabusOpenState[key] } })} onRenameColumn={dataMgr.onRenameColumn} onAddColumn={dataMgr.onAddColumn} onAddChapter={dataMgr.onAddChapter} onDeleteChapter={dataMgr.onDeleteChapter} onDeleteColumn={dataMgr.onDeleteColumn} onRenameChapter={dataMgr.handleRenameChapter} />
+                    <MemoizedSyllabus activeSubject={activeSubject} userData={userData} settings={settings} userId={userId} onUpdateStatus={wrappedStatusUpdate} onUpdateNote={wrappedNoteUpdate} onTogglePaper={(key) => wrappedSettingsUpdate({ ...settings, syllabusOpenState: { ...settings.syllabusOpenState, [key]: !settings.syllabusOpenState[key] } })} onRenameColumn={dataMgr.onRenameColumn} onAddColumn={dataMgr.onAddColumn} onAddChapter={dataMgr.onAddChapter} onDeleteChapter={dataMgr.onDeleteChapter} onDeleteColumn={dataMgr.onDeleteColumn} onRenameChapter={dataMgr.handleRenameChapter} onDeletePaper={dataMgr.onDeletePaper} />
                   </div>
                 </div>
               )}
