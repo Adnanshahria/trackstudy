@@ -18,7 +18,8 @@ const ADMIN_DISPLAY_NAMES: string[] = [
     'adnan',
     'Adnan',
     'admin',
-    'asmedical', // Based on the Firebase data screenshot
+    'asmedical',
+    'adnanshahria2019@gmail.com', // Added by user request
 ];
 
 export const useAdmin = (): UseAdminResult => {
