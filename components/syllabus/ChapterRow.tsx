@@ -4,6 +4,7 @@ import { StatusButton } from './StatusButton';
 
 interface Props {
     ch: Chapter;
+    index: number;
     activeSubject: string;
     allItems: TrackableItem[];
     userData: UserData;
@@ -11,11 +12,14 @@ interface Props {
     actions: any;
 }
 
-export const ChapterRow: React.FC<Props> = ({ ch, activeSubject, allItems, userData, editMode, actions }) => (
+export const ChapterRow: React.FC<Props> = ({ ch, index, activeSubject, allItems, userData, editMode, actions }) => (
     <tr className="border-b border-slate-200 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors group/tr">
         <td className="p-2 pl-4 font-medium sticky left-0 z-20 bg-slate-50 dark:bg-[#020617] text-sm border-r border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 group/ch h-10 leading-tight print:static">
             <div className="flex items-center justify-between gap-2 h-full">
-                <span className="line-clamp-2 leading-tight font-semibold" title={ch.name}>{ch.name}</span>
+                <div className="flex items-center gap-2 overflow-hidden">
+                    <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500 font-bold shrink-0">{index + 1}.</span>
+                    <span className="line-clamp-2 leading-tight font-semibold" title={ch.name}>{ch.name}</span>
+                </div>
                 {editMode && (
                     <div className="flex items-center gap-1 min-w-fit no-print opacity-100 lg:opacity-0 lg:group-hover/ch:opacity-100 transition-opacity">
                         <button onClick={() => actions.setRenameModal({ isOpen: true, key: ch.id, currentName: ch.name, type: 'chapter' })} className="text-[10px] text-slate-400 hover:text-blue-500 transition-colors">✏️</button>

@@ -32,7 +32,7 @@ export const PaperTable: React.FC<Props> = ({ paper, chapters, allItems, userDat
                 </tr>
             </thead>
             <tbody className="text-sm print:text-xs">
-                {chapters.map(ch => <ChapterRow key={ch.id} ch={ch} activeSubject={activeSubject} allItems={allItems} userData={userData} editMode={editMode} actions={actions} />)}
+                {chapters.map((ch, idx) => <ChapterRow key={ch.id} ch={ch} index={idx} activeSubject={activeSubject} allItems={allItems} userData={userData} editMode={editMode} actions={actions} />)}
                 {editMode && <tr className="no-print"><td colSpan={allItems.length + 2} className="p-4 text-center sticky left-0 bg-slate-100 dark:bg-[#0f172a] border-t border-slate-200 dark:border-white/10 z-20"><button onClick={() => setAddChapterModal({ isOpen: true, paper })} className="w-full py-3 border-2 border-dashed border-slate-300 dark:border-white/10 rounded-xl text-slate-500 hover:text-blue-500 transition-all text-xs font-bold">+ Add New Chapter to Paper {paper}</button></td></tr>}
             </tbody>
         </table>
