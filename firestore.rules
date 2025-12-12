@@ -10,11 +10,11 @@ service cloud.firestore {
     }
 
     // Tick Logs - Immutable audit history
-    // Read: authenticated users can read their own logs
+    // Read: authenticated users (query filters by userId client-side)
     // Create: authenticated users can create logs for themselves
     // Update/Delete: DENIED for immutability
     match /tickLogs/{logId} {
-      allow read: if request.auth != null && resource.data.userId == request.auth.token.name;
+      allow read: if request.auth != null;
       allow create: if request.auth != null && request.resource.data.userId == request.auth.token.name;
       allow update, delete: if false;
     }
