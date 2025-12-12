@@ -66,9 +66,18 @@ export const useSyncActions = (
         }
     };
 
-    const handleSettingsUpdate = async (newSettings: UserSettings) => {
-        if (!newSettings || typeof newSettings !== 'object') return;
+    const handleSettingsUpdate = async (newSettingsOrUpdater: UserSettings | ((prev: UserSettings) => UserSettings)) => {
         try {
+            // Support both direct object and callback function patterns
+            let newSettings: UserSettings;
+            if (typeof newSettingsOrUpdater === 'function') {
+                newSettings = newSettingsOrUpdater(settings);
+            } else {
+                newSettings = newSettingsOrUpdater;
+            }
+
+            if (!newSettings || typeof newSettings !== 'object') return;
+
             // DEBUG: Log what we're about to save
             console.log('[DEBUG SAVE] subjectConfigs being saved:', JSON.stringify(newSettings.subjectConfigs, null, 2));
             setSettings(newSettings);
