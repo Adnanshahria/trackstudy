@@ -31,12 +31,12 @@ export const INITIAL_SYLLABUS_DATA: SyllabusData = {
 };
 
 export const TRACKABLE_ITEMS: TrackableItem[] = [
-  { name: "Main Book", color: "bg-sky-500", key: "mainbook" },
-  { name: "Class", color: "bg-blue-500", key: "class" },
-  { name: "Rev Class", color: "bg-indigo-500", key: "revclass" },
-  { name: "Meditrics", color: "bg-teal-500", key: "meditrics" },
-  { name: "MQB", color: "bg-amber-500", key: "mqb" },
-  { name: "SF Exam", color: "bg-rose-500", key: "sfexam" },
-  { name: "Rev 1", color: "bg-violet-500", key: "rev1" },
-  { name: "Rev 2", color: "bg-purple-500", key: "rev2" }
+  { name: "Lecture", color: "bg-sky-500", key: "mainbook" },
+  { name: "Book", color: "bg-blue-500", key: "class" },
+  { name: "Resource 1", color: "bg-indigo-500", key: "revclass" },
+  { name: "Resource 2", color: "bg-teal-500", key: "meditrics" },
+  { name: "Resource 3", color: "bg-amber-500", key: "mqb" },
+  { name: "Resource 4", color: "bg-rose-500", key: "sfexam" },
+  { name: "Resource 5", color: "bg-violet-500", key: "rev1" },
+  { name: "Resource 6", color: "bg-purple-500", key: "rev2" }
 ];
