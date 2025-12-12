@@ -2,17 +2,17 @@
 import { UserSettings, Chapter } from '../../types';
 
 export const useChapterActions = (settings: UserSettings, handleSettingsUpdate: (s: UserSettings) => void) => {
-    
+
     const onDeleteChapter = (subjectKey: string, chapterId: number | string) => {
         if (!subjectKey || chapterId === undefined || chapterId === null) return;
-        
+
         const currentSub = settings.syllabus[subjectKey];
         if (!currentSub || !Array.isArray(currentSub.chapters)) return;
 
         const newSyllabus = { ...settings.syllabus };
         newSyllabus[subjectKey] = {
             ...newSyllabus[subjectKey],
-            chapters: newSyllabus[subjectKey].chapters.filter((c: Chapter) => c.id !== chapterId)
+            chapters: newSyllabus[subjectKey].chapters.filter((c: Chapter) => String(c.id) !== String(chapterId))
         };
         handleSettingsUpdate({ ...settings, syllabus: newSyllabus });
     };
@@ -21,7 +21,7 @@ export const useChapterActions = (settings: UserSettings, handleSettingsUpdate: 
         if (!subjectKey || chapterId === undefined || chapterId === null) return;
         const trimmedName = typeof newName === 'string' ? newName.trim() : '';
         if (!trimmedName || trimmedName.length > 200) return;
-        
+
         const currentSub = settings.syllabus[subjectKey];
         if (!currentSub) return;
 
@@ -36,14 +36,14 @@ export const useChapterActions = (settings: UserSettings, handleSettingsUpdate: 
         }
     };
 
-    const onAddChapter = (subjectKey: string, paper: 1 | 2, name: string) => {
-        if (!subjectKey || (paper !== 1 && paper !== 2)) return;
+    const onAddChapter = (subjectKey: string, paper: number, name: string) => {
+        if (!subjectKey || !paper) return;
         const trimmedName = typeof name === 'string' ? name.trim() : '';
         if (!trimmedName || trimmedName.length > 200) return;
-        
+
         const currentSub = settings.syllabus[subjectKey];
         if (!currentSub) return;
-        
+
         const uniqueId = `custom_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
         const newChapter: Chapter = { id: uniqueId, name: trimmedName, paper };
         const newSyllabus = { ...settings.syllabus };

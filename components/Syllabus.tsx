@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { calculateProgress } from '../utils/calculations';
 import { UserData, UserSettings } from '../types';
 import { SyllabusHeader } from './syllabus/SyllabusHeader';
@@ -32,6 +32,11 @@ export const Syllabus: React.FC<SyllabusProps> = ({ activeSubject, userData, set
     const [showPrintModal, setShowPrintModal] = useState(false);
     const [printMode, setPrintMode] = useState<'p1' | 'p2' | 'both'>('both');
     const [localMaxPaper, setLocalMaxPaper] = useState<number>(0);
+
+    // Reset extra papers when switching subjects to avoid global scope leakage
+    useEffect(() => {
+        setLocalMaxPaper(0);
+    }, [activeSubject]);
 
     if (!subject) return <div className="p-10 text-center text-slate-500">Subject not found.</div>;
 

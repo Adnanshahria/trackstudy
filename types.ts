@@ -1,7 +1,7 @@
 export interface Chapter {
   id: number | string;
   name: string;
-  paper: 1 | 2;
+  paper: number;
 }
 
 export interface SubjectData {
@@ -46,15 +46,15 @@ export interface UserSettings {
   subjectProgressWeights?: Record<string, number>;
   customNames: Record<string, string>;
   trackableItems: TrackableItem[];
-  subjectConfigs?: Record<string, TrackableItem[]>; 
-  syllabus: SyllabusData; 
+  subjectConfigs?: Record<string, TrackableItem[]>;
+  syllabus: SyllabusData;
   countdownTarget?: string;
   countdownLabel?: string;
   subjectOrder?: string[];
 }
 
 export interface UserData {
-  [key: string]: any; 
+  [key: string]: any;
   password?: string;
   valid_tokens?: string[];
 }
@@ -65,7 +65,7 @@ export interface StoreData {
 }
 
 export interface CompositeData {
-    composite: number;
-    breakdown: Record<string, { name: string; val: number; weight: number; color: string }>;
-    totalWeight: number;
+  composite: number;
+  breakdown: Record<string, { name: string; val: number; weight: number; color: string }>;
+  totalWeight: number;
 }
