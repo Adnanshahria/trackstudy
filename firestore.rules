@@ -9,6 +9,14 @@ service cloud.firestore {
       }
     }
 
+    // Tick Logs - Immutable audit history
+    // Read: authenticated users only
+    // Write: DENIED for all clients (only Cloud Functions can write)
+    match /tickLogs/{logId} {
+      allow read: if request.auth != null;
+      allow create, update, delete: if false;
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }

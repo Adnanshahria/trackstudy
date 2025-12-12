@@ -1,4 +1,4 @@
-const CACHE_NAME = 'trackstudy-v3';
+const CACHE_NAME = 'trackstudy-v4';
 
 // Dynamically determine the base path from the service worker's location
 // This makes caching work on both root (Vercel) and subdirectory (GitHub Pages) deployments

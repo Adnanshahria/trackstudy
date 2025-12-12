@@ -1,0 +1,33 @@
+{
+    "indexes": [
+        {
+            "collectionGroup": "tickLogs",
+            "queryScope": "COLLECTION",
+            "fields": [
+                {
+                    "fieldPath": "boxId",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "timestamp",
+                    "order": "DESCENDING"
+                }
+            ]
+        },
+        {
+            "collectionGroup": "tickLogs",
+            "queryScope": "COLLECTION",
+            "fields": [
+                {
+                    "fieldPath": "userId",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "timestamp",
+                    "order": "DESCENDING"
+                }
+            ]
+        }
+    ],
+    "fieldOverrides": []
+}
