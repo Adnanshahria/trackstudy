@@ -11,6 +11,7 @@ import { DeveloperModal } from './components/auth/DeveloperModal';
 import { AppGuideModal } from './components/guide/AppGuideModal';
 import { AppearanceModal } from './components/settings/AppearanceModal';
 import { AdminPanel } from './components/admin/AdminPanel';
+import { DataMigrationModal } from './components/settings/DataMigrationModal';
 import { LandingHeader } from './components/layout/LandingHeader';
 import { DashboardHeader } from './components/layout/DashboardHeader';
 import { WelcomeHero } from './components/layout/WelcomeHero';
@@ -31,6 +32,7 @@ function App() {
   const [showAppGuide, setShowAppGuide] = useState(false);
   const [showAppearance, setShowAppearance] = useState(false);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
+  const [showMigration, setShowMigration] = useState(false);
   const [bypassAuth, setBypassAuth] = useState(false);
 
   const { toast, showToast, hideToast } = useToast();
@@ -134,6 +136,7 @@ function App() {
                 onAppearance={() => setShowAppearance(true)}
                 onForceSync={forceSync}
                 onOpenAdmin={() => setShowAdminPanel(true)}
+                onOpenMigration={() => setShowMigration(true)}
               />
               {isLoading ? (
                 <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-6 items-start lg:overflow-hidden animate-pulse">
@@ -181,6 +184,17 @@ function App() {
         <AppGuideModal isOpen={showAppGuide} onClose={() => setShowAppGuide(false)} />
         <AppearanceModal isOpen={showAppearance} onClose={() => setShowAppearance(false)} settings={settings} onUpdateSettings={wrappedSettingsUpdate} />
         <AdminPanel isOpen={showAdminPanel} onClose={() => setShowAdminPanel(false)} />
+        <DataMigrationModal
+          isOpen={showMigration}
+          onClose={() => setShowMigration(false)}
+          userId={userId}
+          userData={userData}
+          settings={settings}
+          onImportComplete={() => {
+            // Force sync to re-fetch data from server
+            forceSync();
+          }}
+        />
 
         <Toast
           message={toast.message}

@@ -12,6 +12,7 @@ interface SettingsMenuProps {
     onOpenGuide: () => void;
     onOpenDevModal: () => void;
     onOpenAdmin?: () => void;
+    onOpenMigration?: () => void;
     onOpenAppearance: () => void;
     onForceSync: () => void;
     className?: string; // Allow overriding button styles
