@@ -135,3 +135,6 @@ export const onUserDataUpdate = functions.firestore
 
         return null;
     });
+
+// Export admin resource functions
+export { adminUpdateResourceLabel, seedResourceDefaults } from './adminResources';
