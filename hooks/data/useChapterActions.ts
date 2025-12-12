@@ -26,7 +26,7 @@ export const useChapterActions = (settings: UserSettings, handleSettingsUpdate: 
         const newSyllabus = { ...settings.syllabus };
         newSyllabus[subjectKey] = {
             ...newSyllabus[subjectKey],
-            chapters: newSyllabus[subjectKey].chapters.filter((c: Chapter) => c.paper !== paperId)
+            chapters: newSyllabus[subjectKey].chapters.filter((c: Chapter) => String(c.paper) !== String(paperId))
         };
         handleSettingsUpdate({ ...settings, syllabus: newSyllabus });
     };
