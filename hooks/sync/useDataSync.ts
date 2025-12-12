@@ -33,7 +33,7 @@ export const useDataSync = (
 
         const syncProcess = async () => {
             if (!isMounted.current || isCleanedUp || thisSyncId !== currentSyncId.current) return;
-            
+
             setIsLoading(true);
 
             try {
@@ -62,19 +62,21 @@ export const useDataSync = (
 
                     if (remoteData && typeof remoteData === 'object') {
                         setUserData(prev => ({ ...prev, ...remoteData }));
-                        dbPut('userData', { id: 'main', value: remoteData }).catch(() => {});
+                        dbPut('userData', { id: 'main', value: remoteData }).catch(() => { });
                     }
                     if (remoteSettings && typeof remoteSettings === 'object') {
                         setSettings(prev => {
-                            const merged: UserSettings = { 
-                                ...DEFAULT_SETTINGS, 
+                            const merged: UserSettings = {
+                                ...DEFAULT_SETTINGS,
                                 ...remoteSettings,
                                 syllabus: remoteSettings.syllabus || JSON.parse(JSON.stringify(INITIAL_SYLLABUS_DATA)),
                                 trackableItems: remoteSettings.trackableItems || DEFAULT_SETTINGS.trackableItems,
                                 subjectConfigs: remoteSettings.subjectConfigs || {},
                                 subjectWeights: remoteSettings.subjectWeights || {}
                             };
-                            dbPut('userData', { id: 'settings', value: merged }).catch(() => {});
+                            // DEBUG: Log subjectConfigs to verify persistence
+                            console.log('[DEBUG] subjectConfigs from server:', JSON.stringify(merged.subjectConfigs, null, 2));
+                            dbPut('userData', { id: 'settings', value: merged }).catch(() => { });
                             return merged;
                         });
                     }
