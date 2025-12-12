@@ -13,6 +13,7 @@ interface StudyDetailModalProps {
     setText: (s: string) => void;
     settings: UserSettings;
     activeSubject: string;
+    userId: string | null;
 }
 
 type TabType = 'note' | 'history';
@@ -41,7 +42,7 @@ const parseNoteId = (noteKey: string, settings: UserSettings, activeSubject: str
 };
 
 export const StudyDetailModal: React.FC<StudyDetailModalProps> = ({
-    isOpen, onClose, noteKey, text, onSave, setText, settings, activeSubject
+    isOpen, onClose, noteKey, text, onSave, setText, settings, activeSubject, userId
 }) => {
     const [activeTab, setActiveTab] = useState<TabType>('note');
     const displayId = parseNoteId(noteKey, settings, activeSubject);
@@ -100,7 +101,7 @@ export const StudyDetailModal: React.FC<StudyDetailModalProps> = ({
                             </div>
                         </div>
                     ) : (
-                        <TickLogListWithData boxId={boxId} />
+                        <TickLogListWithData boxId={boxId} userId={userId} />
                     )}
                 </div>
             </div>

@@ -105,8 +105,8 @@ export const TickLogListWithMocks: React.FC<{ boxId: string }> = ({ boxId }) => 
 };
 
 // Wrapper that uses real Firestore data via useTickLogs hook
-export const TickLogListWithData: React.FC<{ boxId: string }> = ({ boxId }) => {
-    const { logs, isLoading, error, hasMore, loadMore } = useTickLogs(boxId);
+export const TickLogListWithData: React.FC<{ boxId: string, userId: string | null }> = ({ boxId, userId }) => {
+    const { logs, isLoading, error, hasMore, loadMore } = useTickLogs(boxId, userId);
 
     return (
         <TickLogList

@@ -24,9 +24,10 @@ interface UseTickLogsResult {
 /**
  * Fetches tick logs for a specific box ID
  * @param boxId - The progress box identifier (e.g., "s_biology_1_mainBook")
+ * @param userId - The user ID to filter logs for (CRITICAL: TickLogs are shared collection, must filter by user)
  * @param useMockData - Use mock data for development/testing
  */
-export const useTickLogs = (boxId: string, useMockData = false): UseTickLogsResult => {
+export const useTickLogs = (boxId: string, userId: string | null, useMockData = false): UseTickLogsResult => {
     const [logs, setLogs] = useState<TickLog[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -56,8 +57,8 @@ export const useTickLogs = (boxId: string, useMockData = false): UseTickLogsResu
     const fetchLogs = useCallback(async () => {
         if (!boxId) return;
 
-        // Use mock data if requested or Firestore not available
-        if (useMockData || !firestore) {
+        // Use mock data if requested or Firestore not available or no userId
+        if (useMockData || !firestore || !userId) {
             setLogs(MOCK_TICK_LOGS.filter(log => log.boxId === boxId || boxId === 's_biology_1_mainBook'));
             setHasMore(false);
             return;
@@ -70,6 +71,7 @@ export const useTickLogs = (boxId: string, useMockData = false): UseTickLogsResu
             const query = firestore
                 .collection(TICK_LOGS_COLLECTION)
                 .where('boxId', '==', boxId)
+                .where('userId', '==', userId)
                 .orderBy('timestamp', 'desc')
                 .limit(PAGE_SIZE);
 
@@ -82,21 +84,23 @@ export const useTickLogs = (boxId: string, useMockData = false): UseTickLogsResu
         } catch (err: any) {
             console.error('Error fetching tick logs:', err);
             // If index not yet created or permission denied, show mock data
+            // Also if composite index is missing (boxId + userId + timestamp)
             if (err.code === 'failed-precondition' || err.code === 'permission-denied') {
-                setLogs(MOCK_TICK_LOGS);
+                console.warn("Missing index or permission. Showing empty/mock data.");
+                setLogs([]); // Better to show nothing than wrong data
                 setHasMore(false);
-                setError(null); // Don't show error, just use mock data
+                setError(null);
             } else {
                 setError('Failed to load history');
             }
         } finally {
             setIsLoading(false);
         }
-    }, [boxId, useMockData]);
+    }, [boxId, userId, useMockData]);
 
     // Load more (pagination)
     const loadMore = useCallback(async () => {
-        if (!boxId || !hasMore || isLoading || !lastDoc || !firestore) return;
+        if (!boxId || !userId || !hasMore || isLoading || !lastDoc || !firestore) return;
 
         setIsLoading(true);
 
@@ -104,6 +108,7 @@ export const useTickLogs = (boxId: string, useMockData = false): UseTickLogsResu
             const query = firestore
                 .collection(TICK_LOGS_COLLECTION)
                 .where('boxId', '==', boxId)
+                .where('userId', '==', userId)
                 .orderBy('timestamp', 'desc')
                 .startAfter(lastDoc)
                 .limit(PAGE_SIZE);
@@ -120,7 +125,7 @@ export const useTickLogs = (boxId: string, useMockData = false): UseTickLogsResu
         } finally {
             setIsLoading(false);
         }
-    }, [boxId, hasMore, isLoading, lastDoc]);
+    }, [boxId, userId, hasMore, isLoading, lastDoc]);
 
     // Refresh (re-fetch from beginning)
     const refresh = useCallback(async () => {
