@@ -14,7 +14,7 @@ export const GuideChangelog = () => (
                 </div>
                 <ul className="space-y-1 text-xs text-slate-600 dark:text-slate-400 list-disc pl-4">
                     <li><strong>📐 Higher Math:</strong> নতুন ইউজারদের জন্য Higher Math (H.Math) সাবজেক্ট যুক্ত করা হয়েছে।</li>
-                    <li><strong>🚫 Signup:</strong> নতুন একাউন্ট খোলা সাময়িকভাবে বন্ধ রাখা হয়েছে।</li>
+                    <li><strong>📑 Syllabus:</strong> ১ম ও ২য় পত্রের পূর্ণাঙ্গ সিলেবাস আপডেটেড।</li>
                     <li><strong>✨ Default:</strong> এখন থেকে ডিফল্টভাবে ৪টি সাবজেক্ট থাকবে (Bio, Phy, Chem, H.Math)।</li>
                 </ul>
                 <div className="mt-2 pt-2 border-t border-purple-200 dark:border-purple-800">

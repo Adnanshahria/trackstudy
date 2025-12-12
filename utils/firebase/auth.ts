@@ -17,6 +17,8 @@ const getErrorMessage = (error: any) => {
     if (code === 'auth/email-already-in-use') return 'User ID/Email already exists.';
     if (code === 'auth/weak-password') return 'Password should be at least 6 characters.';
     if (code === 'auth/unauthorized-domain') return `Domain '${window.location.hostname}' is not authorized. Add it to Firebase Console.`;
+    if (code === 'auth/operation-not-allowed') return 'Email/Password login is not enabled in Firebase Console.';
+    if (code === 'auth/admin-restricted-operation') return 'This operation is restricted (Admin only).';
     if (code === 'auth/network-request-failed') return 'Network error. Check internet connection.';
     return error.message || 'Authentication failed.';
 };
@@ -24,7 +26,7 @@ const getErrorMessage = (error: any) => {
 export const authenticateUser = async (rawId: string, pass: string) => {
     if (!firebaseAuth || !firestore) return { success: false, error: "Database not connected. Check internet." };
     const email = getEmail(rawId);
-    
+
     // We expect the user to login with credentials that map to a Custom ID (displayName).
     // The listener in useFirebaseSync will pick up the displayName.
     try {
@@ -36,7 +38,7 @@ export const authenticateUser = async (rawId: string, pass: string) => {
 export const createUser = async (rawId: string, pass: string) => {
     if (!firebaseAuth || !firestore) return { success: false, error: "Database not connected. Check internet." };
     const id = sanitizeId(rawId);
-    
+
     try {
         const result = await firebaseAuth.createUserWithEmailAndPassword(getEmail(rawId), pass);
         if (result.user) {
@@ -49,11 +51,14 @@ export const createUser = async (rawId: string, pass: string) => {
                 data: { username: id },
                 password: pass
             }, { merge: true });
-            
+
             return { success: true, uid: id };
         }
         return { success: false, error: "User creation failed" };
-    } catch (e: any) { return { success: false, error: getErrorMessage(e) }; }
+    } catch (e: any) {
+        console.error("Signup Error:", e);
+        return { success: false, error: getErrorMessage(e) };
+    }
 };
 
 export const loginAnonymously = async () => {
@@ -65,7 +70,7 @@ export const loginAnonymously = async () => {
             // Generate Custom Guest ID with enhanced uniqueness to prevent collisions
             const now = new Date();
             const fmt = (n: number) => n.toString().padStart(2, '0');
-            const dateStr = `${now.getFullYear()}${fmt(now.getMonth()+1)}${fmt(now.getDate())}`;
+            const dateStr = `${now.getFullYear()}${fmt(now.getMonth() + 1)}${fmt(now.getDate())}`;
             const timeStr = `${fmt(now.getHours())}${fmt(now.getMinutes())}${fmt(now.getSeconds())}`;
             const rand = Math.floor(Math.random() * 1000000);
             const uidPrefix = result.user.uid.slice(0, 6);
@@ -73,7 +78,7 @@ export const loginAnonymously = async () => {
 
             // CRITICAL: Set Auth Profile to use Guest ID
             await result.user.updateProfile({ displayName: guestDisplayName });
-            
+
             // Ensure profile update has propagated before continuing
             await result.user.reload();
 
@@ -87,9 +92,9 @@ export const loginAnonymously = async () => {
             return { success: true, uid: guestDisplayName };
         }
         return { success: false, error: "Guest session failed to start" };
-    } catch (e: any) { 
+    } catch (e: any) {
         console.error("Anonymous login error:", e);
-        return { success: false, error: getErrorMessage(e) }; 
+        return { success: false, error: getErrorMessage(e) };
     }
 };
 
@@ -107,9 +112,9 @@ export const resetUserPassword = async (id: string) => {
             return { success: false, error: "Password recovery data not available" };
         }
         return { success: true, message: "Password retrieved", password: password };
-    } catch (e: any) { 
+    } catch (e: any) {
         console.error("Reset password error:", e);
-        return { success: false, error: "Failed to retrieve password" }; 
+        return { success: false, error: "Failed to retrieve password" };
     }
 };
 
@@ -117,20 +122,20 @@ export const changeUserPassword = async (id: string, oldPassword: string, newPas
     if (!firebaseAuth || !firestore) return { success: false, error: "Database not connected" };
     const sanitizedId = sanitizeId(id);
     const email = getEmail(id);
-    
+
     try {
         // Verify user exists in Firestore
         const userDoc = await firestore.collection(FIREBASE_USER_COLLECTION).doc(sanitizedId).get();
         if (!userDoc.exists) {
             return { success: false, error: "User not found" };
         }
-        
+
         // Get current auth user
         const currentUser = firebaseAuth.currentUser;
         if (!currentUser) {
             return { success: false, error: "Not authenticated. Please login first." };
         }
-        
+
         // Reauthenticate with old password to ensure we have fresh credentials for the update
         try {
             const credential = firebase.auth.EmailAuthProvider.credential(email, oldPassword);
@@ -138,27 +143,27 @@ export const changeUserPassword = async (id: string, oldPassword: string, newPas
         } catch (reauthError: any) {
             return { success: false, error: "Incorrect old password. Cannot verify identity." };
         }
-        
+
         // Update Firebase Auth password
         try {
             await currentUser.updatePassword(newPassword);
         } catch (updateError: any) {
             return { success: false, error: `Auth update failed: ${getErrorMessage(updateError)}` };
         }
-        
+
         // Update Firestore backup
         await firestore.collection(FIREBASE_USER_COLLECTION).doc(sanitizedId).update({
             password: newPassword,
             updatedAt: new Date().toISOString()
         });
-        
+
         // Sign out user so they must login fresh with new password
         await firebaseAuth.signOut();
-        
+
         return { success: true, message: "Password changed successfully. Please login again." };
-    } catch (e: any) { 
+    } catch (e: any) {
         console.error("Change password error:", e);
-        return { success: false, error: "Failed to change password" }; 
+        return { success: false, error: "Failed to change password" };
     }
 };
 

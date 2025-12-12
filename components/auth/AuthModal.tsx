@@ -32,8 +32,10 @@ export const AuthModal: React.FC<AuthModalProps> = (props) => {
             <div className="flex flex-col gap-6">
                 <div className="flex p-1 bg-slate-200/50 dark:bg-black/40 rounded-full relative backdrop-blur-sm">
                     <button onClick={() => { props.setModalMode('login'); props.resetModalState(); }} className={`flex-1 py-2 text-xs font-bold rounded-full transition-all duration-300 z-10 ${props.modalMode === 'login' ? 'bg-white dark:bg-slate-700 text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'}`}>Sign In</button>
-                    {/* User Creation Disabled */}
-                    <button disabled className="flex-1 py-2 text-xs font-bold rounded-full text-slate-400 bg-transparent cursor-not-allowed opacity-50">Create (Disabled)</button>
+                    <button onClick={() => { props.setModalMode('create'); props.resetModalState(); }} className={`flex-1 py-2 text-xs font-bold rounded-full transition-all duration-300 z-10 relative overflow-hidden ${props.modalMode === 'create' ? 'bg-white dark:bg-slate-700 text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'}`}>
+                        <span className="relative z-10">Create Account</span>
+                        {props.modalMode !== 'create' && <span className="absolute inset-0 rounded-full bg-rose-500/20 animate-pulse shadow-[0_0_15px_rgba(244,63,94,0.6)] border border-rose-500/50"></span>}
+                    </button>
                 </div>
                 <AuthForm
                     modalMode={props.modalMode} setModalMode={(m) => { props.setModalMode(m); props.resetModalState(); }}
