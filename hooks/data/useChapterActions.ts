@@ -17,6 +17,20 @@ export const useChapterActions = (settings: UserSettings, handleSettingsUpdate: 
         handleSettingsUpdate({ ...settings, syllabus: newSyllabus });
     };
 
+    const onDeletePaper = (subjectKey: string, paperId: number) => {
+        if (!subjectKey || !paperId) return;
+
+        const currentSub = settings.syllabus[subjectKey];
+        if (!currentSub || !Array.isArray(currentSub.chapters)) return;
+
+        const newSyllabus = { ...settings.syllabus };
+        newSyllabus[subjectKey] = {
+            ...newSyllabus[subjectKey],
+            chapters: newSyllabus[subjectKey].chapters.filter((c: Chapter) => c.paper !== paperId)
+        };
+        handleSettingsUpdate({ ...settings, syllabus: newSyllabus });
+    };
+
     const handleRenameChapter = (subjectKey: string, chapterId: number | string, newName: string) => {
         if (!subjectKey || chapterId === undefined || chapterId === null) return;
         const trimmedName = typeof newName === 'string' ? newName.trim() : '';
@@ -54,5 +68,5 @@ export const useChapterActions = (settings: UserSettings, handleSettingsUpdate: 
         handleSettingsUpdate({ ...settings, syllabus: newSyllabus });
     };
 
-    return { onDeleteChapter, handleRenameChapter, onAddChapter };
+    return { onDeleteChapter, handleRenameChapter, onAddChapter, onDeletePaper };
 };

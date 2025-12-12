@@ -17,8 +17,9 @@ interface SyllabusProps {
     onTogglePaper: (key: string) => void;
     onRenameColumn: (subject: string, key: string, newName: string) => void;
     onAddColumn: (subject: string, name: string, color: string) => void;
-    onAddChapter: (subject: string, paper: 1 | 2, name: string) => void;
+    onAddChapter: (subject: string, paper: number, name: string) => void;
     onDeleteChapter: (subject: string, chapterId: number | string) => void;
+    onDeletePaper: (subject: string, paperId: number) => void;
     onDeleteColumn: (subject: string, itemKey: string) => void;
     onRenameChapter: (subject: string, chapterId: number | string, newName: string) => void;
     userId: string | null;
@@ -60,8 +61,7 @@ export const Syllabus: React.FC<SyllabusProps> = ({ activeSubject, userData, set
         } else if (confirmAction.type === 'paper') {
             // Delete all chapters in this paper
             const paperId = Number(confirmAction.id);
-            const chaptersToDelete = subject.chapters.filter(c => c.paper === paperId);
-            chaptersToDelete.forEach(c => handlers.onDeleteChapter(activeSubject, c.id));
+            handlers.onDeletePaper(activeSubject, paperId);
             if (paperId > 2) {
                 // If it's an extra paper, we can hide it effectively by re-calculating max paper next render
                 // Assuming localMaxPaper logic handles it, or we force update?

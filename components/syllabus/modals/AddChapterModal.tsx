@@ -2,14 +2,14 @@ import React, { useState } from 'react';
 import { Modal } from '../../ui/Modal';
 import { Button } from '../../ui/Button';
 
-export const AddChapterModal = ({ paper, onClose, onAdd }: { paper: 1 | 2, onClose: () => void, onAdd: (name: string) => void }) => {
+export const AddChapterModal = ({ paper, onClose, onAdd }: { paper: number, onClose: () => void, onAdd: (name: string) => void }) => {
     const [name, setName] = useState('');
     return (
         <Modal isOpen={true} onClose={onClose} title={`Add Chapter to Paper ${paper}`}>
             <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-1">
                     <label className="text-xs text-slate-500">Chapter Name</label>
-                    <input 
+                    <input
                         type="text"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
@@ -19,7 +19,7 @@ export const AddChapterModal = ({ paper, onClose, onAdd }: { paper: 1 | 2, onClo
                 </div>
                 <div className="flex justify-end gap-3 mt-2">
                     <Button variant="secondary" onClick={onClose}>Cancel</Button>
-                    <Button onClick={() => { if(name.trim()) { onAdd(name); onClose(); } }} disabled={!name.trim()}>Add Chapter</Button>
+                    <Button onClick={() => { if (name.trim()) { onAdd(name); onClose(); } }} disabled={!name.trim()}>Add Chapter</Button>
                 </div>
             </div>
         </Modal>
