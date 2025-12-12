@@ -28,7 +28,7 @@ export const useSyncActions = (
 
             // Create tick log directly (client-side)
             try {
-                const { firestore } = await import('../utils/firebase/core');
+                const { firestore } = await import('../../utils/firebase/core');
                 if (firestore && key.startsWith('s_')) {
                     const parts = key.slice(2).split('_');
                     if (parts.length >= 3) {
