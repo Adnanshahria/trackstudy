@@ -17,12 +17,12 @@ export const useAuthHandlers = (setUserId: (id: string) => void, onSuccess?: () 
     const [isCheckingUser, setIsCheckingUser] = useState(false);
     const [recoveredPassword, setRecoveredPassword] = useState('');
 
-    const resetModalState = useCallback(() => { 
-        setTempUserId(''); 
-        setTempPassword(''); 
-        setConfirmPassword(''); 
-        setShowPassword(false); 
-        setModalError(''); 
+    const resetModalState = useCallback(() => {
+        setTempUserId('');
+        setTempPassword('');
+        setConfirmPassword('');
+        setShowPassword(false);
+        setModalError('');
         setModalSuccess('');
         setRecoveredPassword('');
     }, []);
@@ -30,7 +30,7 @@ export const useAuthHandlers = (setUserId: (id: string) => void, onSuccess?: () 
     const handleUserAction = async () => {
         const trimmedId = tempUserId.trim();
         const trimmedPass = tempPassword;
-        
+
         if (!trimmedId) {
             setModalError('Please enter a User ID.');
             return;
@@ -39,30 +39,30 @@ export const useAuthHandlers = (setUserId: (id: string) => void, onSuccess?: () 
             setModalError('User ID is too long.');
             return;
         }
-        
-        setModalError(''); 
+
+        setModalError('');
         setModalSuccess('');
-        
+
         if (modalMode === 'create') {
-            if (trimmedPass !== confirmPassword) { 
-                setModalError("Passwords do not match."); 
-                return; 
+            if (trimmedPass !== confirmPassword) {
+                setModalError("Passwords do not match.");
+                return;
             }
-            if (trimmedPass.length < MIN_PASSWORD_LENGTH) { 
-                setModalError(`Password must be at least ${MIN_PASSWORD_LENGTH} characters.`); 
-                return; 
+            if (trimmedPass.length < MIN_PASSWORD_LENGTH) {
+                setModalError(`Password must be at least ${MIN_PASSWORD_LENGTH} characters.`);
+                return;
             }
             if (trimmedPass.length > MAX_INPUT_LENGTH) {
                 setModalError('Password is too long.');
                 return;
             }
         }
-        
+
         if ((modalMode === 'login' || modalMode === 'change') && !trimmedPass) {
             setModalError('Please enter a password.');
             return;
         }
-        
+
         if (modalMode === 'change') {
             if (confirmPassword.length < MIN_PASSWORD_LENGTH) {
                 setModalError(`New password must be at least ${MIN_PASSWORD_LENGTH} characters.`);
@@ -73,17 +73,17 @@ export const useAuthHandlers = (setUserId: (id: string) => void, onSuccess?: () 
                 return;
             }
         }
-        
+
         setIsCheckingUser(true);
-        
+
         try {
             if (modalMode === 'reset') {
                 const result = await authService.resetPassword(trimmedId);
-                if (result.success && result.password) { 
+                if (result.success && result.password) {
                     setRecoveredPassword(result.password);
-                    setModalSuccess('Password recovered. Use it to sign in.'); 
-                } else { 
-                    setModalError(result.error || 'Reset failed.'); 
+                    setModalSuccess('Password recovered. Use it to sign in.');
+                } else {
+                    setModalError(result.error || 'Reset failed.');
                 }
             } else if (modalMode === 'change') {
                 // oldPasswordField is being reused for the old password input
@@ -96,48 +96,48 @@ export const useAuthHandlers = (setUserId: (id: string) => void, onSuccess?: () 
                 }
             } else if (modalMode === 'login') {
                 const result = await authService.login(trimmedId, trimmedPass);
-                if (result.success && result.uid) { 
+                if (result.success && result.uid) {
                     onSuccess?.();
-                    setShowLoginModal(false); 
-                    resetModalState(); 
-                } else { 
-                    setModalError(result.error || 'Login failed.'); 
+                    setShowLoginModal(false);
+                    resetModalState();
+                } else {
+                    setModalError(result.error || 'Login failed.');
                 }
             } else {
                 const result = await authService.signup(trimmedId, trimmedPass);
-                if (result.success && result.uid) { 
-                    onSuccess?.();
-                    setShowLoginModal(false); 
-                    resetModalState(); 
-                } else { 
-                    setModalError(result.error || 'Account creation failed.'); 
+                if (result.success && result.uid) {
+                    // Force reload to ensure Firebase permissions and profile updates are propagated
+                    window.location.reload();
+                    return;
+                } else {
+                    setModalError(result.error || 'Account creation failed.');
                 }
             }
-        } catch (e: unknown) { 
+        } catch (e: unknown) {
             const errorMessage = e instanceof Error ? e.message : 'Network error. Please try again.';
-            setModalError(errorMessage); 
-        } finally { 
-            setIsCheckingUser(false); 
+            setModalError(errorMessage);
+        } finally {
+            setIsCheckingUser(false);
         }
     };
 
     const handleGuestLogin = async () => {
-        setModalError(''); 
+        setModalError('');
         setIsCheckingUser(true);
         try {
             const result = await authService.guestLogin();
-            if (result.success && result.uid) { 
-                onSuccess?.();
-                setShowLoginModal(false); 
-                resetModalState();
-            } else { 
-                setModalError(result.error || 'Guest login failed. Please try again.'); 
+            if (result.success && result.uid) {
+                // Force reload to ensure connection
+                window.location.reload();
+                return;
+            } else {
+                setModalError(result.error || 'Guest login failed. Please try again.');
             }
-        } catch (e: unknown) { 
+        } catch (e: unknown) {
             const errorMessage = e instanceof Error ? e.message : 'Network error. Please try again.';
-            setModalError(errorMessage); 
-        } finally { 
-            setIsCheckingUser(false); 
+            setModalError(errorMessage);
+        } finally {
+            setIsCheckingUser(false);
         }
     };
 
