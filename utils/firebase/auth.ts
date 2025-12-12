@@ -86,9 +86,11 @@ export const loginAnonymously = async () => {
 
             // Ensure profile update has propagated before continuing
             await result.user.reload();
+            await result.user.getIdToken(true);
 
             // Save to Firestore under the Guest ID
             await firestore.collection(FIREBASE_USER_COLLECTION).doc(guestDisplayName).set({
+                uid: result.user.uid, // Store Auth UID for robust security rules
                 createdAt: new Date().toISOString(),
                 settings: DEFAULT_SETTINGS,
                 data: { username: guestDisplayName, isGuest: true }
