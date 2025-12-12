@@ -21,7 +21,7 @@ export const PaperTable: React.FC<Props> = ({ paper, chapters, allItems, userDat
     <div className="overflow-x-auto lg:overflow-y-auto custom-scrollbar lg:max-h-[70vh] relative print:max-h-none print:overflow-visible">
         <table className="w-full text-left border-collapse min-w-[500px] lg:min-w-[700px] print:min-w-0">
             <thead className="sticky top-0 z-30 print:static">
-                <tr className="text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400 border-b border-slate-200 bg-slate-100 dark:bg-[#0f172a] shadow-sm print:bg-white table-header-glow print:font-bold">
+                <tr className="text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400 border-b border-slate-200 bg-slate-100 dark:bg-[#0f172a] shadow-sm table-header-glow print:font-bold">
                     <th className="p-2 pl-4 w-28 lg:w-32 sticky left-0 top-0 z-40 bg-slate-100 dark:bg-[#0f172a] border-r border-slate-200 dark:border-white/5 print:static font-bold">Chapter</th>
                     {allItems.map(t => (
                         <th key={t.key} className="p-2 text-center min-w-[45px] border-r border-slate-200/50 dark:border-white/5 print:min-w-0">

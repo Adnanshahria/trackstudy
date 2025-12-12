@@ -195,11 +195,11 @@
 
       /* Base print styles */
       body {
-        background: white !important;
-        color: black !important;
-        zoom: 0.6;
+        /* Allow user/browser preferences to control print appearance */
         padding: 0;
         margin: 0;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
       }
 
       /* Hide UI Elements: Navbar, Floating Buttons, Edit Toggles, Sidebar */
