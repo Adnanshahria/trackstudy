@@ -31,10 +31,27 @@ interface OnboardingProviderProps {
 
 export const OnboardingProvider: React.FC<OnboardingProviderProps> = ({ children, userId }) => {
     const [state, setState] = useState<OnboardingState>(defaultState);
+    const [hasLoadedState, setHasLoadedState] = useState(false);
 
-    // Load completed tours from Firestore
+    // Load completed tours from localStorage first (instant), then sync with Firestore
     useEffect(() => {
-        if (!userId || !firestore) return;
+        // Load from localStorage immediately
+        const localKey = `onboarding_completed_${userId || 'guest'}`;
+        const localCompleted = localStorage.getItem(localKey);
+        if (localCompleted) {
+            try {
+                const parsed = JSON.parse(localCompleted);
+                setState(prev => ({ ...prev, completedTours: parsed }));
+                setHasLoadedState(true);
+            } catch (e) {
+                console.error('Error parsing local onboarding state:', e);
+            }
+        }
+
+        if (!userId || !firestore) {
+            setHasLoadedState(true);
+            return;
+        }
 
         const loadCompletedTours = async () => {
             try {
@@ -52,14 +69,19 @@ export const OnboardingProvider: React.FC<OnboardingProviderProps> = ({ children
                     }
                 });
 
-                setState(prev => ({ ...prev, completedTours: completed }));
+                // Update localStorage for next time
+                localStorage.setItem(localKey, JSON.stringify(completed));
 
-                // Auto-trigger intro tour for new users
-                if (!completed['intro']) {
-                    setTimeout(() => startTour('intro'), 1000);
+                setState(prev => ({ ...prev, completedTours: completed }));
+                setHasLoadedState(true);
+
+                // Auto-trigger intro tour ONLY for genuinely new users (no completed tours at all)
+                if (Object.keys(completed).length === 0 && !localCompleted) {
+                    setTimeout(() => startTour('intro'), 1500);
                 }
             } catch (error) {
                 console.error('Error loading onboarding state:', error);
+                setHasLoadedState(true);
             }
         };
 

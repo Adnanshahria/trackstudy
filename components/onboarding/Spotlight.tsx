@@ -92,15 +92,24 @@ export const Spotlight: React.FC<SpotlightProps> = ({
                 />
             </svg>
 
-            {/* Highlight border animation */}
+            {/* Highlight border animation - make the highlighted area interactive */}
             <div
-                className="absolute rounded-lg border-2 border-blue-400 animate-pulse pointer-events-none"
+                className="absolute rounded-lg border-2 border-blue-400 pointer-events-auto cursor-pointer"
                 style={{
                     top: targetRect.top,
                     left: targetRect.left,
                     width: targetRect.width,
                     height: targetRect.height,
-                    boxShadow: '0 0 0 4px rgba(59, 130, 246, 0.3), 0 0 20px rgba(59, 130, 246, 0.5)'
+                    boxShadow: '0 0 0 4px rgba(59, 130, 246, 0.3), 0 0 20px rgba(59, 130, 246, 0.5)',
+                    animation: 'pulse 2s ease-in-out infinite'
+                }}
+                onClick={(e) => {
+                    e.stopPropagation();
+                    // Allow interaction with the highlighted element
+                    const element = document.querySelector(targetSelector) as HTMLElement;
+                    if (element) {
+                        element.click();
+                    }
                 }}
             />
         </div>
