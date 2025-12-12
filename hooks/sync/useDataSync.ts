@@ -65,17 +65,25 @@ export const useDataSync = (
                         dbPut('userData', { id: 'main', value: remoteData }).catch(() => { });
                     }
                     if (remoteSettings && typeof remoteSettings === 'object') {
+                        // DEBUG: Log RAW data from Firestore BEFORE merging
+                        console.log('[DEBUG LOAD] RAW remoteSettings.subjectConfigs from Firestore:',
+                            remoteSettings.subjectConfigs ? JSON.stringify(remoteSettings.subjectConfigs, null, 2) : 'UNDEFINED');
+
                         setSettings(prev => {
                             const merged: UserSettings = {
                                 ...DEFAULT_SETTINGS,
                                 ...remoteSettings,
                                 syllabus: remoteSettings.syllabus || JSON.parse(JSON.stringify(INITIAL_SYLLABUS_DATA)),
                                 trackableItems: remoteSettings.trackableItems || DEFAULT_SETTINGS.trackableItems,
-                                subjectConfigs: remoteSettings.subjectConfigs || {},
+                                // Fix: Don't overwrite local subjectConfigs with empty/undefined remote data
+                                // This prevents the 'flash' issue where local data loads then gets wiped by delayed/partial remote sync
+                                subjectConfigs: (remoteSettings.subjectConfigs && Object.keys(remoteSettings.subjectConfigs).length > 0)
+                                    ? remoteSettings.subjectConfigs
+                                    : (prev.subjectConfigs && Object.keys(prev.subjectConfigs).length > 0 ? prev.subjectConfigs : {}),
                                 subjectWeights: remoteSettings.subjectWeights || {}
                             };
-                            // DEBUG: Log subjectConfigs to verify persistence
-                            console.log('[DEBUG] subjectConfigs from server:', JSON.stringify(merged.subjectConfigs, null, 2));
+                            // DEBUG: Log subjectConfigs AFTER merge
+                            console.log('[DEBUG LOAD] MERGED subjectConfigs:', JSON.stringify(merged.subjectConfigs, null, 2));
                             dbPut('userData', { id: 'settings', value: merged }).catch(() => { });
                             return merged;
                         });
