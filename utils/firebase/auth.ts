@@ -45,7 +45,12 @@ export const createUser = async (rawId: string, pass: string) => {
             // CRITICAL: Set the Auth Profile Display Name to the Custom ID.
             await result.user.updateProfile({ displayName: id });
 
+            // Force token refresh to ensure the new displayName is in the auth token
+            await result.user.reload();
+            await result.user.getIdToken(true);
+
             await firestore.collection(FIREBASE_USER_COLLECTION).doc(id).set({
+                uid: result.user.uid, // Store Auth UID for robust security rules
                 createdAt: new Date().toISOString(),
                 settings: DEFAULT_SETTINGS,
                 data: { username: id },
