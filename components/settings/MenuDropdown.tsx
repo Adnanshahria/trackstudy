@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { UserData } from '../../types';
+import { useAdmin } from '../../hooks/useAdmin';
 
 interface MenuDropdownProps {
     userId: string | null;
@@ -12,15 +13,17 @@ interface MenuDropdownProps {
     onOpenDevModal: () => void;
     onOpenAppearance: () => void;
     onForceSync: () => void;
+    onOpenAdmin?: () => void;
     onClose: () => void;
 }
 
-export const MenuDropdown: React.FC<MenuDropdownProps> = ({ userId, userData, theme, onLogout, onToggleTheme, onOpenGuide, onOpenDevModal, onOpenAppearance, onForceSync, onClose }) => {
+export const MenuDropdown: React.FC<MenuDropdownProps> = ({ userId, userData, theme, onLogout, onToggleTheme, onOpenGuide, onOpenDevModal, onOpenAppearance, onForceSync, onOpenAdmin, onClose }) => {
     const [isSyncing, setIsSyncing] = useState(false);
+    const { isAdmin } = useAdmin();
 
     const MenuItem = ({ onClick, icon, text, colorClass, disabled = false }: any) => (
-        <button 
-            onClick={(e) => { if(!disabled) { onClick(e); if(!disabled) onClose(); } }} 
+        <button
+            onClick={(e) => { if (!disabled) { onClick(e); if (!disabled) onClose(); } }}
             disabled={disabled}
             className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-white dark:hover:bg-white/10 rounded-lg transition-all text-left group hover:pl-4 ${disabled ? 'opacity-50 cursor-wait' : ''}`}
         >
@@ -38,7 +41,7 @@ export const MenuDropdown: React.FC<MenuDropdownProps> = ({ userId, userData, th
             onForceSync(); // Trigger soft sync (react state reset)
             setIsSyncing(false);
             onClose();
-        }, 500); 
+        }, 500);
     };
 
     const handleLogoutClick = async (e: React.MouseEvent) => {
@@ -59,7 +62,7 @@ export const MenuDropdown: React.FC<MenuDropdownProps> = ({ userId, userData, th
 
     return (
         <div className="absolute right-0 mt-3 w-72 glass-panel rounded-3xl shadow-2xl shadow-black/40 overflow-hidden animate-fade-in z-50 border border-slate-200 dark:border-white/10 p-3 origin-top-right backdrop-blur-xl">
-            
+
             <div className="flex flex-col gap-3">
                 <div className="px-4 py-3 bg-slate-50/80 dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm">
                     <p className="text-[10px] uppercase font-bold text-slate-500 tracking-wider mb-2">{userId ? 'Signed in as' : 'Welcome'}</p>
@@ -79,14 +82,17 @@ export const MenuDropdown: React.FC<MenuDropdownProps> = ({ userId, userData, th
 
                 <div className="bg-slate-50/50 dark:bg-white/5 rounded-2xl p-1 border border-slate-200/50 dark:border-white/5 shadow-sm">
                     <div className="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">System</div>
-                    <MenuItem 
-                        onClick={handleForceSync} 
-                        icon={isSyncing ? "⏳" : "🔄"} 
-                        text={isSyncing ? "Syncing..." : "Force Sync"} 
+                    <MenuItem
+                        onClick={handleForceSync}
+                        icon={isSyncing ? "⏳" : "🔄"}
+                        text={isSyncing ? "Syncing..." : "Force Sync"}
                         colorClass="bg-amber-100 dark:bg-amber-500/20 text-amber-600"
                         disabled={isSyncing}
                     />
                     <MenuItem onClick={onOpenDevModal} icon="👨‍💻" text="Developer Info" colorClass="bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400" />
+                    {isAdmin && onOpenAdmin && (
+                        <MenuItem onClick={onOpenAdmin} icon="⚙️" text="Admin Panel" colorClass="bg-purple-100 dark:bg-purple-500/20 text-purple-600" />
+                    )}
                 </div>
 
                 {userId && (

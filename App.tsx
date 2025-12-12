@@ -22,6 +22,7 @@ import { useAuthHandlers } from './hooks/useAuthHandlers';
 import { useAppearance } from './hooks/ui/useAppearance';
 import { useToast, ToastContext } from './hooks/useToast';
 import { OnboardingProvider } from './components/onboarding/OnboardingProvider';
+import { AdminPanel } from './components/admin/AdminPanel';
 
 function App() {
   const { userId, setUserId, isAuthResolving, userData, settings, isLoading, connectionStatus, handleStatusUpdate, handleNoteUpdate, handleSettingsUpdate, toggleTheme, handleLogout, forceSync } = useFirebaseSync();
@@ -29,6 +30,7 @@ function App() {
   const [showDevModal, setShowDevModal] = useState(false);
   const [showAppGuide, setShowAppGuide] = useState(false);
   const [showAppearance, setShowAppearance] = useState(false);
+  const [showAdminPanel, setShowAdminPanel] = useState(false);
   const [bypassAuth, setBypassAuth] = useState(false);
 
   const { toast, showToast, hideToast } = useToast();
@@ -131,6 +133,7 @@ function App() {
                 onGuide={() => setShowAppGuide(true)}
                 onAppearance={() => setShowAppearance(true)}
                 onForceSync={forceSync}
+                onOpenAdmin={() => setShowAdminPanel(true)}
               />
               {isLoading ? (
                 <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-6 items-start lg:overflow-hidden animate-pulse">
@@ -177,6 +180,7 @@ function App() {
         <DeveloperModal isOpen={showDevModal} onClose={() => setShowDevModal(false)} />
         <AppGuideModal isOpen={showAppGuide} onClose={() => setShowAppGuide(false)} />
         <AppearanceModal isOpen={showAppearance} onClose={() => setShowAppearance(false)} settings={settings} onUpdateSettings={wrappedSettingsUpdate} />
+        <AdminPanel isOpen={showAdminPanel} onClose={() => setShowAdminPanel(false)} />
 
         <Toast
           message={toast.message}
