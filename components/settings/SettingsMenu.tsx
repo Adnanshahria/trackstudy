@@ -11,6 +11,7 @@ interface SettingsMenuProps {
     theme: 'dark' | 'light';
     onOpenGuide: () => void;
     onOpenDevModal: () => void;
+    onOpenAdmin?: () => void;
     onOpenAppearance: () => void;
     onForceSync: () => void;
     className?: string; // Allow overriding button styles
