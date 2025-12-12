@@ -18,19 +18,19 @@ export const PerformanceBarItems: React.FC<Props> = ({ items, weights, allItems,
             return (
                 <div key={item.key} className="flex items-center justify-between p-1.5 rounded hover:bg-slate-100 dark:hover:bg-white/5 transition-colors">
                     <label className="flex items-center gap-3 text-xs text-slate-700 dark:text-slate-300 cursor-pointer select-none">
-                        <input 
-                            type="checkbox" 
-                            checked={isChecked} 
+                        <input
+                            type="checkbox"
+                            checked={isChecked}
                             onChange={() => toggleItem(idx, item.key)}
-                            className="accent-blue-500 rounded-sm w-3.5 h-3.5" 
+                            className="accent-blue-500 rounded-sm w-3.5 h-3.5"
                         />
                         <span>{item.name}</span>
                     </label>
                     {isChecked && (
                         <div className="flex items-center gap-1">
-                            <input 
-                                type="number" 
-                                value={weight} 
+                            <input
+                                type="number"
+                                value={weight || ''}
                                 onChange={(e) => updateWeight(idx, item.key, parseInt(e.target.value) || 0)}
                                 className="w-12 bg-transparent border border-slate-300 dark:border-white/20 rounded px-1 py-0.5 text-[10px] text-center text-slate-800 dark:text-white focus:outline-none focus:border-blue-500"
                             />

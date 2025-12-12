@@ -1,9 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ProgressBarConfig } from '../../../types';
 import { TitleEditState } from './PerformanceConfig.types';
 
 export const usePerformanceConfig = (currentConfig: ProgressBarConfig[], onSave: (c: ProgressBarConfig[]) => void) => {
     const [config, setConfig] = useState<ProgressBarConfig[]>(JSON.parse(JSON.stringify(currentConfig)));
+
+    useEffect(() => {
+        setConfig(JSON.parse(JSON.stringify(currentConfig)));
+    }, [currentConfig]);
     const [titleEdit, setTitleEdit] = useState<TitleEditState | null>(null);
 
     const updateConfig = (fn: (c: ProgressBarConfig[]) => void) => {
@@ -13,7 +17,7 @@ export const usePerformanceConfig = (currentConfig: ProgressBarConfig[], onSave:
     };
 
     const toggleVisibility = (idx: number) => updateConfig(c => c[idx].visible = !c[idx].visible);
-    
+
     const toggleItem = (confIdx: number, itemKey: string) => updateConfig(c => {
         const items = c[confIdx].items;
         if (items.includes(itemKey)) {
@@ -22,7 +26,7 @@ export const usePerformanceConfig = (currentConfig: ProgressBarConfig[], onSave:
         } else {
             c[confIdx].items = [...items, itemKey];
             if (!c[confIdx].weights) c[confIdx].weights = {};
-            c[confIdx].weights![itemKey] = 10; 
+            c[confIdx].weights![itemKey] = 10;
         }
     });
 
@@ -32,9 +36,9 @@ export const usePerformanceConfig = (currentConfig: ProgressBarConfig[], onSave:
     });
 
     const updateConfigTitle = (idx: number, val: string) => updateConfig(c => c[idx].title = val);
-    
-    const deleteBar = (idx: number) => { 
-        if (confirm("Delete this progress bar?")) setConfig(config.filter((_, i) => i !== idx)); 
+
+    const deleteBar = (idx: number) => {
+        if (confirm("Delete this progress bar?")) setConfig(config.filter((_, i) => i !== idx));
     };
 
     const addBar = () => setConfig([...config, {
