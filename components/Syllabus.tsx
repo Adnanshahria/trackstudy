@@ -62,11 +62,9 @@ export const Syllabus: React.FC<SyllabusProps> = ({ activeSubject, userData, set
             // Delete all chapters in this paper
             const paperId = Number(confirmAction.id);
             handlers.onDeletePaper(activeSubject, paperId);
+            // Reset localMaxPaper so if this was an extra paper, it disappears (unless data keeps it open)
             if (paperId > 2) {
-                // If it's an extra paper, we can hide it effectively by re-calculating max paper next render
-                // Assuming localMaxPaper logic handles it, or we force update?
-                // Actually, if we delete chapters, it disappears from data.
-                // But we might want to explicitly decrease localMaxPaper if it was the last one.
+                setLocalMaxPaper(0);
             }
         }
         setConfirmAction(null);
