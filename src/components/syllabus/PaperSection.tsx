@@ -20,14 +20,15 @@ export const PaperSection: React.FC<Props> = ({ paper, activeSubject, userData, 
                 onTogglePaper={onTogglePaper} editMode={editMode} onToggleEdit={toggleEdit}
                 onDeletePaper={onDeletePaper}
             />
-            {isOpen && (
+            {/* Always render table for print, but hide on screen when collapsed */}
+            <div className={`${isOpen ? '' : 'hidden print:block'}`}>
                 <PaperTable
                     paper={paper} chapters={chapters} allItems={allItems} userData={userData}
                     activeSubject={activeSubject} editMode={editMode} actions={actions}
                     setRenameModal={setRenameModal} onDeleteColumn={onDeleteColumn}
                     setAddColumnModal={setAddColumnModal} setAddChapterModal={setAddChapterModal}
                 />
-            )}
+            </div>
         </div>
     );
 };

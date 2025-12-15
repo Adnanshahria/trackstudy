@@ -189,7 +189,7 @@
     /* Print Optimization */
     @media print {
       @page {
-        size: landscape;
+        size: auto;
         margin: 6mm;
       }
 
@@ -261,13 +261,21 @@
         font-weight: 700 !important;
       }
 
-      /* Print Container - CSS Grid Layout for Both Papers */
+      /* Print Container - Stack papers vertically by default (mobile-friendly) */
       .print-grid {
-        display: grid !important;
-        grid-template-columns: 1fr 1fr !important;
-        gap: 10px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 20px !important;
         width: 100% !important;
-        page-break-inside: avoid;
+      }
+
+      /* On wider paper (landscape or A4), use side-by-side layout */
+      @media (min-width: 800px) {
+        .print-grid {
+          display: grid !important;
+          grid-template-columns: 1fr 1fr !important;
+          gap: 10px !important;
+        }
       }
 
       /* Paper 1 on Left, Paper 2 on Right */
