@@ -4,7 +4,7 @@ import { UserData, UserSettings } from '../types';
 import { DEFAULT_SETTINGS } from '../constants';
 import { useSyncActions } from './sync/useSyncActions';
 import { useDataSync } from './sync/useDataSync';
-import { useDataMigration } from './sync/useDataMigration';
+
 import { firebaseAuth } from '../utils/firebase/core';
 import { logger } from '../utils/logger';
 import firebase from 'firebase/compat/app';
@@ -14,16 +14,16 @@ export const useFirebaseSync = () => {
     const [settings, setSettings] = useState<UserSettings>(DEFAULT_SETTINGS);
     const [userId, setUserId] = useState<string | null>(null);
     const [isAuthResolving, setIsAuthResolving] = useState(true);
-    
+
     // Add a key state to force re-mounting/re-syncing
     const [syncKey, setSyncKey] = useState(0);
 
     const localDataRef = useRef<UserData>({});
     const localSettingsRef = useRef<UserSettings>(DEFAULT_SETTINGS);
-    
+
     useEffect(() => { localDataRef.current = userData; }, [userData]);
     useEffect(() => { localSettingsRef.current = settings; }, [settings]);
-    
+
     // Helper to wait for the custom ID (displayName) to appear
     // Optimized with reduced polling iterations and faster timeout
     const waitForCustomId = async (user: firebase.User): Promise<string> => {
@@ -50,10 +50,10 @@ export const useFirebaseSync = () => {
         return user.uid;
     };
 
-    useEffect(() => { 
-        setUserData({}); 
-        setSettings(DEFAULT_SETTINGS); 
-        
+    useEffect(() => {
+        // NOTE: Don't reset settings here - it would overwrite Firestore data
+        // The initial state in useState is sufficient for empty/new users
+
         if (!firebaseAuth) {
             logger.error("Auth not initialized, skipping auth check.");
             setIsAuthResolving(false);
@@ -86,10 +86,10 @@ export const useFirebaseSync = () => {
     useEffect(() => { document.documentElement.setAttribute('data-theme', settings.theme); }, [settings.theme]);
 
     const actions = useSyncActions(userId, userData, setUserData, settings, setSettings, localDataRef, localSettingsRef, setUserId);
-    
+
     const { isLoading, connectionStatus } = useDataSync(userId, setUserData, setSettings, localSettingsRef, localDataRef, actions.handleLogout, syncKey);
 
-    useDataMigration(userData, setUserData, settings, userId);
+
 
     const forceSync = () => {
         setSyncKey(prev => prev + 1);

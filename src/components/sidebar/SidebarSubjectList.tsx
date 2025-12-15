@@ -1,5 +1,5 @@
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { SubjectItem } from './SubjectItem';
 import { SubjectData, UserData, UserSettings } from '../../types';
 
@@ -18,25 +18,20 @@ export const SidebarSubjectList: React.FC<Props> = ({ settings, activeSubject, i
     const [draggedKey, setDraggedKey] = useState<string | null>(null);
     const [dragOverKey, setDragOverKey] = useState<string | null>(null);
     const dragCounter = useRef(0);
-    const hasPersistedOrder = useRef(false);
 
-    const syllabusKeys = Object.keys(settings.syllabus);
+    const syllabusKeys = Object.keys(settings.syllabus || {});
     const existingOrder = settings.subjectOrder || [];
 
-    const validOrder = existingOrder.filter(key => settings.syllabus[key]);
+    // Compute display order without auto-saving - prevents re-saving old cached data
+    const validOrder = existingOrder.filter(key => settings.syllabus?.[key]);
     const newKeys = syllabusKeys.filter(key => !validOrder.includes(key));
     const finalOrder = [...validOrder, ...newKeys];
 
-    // Persist the order if it doesn't exist yet (one-time initialization)
-    useEffect(() => {
-        if (!settings.subjectOrder && syllabusKeys.length > 0 && !hasPersistedOrder.current) {
-            hasPersistedOrder.current = true;
-            onUpdateSettings({ ...settings, subjectOrder: finalOrder });
-        }
-    }, [settings.subjectOrder, syllabusKeys.length]);
+    // NOTE: Removed auto-save useEffect that was causing data overwrites
+    // Subject order is now only saved explicitly when user drag-and-drops
 
     const orderedSubjects = finalOrder
-        .map(key => [key, settings.syllabus[key]] as [string, SubjectData])
+        .map(key => [key, settings.syllabus?.[key]] as [string, SubjectData])
         .filter(([_, data]) => data !== undefined);
 
     const handleDragStart = (e: React.DragEvent, key: string) => {

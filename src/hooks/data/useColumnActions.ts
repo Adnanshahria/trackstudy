@@ -14,7 +14,6 @@ export const useColumnActions = (settings: UserSettings, handleSettingsUpdate: (
             const currentItems = getItems(currentSettings, subjectKey).filter((t: TrackableItem) => t.key !== itemKey);
             const newConfigs = { ...(currentSettings.subjectConfigs || {}) };
             newConfigs[subjectKey] = currentItems;
-            console.log('[DEBUG] onDeleteColumn - saving subjectConfigs:', JSON.stringify(newConfigs, null, 2));
             return { ...currentSettings, subjectConfigs: newConfigs };
         });
     };
@@ -33,7 +32,6 @@ export const useColumnActions = (settings: UserSettings, handleSettingsUpdate: (
             currentItems[itemIndex].name = trimmedName;
             const newConfigs = { ...(currentSettings.subjectConfigs || {}) };
             newConfigs[subjectKey] = currentItems;
-            console.log('[DEBUG] onRenameColumn - saving subjectConfigs:', JSON.stringify(newConfigs, null, 2));
             return { ...currentSettings, subjectConfigs: newConfigs };
         });
     };
@@ -53,7 +51,6 @@ export const useColumnActions = (settings: UserSettings, handleSettingsUpdate: (
             currentItems.push(newItem);
             const newConfigs = { ...(currentSettings.subjectConfigs || {}) };
             newConfigs[subjectKey] = currentItems;
-            console.log('[DEBUG] onAddColumn - saving subjectConfigs:', JSON.stringify(newConfigs, null, 2));
             return { ...currentSettings, subjectConfigs: newConfigs };
         });
     };

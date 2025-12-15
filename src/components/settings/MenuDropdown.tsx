@@ -12,12 +12,10 @@ interface MenuDropdownProps {
     onOpenDevModal: () => void;
     onOpenAppearance: () => void;
     onForceSync: () => void;
-    onOpenAdmin?: () => void;
-    onOpenMigration?: () => void;
     onClose: () => void;
 }
 
-export const MenuDropdown: React.FC<MenuDropdownProps> = ({ userId, userData, theme, onLogout, onToggleTheme, onOpenGuide, onOpenDevModal, onOpenAppearance, onForceSync, onOpenAdmin, onOpenMigration, onClose }) => {
+export const MenuDropdown: React.FC<MenuDropdownProps> = ({ userId, userData, theme, onLogout, onToggleTheme, onOpenGuide, onOpenDevModal, onOpenAppearance, onForceSync, onClose }) => {
     const [isSyncing, setIsSyncing] = useState(false);
 
     const MenuItem = ({ onClick, icon, text, colorClass, disabled = false }: any) => (
@@ -88,8 +86,6 @@ export const MenuDropdown: React.FC<MenuDropdownProps> = ({ userId, userData, th
                         colorClass="bg-amber-100 dark:bg-amber-500/20 text-amber-600"
                         disabled={isSyncing}
                     />
-                    <MenuItem onClick={onOpenMigration} icon="🔄" text="Data Migration" colorClass="bg-purple-100 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400" />
-                    <MenuItem onClick={onOpenAdmin} icon="⚙️" text="Admin Panel" colorClass="bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400" />
                     <MenuItem onClick={onOpenDevModal} icon="👨‍💻" text="Developer Info" colorClass="bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400" />
                 </div>
 

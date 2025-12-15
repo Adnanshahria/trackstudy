@@ -1,9 +1,9 @@
 
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { UserData, UserSettings } from '../../types';
-import { DEFAULT_SETTINGS, INITIAL_SYLLABUS_DATA } from '../../constants';
-import { dbPut, dbGet, initFirebase } from '../../utils/storage';
+import { initFirebase } from '../../utils/storage';
 import { logger } from '../../utils/logger';
+import { DEFAULT_SETTINGS } from '../../constants';
 
 export const useDataSync = (
     userId: string | null,
@@ -36,25 +36,7 @@ export const useDataSync = (
 
             setIsLoading(true);
 
-            try {
-                const [cachedData, cachedSettings] = await Promise.all([
-                    dbGet('main').catch(() => null),
-                    dbGet('settings').catch(() => null)
-                ]);
-
-                if (!isMounted.current || isCleanedUp || thisSyncId !== currentSyncId.current) return;
-
-                if (cachedData && typeof cachedData === 'object') {
-                    setUserData(prev => ({ ...prev, ...cachedData }));
-                }
-                if (cachedSettings && typeof cachedSettings === 'object') {
-                    setSettings(prev => ({ ...prev, ...cachedSettings }));
-                }
-            } catch (e) {
-                logger.debug("Local cache load failed");
-            }
-
-            if (!isMounted.current || isCleanedUp || thisSyncId !== currentSyncId.current) return;
+            // NO IndexedDB cache - Firestore is the only source of truth
 
             try {
                 const unsubscribe = await initFirebase(userId, (remoteData, remoteSettings) => {
@@ -62,31 +44,17 @@ export const useDataSync = (
 
                     if (remoteData && typeof remoteData === 'object') {
                         setUserData(prev => ({ ...prev, ...remoteData }));
-                        dbPut('userData', { id: 'main', value: remoteData }).catch(() => { });
                     }
                     if (remoteSettings && typeof remoteSettings === 'object') {
-                        // DEBUG: Log RAW data from Firestore BEFORE merging
-                        console.log('[DEBUG LOAD] RAW remoteSettings.subjectConfigs from Firestore:',
-                            remoteSettings.subjectConfigs ? JSON.stringify(remoteSettings.subjectConfigs, null, 2) : 'UNDEFINED');
-
-                        setSettings(prev => {
-                            const merged: UserSettings = {
-                                ...DEFAULT_SETTINGS,
-                                ...remoteSettings,
-                                syllabus: remoteSettings.syllabus || JSON.parse(JSON.stringify(INITIAL_SYLLABUS_DATA)),
-                                trackableItems: remoteSettings.trackableItems || DEFAULT_SETTINGS.trackableItems,
-                                // Fix: Don't overwrite local subjectConfigs with empty/undefined remote data
-                                // This prevents the 'flash' issue where local data loads then gets wiped by delayed/partial remote sync
-                                subjectConfigs: (remoteSettings.subjectConfigs && Object.keys(remoteSettings.subjectConfigs).length > 0)
-                                    ? remoteSettings.subjectConfigs
-                                    : (prev.subjectConfigs && Object.keys(prev.subjectConfigs).length > 0 ? prev.subjectConfigs : {}),
-                                subjectWeights: remoteSettings.subjectWeights || {}
-                            };
-                            // DEBUG: Log subjectConfigs AFTER merge
-                            console.log('[DEBUG LOAD] MERGED subjectConfigs:', JSON.stringify(merged.subjectConfigs, null, 2));
-                            dbPut('userData', { id: 'settings', value: merged }).catch(() => { });
-                            return merged;
-                        });
+                        // MERGE STRATEGY:
+                        // 1. Start with DEFAULT_SETTINGS to ensure all partial fields exist
+                        // 2. Spread remoteSettings on top:
+                        //    - Since we sanitized before saving, explicit empty arrays/objects ARE in remoteSettings
+                        //    - So ({ ...defaults, syllabus: {} }) results in empty syllabus, not defaults
+                        setSettings(prev => ({
+                            ...DEFAULT_SETTINGS,
+                            ...remoteSettings
+                        }));
                     }
                     setIsLoading(false);
                 }, (status) => {

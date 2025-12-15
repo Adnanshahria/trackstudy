@@ -1,6 +1,6 @@
 import React from 'react';
 import { UserData, UserSettings } from '../../types';
-import { saveUserProgress, saveSettings, cleanupStorage, firebaseAuth } from '../../utils/storage';
+import { saveUserProgress, saveSettings, flushPendingSaves, firebaseAuth } from '../../utils/storage';
 import { logger } from '../../utils/logger';
 import { DEFAULT_SETTINGS } from '../../constants';
 
@@ -68,7 +68,6 @@ export const useSyncActions = (
 
     const handleSettingsUpdate = async (newSettingsOrUpdater: UserSettings | ((prev: UserSettings) => UserSettings)) => {
         try {
-            // Support both direct object and callback function patterns
             let newSettings: UserSettings;
             if (typeof newSettingsOrUpdater === 'function') {
                 newSettings = newSettingsOrUpdater(settings);
@@ -79,7 +78,9 @@ export const useSyncActions = (
             if (!newSettings || typeof newSettings !== 'object') return;
 
             setSettings(newSettings);
+
             if (!userId) return;
+
             await saveSettings(userId, newSettings);
         } catch (error) {
             console.error('Settings update failed:', error);
@@ -91,13 +92,17 @@ export const useSyncActions = (
     };
 
     const handleLogout = async () => {
-        // CRITICAL FIX: Clear UI state FIRST to prevent zombie listeners
+        // Flush any pending debounced saves before logout
+        if (userId) {
+            flushPendingSaves(userId);
+        }
+
+        // Clear UI state
         setUserId(null);
         setUserData({});
         setSettings(DEFAULT_SETTINGS);
         localDataRef.current = {};
         localSettingsRef.current = DEFAULT_SETTINGS;
-        cleanupStorage();
 
         // THEN sign out from Firebase to properly disconnect
         try {
