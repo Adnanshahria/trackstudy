@@ -67,14 +67,12 @@ export const Syllabus: React.FC<SyllabusProps> = ({ activeSubject, userData, set
         setPrintMode(mode);
         setShowPrintModal(false);
 
-        // Use requestAnimationFrame to ensure React has rendered the new class
-        requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-                window.print();
-                // Fallback reset for browsers where afterprint doesn't fire
-                // The afterprint listener above is the primary reset mechanism
-            });
-        });
+        // Use setTimeout(0) instead of requestAnimationFrame
+        // Mobile browsers block print() if called outside direct user gesture context
+        // setTimeout(0) lets React update while preserving the gesture chain
+        setTimeout(() => {
+            window.print();
+        }, 0);
     }, []);
 
     return (
