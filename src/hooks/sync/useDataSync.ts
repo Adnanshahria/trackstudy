@@ -12,7 +12,8 @@ export const useDataSync = (
     localSettingsRef: React.MutableRefObject<UserSettings>,
     localDataRef: React.MutableRefObject<UserData>,
     handleLogout: () => void,
-    syncKey: number = 0
+    syncKey: number = 0,
+    pendingSettingsUpdateRef: React.MutableRefObject<number>
 ) => {
     const [isLoading, setIsLoading] = useState(false);
     const [connectionStatus, setConnectionStatus] = useState<'connected' | 'disconnected'>('disconnected');
@@ -46,6 +47,15 @@ export const useDataSync = (
                         setUserData(prev => ({ ...prev, ...remoteData }));
                     }
                     if (remoteSettings && typeof remoteSettings === 'object') {
+                        // RACE CONDITION FIX: Check if there's a pending local settings update
+                        // If so, skip applying remote settings to avoid overwriting local changes
+                        const now = Date.now();
+                        if (pendingSettingsUpdateRef.current > now) {
+                            logger.debug('Skipping remote settings update - pending local change');
+                            setIsLoading(false);
+                            return;
+                        }
+
                         // MERGE STRATEGY:
                         // 1. Start with DEFAULT_SETTINGS to ensure all partial fields exist
                         // 2. Spread remoteSettings on top:

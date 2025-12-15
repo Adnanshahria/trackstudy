@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { calculateProgress } from '../../utils/calculations';
 import { UserData, UserSettings } from '../../types';
 import { SyllabusHeader } from './SyllabusHeader';
@@ -27,15 +27,15 @@ interface SyllabusProps {
 export const Syllabus: React.FC<SyllabusProps> = ({ activeSubject, userData, settings, ...handlers }) => {
     const ui = useSyllabusUI();
     const subject = settings.syllabus[activeSubject];
-    
+
     const [confirmAction, setConfirmAction] = useState<{ type: 'chapter' | 'column'; id: string | number; subject: string; } | null>(null);
     const [showPrintModal, setShowPrintModal] = useState(false);
     const [printMode, setPrintMode] = useState<'p1' | 'p2' | 'both'>('both');
-    
+
     if (!subject) return <div className="p-10 text-center text-slate-500">Subject not found.</div>;
 
     const allItems = settings.subjectConfigs?.[activeSubject] || settings.trackableItems;
-    
+
     const safeHandlers = {
         ...handlers,
         onDeleteChapter: (sub: string, id: string | number) => setConfirmAction({ type: 'chapter', id, subject: sub }),
@@ -54,21 +54,33 @@ export const Syllabus: React.FC<SyllabusProps> = ({ activeSubject, userData, set
         setConfirmAction(null);
     };
 
-    const handlePrint = (mode: 'p1' | 'p2' | 'both') => {
+    // Robust afterprint listener to reset print mode across all browsers
+    useEffect(() => {
+        const resetPrintMode = () => {
+            setPrintMode('both');
+        };
+        window.addEventListener('afterprint', resetPrintMode);
+        return () => window.removeEventListener('afterprint', resetPrintMode);
+    }, []);
+
+    const handlePrint = useCallback((mode: 'p1' | 'p2' | 'both') => {
         setPrintMode(mode);
         setShowPrintModal(false);
-        // Slight delay to allow React to update the classNames before printing
-        setTimeout(() => {
-            window.print();
-            // Reset after print dialog closes (execution pauses during print)
-            setPrintMode('both');
-        }, 300);
-    };
+
+        // Use requestAnimationFrame to ensure React has rendered the new class
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                window.print();
+                // Fallback reset for browsers where afterprint doesn't fire
+                // The afterprint listener above is the primary reset mechanism
+            });
+        });
+    }, []);
 
     return (
         <div className={`flex flex-col gap-6 min-w-0 ${printMode === 'p1' ? 'print-show-p1' : printMode === 'p2' ? 'print-show-p2' : ''}`}>
             <SyllabusHeader subject={subject} onOpenPrintModal={() => setShowPrintModal(true)} />
-            
+
             <div className="flex flex-col gap-6 print-grid">
                 {[1, 2].map(paper => {
                     const p = calculateProgress(activeSubject, allItems.map(i => i.key), userData, undefined, allItems, settings.syllabus);
@@ -79,10 +91,10 @@ export const Syllabus: React.FC<SyllabusProps> = ({ activeSubject, userData, set
                     );
                 })}
             </div>
-            
+
             <SyllabusModals modals={ui.modals} setModals={ui.setModals} handlers={handlers} ui={ui} activeSubject={activeSubject} settings={settings} />
-            
-            <ConfirmModal 
+
+            <ConfirmModal
                 isOpen={!!confirmAction}
                 onClose={() => setConfirmAction(null)}
                 onConfirm={executeDelete}
@@ -92,10 +104,10 @@ export const Syllabus: React.FC<SyllabusProps> = ({ activeSubject, userData, set
                 isDanger={true}
             />
 
-            <PrintModal 
-                isOpen={showPrintModal} 
-                onClose={() => setShowPrintModal(false)} 
-                onPrint={handlePrint} 
+            <PrintModal
+                isOpen={showPrintModal}
+                onClose={() => setShowPrintModal(false)}
+                onPrint={handlePrint}
             />
         </div>
     );

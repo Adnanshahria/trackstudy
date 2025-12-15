@@ -57,17 +57,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeSubject, onChangeSubject
                 />
             </div>
 
-            {/* ROW 2: Performance Widget (Standalone Card) */}
-            <div className="glass-panel rounded-3xl p-5 shadow-sm shrink-0">
-                <PerformanceWidget
-                    settings={settings}
-                    userData={userData}
-                    activeSubject={activeSubject}
-                    onConfig={() => setModals({ ...modals, perf: true })}
-                />
-            </div>
-
-            {/* ROW 3: Subjects List (Max Height ~4 items then scroll) */}
+            {/* ROW 2: Subjects List (Max Height ~4 items then scroll) */}
             <div className="glass-panel rounded-3xl flex flex-col overflow-hidden shadow-sm shrink-0 max-h-[380px]">
                 <div className="pt-5 px-5 shrink-0">
                     <SidebarHeader isEditing={isEditingSubjects} setIsEditing={setIsEditingSubjects} setModals={setModals} />
@@ -80,6 +70,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeSubject, onChangeSubject
                         onDeleteSubject={(key) => setDeleteConfirm(key)}
                     />
                 </div>
+            </div>
+
+            {/* ROW 3: Performance Widget (Standalone Card) */}
+            <div className="glass-panel rounded-3xl p-5 shadow-sm shrink-0">
+                <PerformanceWidget
+                    settings={settings}
+                    userData={userData}
+                    activeSubject={activeSubject}
+                    onConfig={() => setModals({ ...modals, perf: true })}
+                />
             </div>
 
             {/* ROW 4: Subject Progress (for active subject) */}

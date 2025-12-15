@@ -4,6 +4,9 @@ import { saveUserProgress, saveSettings, flushPendingSaves, firebaseAuth } from 
 import { logger } from '../../utils/logger';
 import { DEFAULT_SETTINGS } from '../../constants';
 
+// Debounce wait time (must match writers.ts) + buffer for network latency
+const PENDING_UPDATE_TIMEOUT_MS = 300 + 500; // 300ms debounce + 500ms buffer
+
 export const useSyncActions = (
     userId: string | null,
     userData: UserData,
@@ -12,7 +15,8 @@ export const useSyncActions = (
     setSettings: React.Dispatch<React.SetStateAction<UserSettings>>,
     localDataRef: React.MutableRefObject<UserData>,
     localSettingsRef: React.MutableRefObject<UserSettings>,
-    setUserId: React.Dispatch<React.SetStateAction<string | null>>
+    setUserId: React.Dispatch<React.SetStateAction<string | null>>,
+    pendingSettingsUpdateRef: React.MutableRefObject<number>
 ) => {
     const handleStatusUpdate = async (key: string) => {
         if (!userId || !key || typeof key !== 'string') return;
@@ -76,6 +80,11 @@ export const useSyncActions = (
             }
 
             if (!newSettings || typeof newSettings !== 'object') return;
+
+            // RACE CONDITION FIX: Mark that we have a pending local update
+            // This timestamp tells useDataSync to ignore incoming remote updates
+            // until the debounced save has been persisted
+            pendingSettingsUpdateRef.current = Date.now() + PENDING_UPDATE_TIMEOUT_MS;
 
             setSettings(newSettings);
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { calculateProgress } from '../utils/calculations';
 import { UserData, UserSettings } from '../types';
 import { SyllabusHeader } from './syllabus/SyllabusHeader';
@@ -79,21 +79,26 @@ export const Syllabus: React.FC<SyllabusProps> = ({ activeSubject, userData, set
         setLocalMaxPaper(papers.length + 1);
     };
 
-    const handlePrint = (mode: 'p1' | 'p2' | 'both') => {
+    // Robust afterprint listener to reset print mode across all browsers
+    useEffect(() => {
+        const resetPrintMode = () => {
+            setPrintMode('both');
+        };
+        window.addEventListener('afterprint', resetPrintMode);
+        return () => window.removeEventListener('afterprint', resetPrintMode);
+    }, []);
+
+    const handlePrint = useCallback((mode: 'p1' | 'p2' | 'both') => {
         setPrintMode(mode);
         setShowPrintModal(false);
 
-        const resetMode = () => {
-            setPrintMode('both');
-            window.removeEventListener('afterprint', resetMode);
-        };
-
-        window.addEventListener('afterprint', resetMode);
-
-        setTimeout(() => {
-            window.print();
-        }, 300);
-    };
+        // Use requestAnimationFrame to ensure React has rendered the new class
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                window.print();
+            });
+        });
+    }, []);
 
     return (
         <div className={`flex flex-col gap-6 min-w-0 ${printMode === 'p1' ? 'print-show-p1' : printMode === 'p2' ? 'print-show-p2' : ''}`}>

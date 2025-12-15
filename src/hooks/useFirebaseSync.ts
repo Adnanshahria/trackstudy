@@ -21,6 +21,11 @@ export const useFirebaseSync = () => {
     const localDataRef = useRef<UserData>({});
     const localSettingsRef = useRef<UserSettings>(DEFAULT_SETTINGS);
 
+    // Track pending settings updates to prevent race conditions with Firebase listener
+    // When this timestamp is set, incoming remote settings updates will be ignored
+    // until the local change has been persisted (debounce period + network latency)
+    const pendingSettingsUpdateRef = useRef<number>(0);
+
     useEffect(() => { localDataRef.current = userData; }, [userData]);
     useEffect(() => { localSettingsRef.current = settings; }, [settings]);
 
@@ -85,9 +90,9 @@ export const useFirebaseSync = () => {
 
     useEffect(() => { document.documentElement.setAttribute('data-theme', settings.theme); }, [settings.theme]);
 
-    const actions = useSyncActions(userId, userData, setUserData, settings, setSettings, localDataRef, localSettingsRef, setUserId);
+    const actions = useSyncActions(userId, userData, setUserData, settings, setSettings, localDataRef, localSettingsRef, setUserId, pendingSettingsUpdateRef);
 
-    const { isLoading, connectionStatus } = useDataSync(userId, setUserData, setSettings, localSettingsRef, localDataRef, actions.handleLogout, syncKey);
+    const { isLoading, connectionStatus } = useDataSync(userId, setUserData, setSettings, localSettingsRef, localDataRef, actions.handleLogout, syncKey, pendingSettingsUpdateRef);
 
 
 
