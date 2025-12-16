@@ -1,10 +1,7 @@
-
-import React from 'react';
-import { UserData, UserSettings, CompositeData } from '../../types';
-import { ProgressCard } from '../hero/ProgressCard';
-import { CountdownCard } from '../hero/CountdownCard';
-import { SidebarSubjectList } from '../sidebar/SidebarSubjectList';
-import { useCountdown } from '../../hooks/useCountdown';
+import { Modal } from '../ui/Modal';
+import { Button } from '../ui/Button';
+import { ConfirmModal } from '../ui/ConfirmModal';
+import { AddSubjectModal } from '../sidebar/AddSubjectModal';
 
 interface MobileDashboardProps {
     activeSubject: string;
@@ -16,6 +13,7 @@ interface MobileDashboardProps {
     onEditWeights: () => void;
     onEditCountdown: () => void;
     onConfigSubjectProgress?: () => void;
+    onDeleteSubject: (key: string) => void;
 }
 
 export const MobileDashboard: React.FC<MobileDashboardProps> = ({
@@ -27,11 +25,23 @@ export const MobileDashboard: React.FC<MobileDashboardProps> = ({
     compositeData,
     onEditWeights,
     onEditCountdown,
-    onConfigSubjectProgress
+    onConfigSubjectProgress,
+    onDeleteSubject
 }) => {
     const target = settings.countdownTarget || '2025-12-12T00:00';
     const label = settings.countdownLabel || 'Time Remaining';
     const countdown = useCountdown(target);
+
+    const [isEditing, setIsEditing] = React.useState(false);
+    const [modals, setModals] = React.useState({ addSub: false, rename: null as { key: string, name: string } | null });
+    const [deleteConfirm, setDeleteConfirm] = React.useState<string | null>(null);
+
+    const handleRename = () => {
+        if (modals.rename) {
+            onUpdateSettings({ ...settings, customNames: { ...settings.customNames, [modals.rename.key]: modals.rename.name } });
+            setModals({ ...modals, rename: null });
+        }
+    };
 
     return (
         <div className="flex flex-col gap-3 pb-16 px-3 pt-3">
@@ -58,12 +68,26 @@ export const MobileDashboard: React.FC<MobileDashboardProps> = ({
 
             {/* Subject List */}
             <div className="glass-panel rounded-2xl p-3">
-                {/* Header with gear icons */}
-                <div className="flex justify-between items-center mb-2">
+                {/* Header with interactions */}
+                <div className="flex justify-between items-center mb-3">
                     <h2 className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
                         Subjects
                     </h2>
                     <div className="flex gap-1">
+                        <button
+                            onClick={() => setModals({ ...modals, addSub: true })}
+                            className="text-emerald-500 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 p-1 rounded-lg font-bold text-lg leading-none transition-colors"
+                            title="Add New Subject"
+                        >
+                            +
+                        </button>
+                        <button
+                            onClick={() => setIsEditing(!isEditing)}
+                            className={`p-1 rounded-lg transition-colors ${isEditing ? 'text-blue-600 bg-blue-50 dark:bg-blue-500/10' : 'text-slate-400 hover:text-blue-600 hover:bg-slate-100 dark:hover:bg-white/5'}`}
+                            title="Edit Subjects"
+                        >
+                            ✏️
+                        </button>
                         {onConfigSubjectProgress && (
                             <button
                                 onClick={onConfigSubjectProgress}
@@ -78,12 +102,42 @@ export const MobileDashboard: React.FC<MobileDashboardProps> = ({
                 <SidebarSubjectList
                     settings={settings}
                     activeSubject={activeSubject}
-                    isEditing={false}
+                    isEditing={isEditing}
                     userData={userData}
                     onChangeSubject={onChangeSubject}
-                    setModals={() => { }}
+                    setModals={setModals}
                     onUpdateSettings={onUpdateSettings}
-                    onDeleteSubject={() => { }}
+                    onDeleteSubject={(key) => setDeleteConfirm(key)}
+                />
+
+                {/* Local Modals */}
+                {modals.addSub && <AddSubjectModal onClose={() => setModals({ ...modals, addSub: false })} onAdd={(name, emoji, color) => { const subKey = `subj_${Date.now()}`; const newSyllabus = { ...settings.syllabus, [subKey]: { name, icon: emoji, color, chapters: [] } }; const newOpenState = { ...settings.syllabusOpenState, [`${subKey}-p1`]: true, [`${subKey}-p2`]: true }; onUpdateSettings({ ...settings, syllabus: newSyllabus, syllabusOpenState: newOpenState }); }} />}
+
+                {modals.rename && (
+                    <Modal isOpen={true} onClose={() => setModals({ ...modals, rename: null })} title="Rename Subject">
+                        <div className="flex flex-col gap-4">
+                            <input
+                                type="text"
+                                value={modals.rename.name}
+                                onChange={(e) => setModals({ ...modals, rename: { ...modals.rename!, name: e.target.value } })}
+                                className="bg-white dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl p-3 text-sm dark:text-white"
+                            />
+                            <div className="flex justify-end gap-3">
+                                <Button variant="secondary" onClick={() => setModals({ ...modals, rename: null })}>Cancel</Button>
+                                <Button onClick={handleRename}>Save Name</Button>
+                            </div>
+                        </div>
+                    </Modal>
+                )}
+
+                <ConfirmModal
+                    isOpen={!!deleteConfirm}
+                    onClose={() => setDeleteConfirm(null)}
+                    onConfirm={() => { if (deleteConfirm) onDeleteSubject(deleteConfirm); setDeleteConfirm(null); }}
+                    title="Delete Subject"
+                    message={`Are you sure you want to delete this subject? All associated data will be lost permanently.`}
+                    confirmText="Delete Subject"
+                    isDanger={true}
                 />
             </div>
         </div>

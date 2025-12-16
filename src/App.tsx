@@ -151,6 +151,7 @@ function App() {
             onDeleteChapter={dataMgr.onDeleteChapter}
             onDeletePaper={dataMgr.onDeletePaper}
             onDeleteColumn={dataMgr.onDeleteColumn}
+            onDeleteSubject={dataMgr.handleDeleteSubject}
             onRenameChapter={dataMgr.handleRenameChapter}
             onLogout={handleLogout}
             onToggleTheme={toggleTheme}

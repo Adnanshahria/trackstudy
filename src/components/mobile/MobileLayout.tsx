@@ -24,6 +24,7 @@ interface MobileLayoutProps {
     onDeletePaper: (subject: string, paperId: number) => void;
     onDeleteColumn: (subject: string, itemKey: string) => void;
     onRenameChapter: (subject: string, chapterId: number | string, newName: string) => void;
+    onDeleteSubject: (key: string) => void;
     onLogout: () => void;
     onToggleTheme: () => void;
     onOpenGuide: () => void;
@@ -76,6 +77,7 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({
                         onEditWeights={onEditWeights}
                         onEditCountdown={onEditCountdown}
                         onConfigSubjectProgress={onConfigSubjectProgress}
+                        onDeleteSubject={props.onDeleteSubject}
                     />
                 )}
                 {activeTab === 'syllabus' && (
