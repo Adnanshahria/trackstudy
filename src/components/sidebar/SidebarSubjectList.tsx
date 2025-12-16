@@ -90,7 +90,7 @@ export const SidebarSubjectList: React.FC<Props> = ({ settings, activeSubject, i
     };
 
     return (
-        <div className="flex flex-col gap-3 pr-1">
+        <div className="flex flex-col gap-4 pr-1">
             {orderedSubjects.map(([key, data]) => (
                 <div
                     key={key}

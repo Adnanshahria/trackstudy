@@ -14,14 +14,15 @@ interface Props {
 export const PerformanceWidget: React.FC<Props> = ({ settings, userData, activeSubject, onConfig }) => {
     return (
         <div className="w-full">
-            <div className="flex justify-between items-center mb-2 md:mb-4">
+            <div className="flex justify-between items-center mb-3 md:mb-5">
                 <h3 className="font-bold text-[10px] md:text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5 md:gap-2"><span className="w-1 md:w-1.5 h-3 md:h-4 bg-purple-500 rounded-full"></span> Performance</h3>
-                <div className="flex gap-0.5 md:gap-1">
-                    <button onClick={onConfig} className="text-emerald-500 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 p-0.5 md:p-1 rounded-md md:rounded-lg font-bold text-base md:text-lg leading-none" title="Add Progress Bar">+</button>
-                    <button onClick={onConfig} className="text-slate-400 hover:text-blue-600 dark:hover:text-white p-0.5 md:p-1 rounded-md md:rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 text-xs md:text-sm">⚙️</button>
+                <div className="flex gap-1 md:gap-1.5">
+                    <button onClick={onConfig} className="text-emerald-500 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 p-1 rounded-md md:rounded-lg font-bold text-base md:text-lg leading-none transition-colors" title="Add Progress Bar">+</button>
+                    <button onClick={onConfig} className="text-slate-400 hover:text-blue-600 dark:hover:text-white p-1 rounded-md md:rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 text-xs md:text-sm transition-colors" title="Edit Performance">✏️</button>
+                    <button onClick={onConfig} className="text-slate-400 hover:text-blue-600 dark:hover:text-white p-1 rounded-md md:rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 text-xs md:text-sm transition-colors" title="Configure">⚙️</button>
                 </div>
             </div>
-            <div className="flex flex-col gap-2 md:gap-4">
+            <div className="flex flex-col gap-3 md:gap-5">
                 {settings.progressBars.filter(conf => conf.visible !== false).map(conf => {
                     if (conf.items.length === 0) return null;
                     const items = settings.subjectConfigs?.[activeSubject] || settings.trackableItems;

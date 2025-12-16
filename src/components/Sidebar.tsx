@@ -43,7 +43,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeSubject, onChangeSubject
     const handleRename = () => { if (modals.rename) { onUpdateSettings({ ...settings, customNames: { ...settings.customNames, [modals.rename.key]: modals.rename.name } }); setModals({ ...modals, rename: null }); } };
 
     return (
-        <aside className="flex flex-col gap-4 h-full lg:overflow-y-auto custom-scrollbar pr-1">
+        <aside className="flex flex-col gap-6 h-full lg:overflow-y-auto custom-scrollbar pr-1">
             {/* ROW 1: Progress & Countdown */}
             <div className="grid grid-cols-2 gap-3 shrink-0">
                 <ProgressCard
