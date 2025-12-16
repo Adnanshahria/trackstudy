@@ -22,7 +22,7 @@ export const PerformanceBarCard: React.FC<Props> = ({
     const totalWeight = conf.weights ? Object.values(conf.weights).reduce((a: number, b: number) => a + b, 0) : 0;
 
     return (
-        <div className="bg-slate-50 dark:bg-black p-2 md:p-4 rounded-lg md:rounded-xl border border-slate-200 dark:border-white/10 relative group">
+        <div className="glass-panel p-2 md:p-4 rounded-lg md:rounded-xl relative group text-left">
             <div className="flex items-center justify-between mb-2 md:mb-4 pb-1.5 md:pb-2 border-b border-slate-200 dark:border-white/5">
                 <div className="flex items-center gap-2 md:gap-3 flex-1">
                     <div className={`w-3 h-3 md:w-4 md:h-4 rounded-full bg-gradient-to-br ${conf.color}`}></div>
