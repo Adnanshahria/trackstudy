@@ -13,6 +13,7 @@ interface SyllabusProps {
     activeSubject: string;
     userData: UserData;
     settings: UserSettings;
+    userId: string | null;
     onUpdateStatus: (key: string) => void;
     onUpdateNote: (key: string, text: string) => void;
     onTogglePaper: (key: string) => void;
@@ -24,7 +25,7 @@ interface SyllabusProps {
     onRenameChapter: (subject: string, chapterId: number | string, newName: string) => void;
 }
 
-export const Syllabus: React.FC<SyllabusProps> = ({ activeSubject, userData, settings, ...handlers }) => {
+export const Syllabus: React.FC<SyllabusProps> = ({ activeSubject, userData, settings, userId, ...handlers }) => {
     const ui = useSyllabusUI();
     const subject = settings.syllabus[activeSubject];
 
@@ -90,7 +91,7 @@ export const Syllabus: React.FC<SyllabusProps> = ({ activeSubject, userData, set
                 })}
             </div>
 
-            <SyllabusModals modals={ui.modals} setModals={ui.setModals} handlers={handlers} ui={ui} activeSubject={activeSubject} settings={settings} />
+            <SyllabusModals modals={ui.modals} setModals={ui.setModals} handlers={handlers} ui={ui} activeSubject={activeSubject} settings={settings} userId={userId} />
 
             <ConfirmModal
                 isOpen={!!confirmAction}

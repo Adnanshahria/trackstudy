@@ -10,14 +10,14 @@ export const StatusButton: React.FC<{ val: number; onClick: () => void }> = ({ v
     else if (val === 6) { bg = "!bg-rose-500 !border-rose-500 print:!bg-white print:!border-black shadow-md shadow-rose-500/20"; text = "text-white print:text-black"; label = "✕"; fill = 0; }
 
     return (
-        <button 
+        <button
             onClick={onClick}
-            className={`relative overflow-hidden w-12 h-8 rounded-lg border flex items-center justify-center text-[10px] font-bold transition-all duration-200 hover:scale-105 active:scale-90 hover:shadow-md ${bg} ${text}`}
+            className={`relative overflow-hidden w-9 h-6 md:w-12 md:h-8 rounded-md md:rounded-lg border flex items-center justify-center text-[8px] md:text-[10px] font-bold transition-all duration-200 hover:scale-105 active:scale-90 hover:shadow-md ${bg} ${text}`}
         >
             {val !== 5 && val !== 6 && (
-                <div 
-                    className="absolute top-0 bottom-0 left-0 bg-sky-500/20 dark:bg-sky-400/20 print:bg-gray-300 transition-all duration-300 ease-out" 
-                    style={{ width: `${fill}%` }} 
+                <div
+                    className="absolute top-0 bottom-0 left-0 bg-sky-500/20 dark:bg-sky-400/20 print:bg-gray-300 transition-all duration-300 ease-out"
+                    style={{ width: `${fill}%` }}
                 />
             )}
             <span className="relative z-10 drop-shadow-sm">{label}</span>

@@ -52,17 +52,17 @@ export const StudyDetailModal: React.FC<StudyDetailModalProps> = ({
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} title="Study Details">
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-3 md:gap-4">
                 {/* Context ID */}
-                <p className="text-xs text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-black/20 px-3 py-2 rounded-lg">
+                <p className="text-[10px] md:text-xs text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-black px-2 md:px-3 py-1.5 md:py-2 rounded-lg">
                     <span className="font-medium">ID:</span> {displayId}
                 </p>
 
                 {/* Tab Buttons */}
-                <div className="flex gap-1 p-1 bg-slate-100 dark:bg-black/20 rounded-xl">
+                <div className="flex gap-1 p-0.5 md:p-1 bg-slate-100 dark:bg-black rounded-lg md:rounded-xl">
                     <button
                         onClick={() => setActiveTab('note')}
-                        className={`flex-1 px-4 py-2 text-xs font-bold rounded-lg transition-all ${activeTab === 'note'
+                        className={`flex-1 px-2 md:px-4 py-1.5 md:py-2 text-[10px] md:text-xs font-bold rounded-md md:rounded-lg transition-all ${activeTab === 'note'
                             ? 'bg-white dark:bg-white/10 text-blue-600 dark:text-blue-400 shadow-sm'
                             : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
                             }`}
@@ -73,7 +73,7 @@ export const StudyDetailModal: React.FC<StudyDetailModalProps> = ({
                     </button>
                     <button
                         onClick={() => setActiveTab('history')}
-                        className={`flex-1 px-4 py-2 text-xs font-bold rounded-lg transition-all ${activeTab === 'history'
+                        className={`flex-1 px-2 md:px-4 py-1.5 md:py-2 text-[10px] md:text-xs font-bold rounded-md md:rounded-lg transition-all ${activeTab === 'history'
                             ? 'bg-white dark:bg-white/10 text-blue-600 dark:text-blue-400 shadow-sm'
                             : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
                             }`}
@@ -85,17 +85,17 @@ export const StudyDetailModal: React.FC<StudyDetailModalProps> = ({
                 </div>
 
                 {/* Tab Content */}
-                <div role="tabpanel" className="min-h-[200px]">
+                <div role="tabpanel" className="min-h-[150px] md:min-h-[200px]">
                     {activeTab === 'note' ? (
-                        <div className="flex flex-col gap-4">
+                        <div className="flex flex-col gap-3 md:gap-4">
                             <textarea
-                                className="w-full h-40 bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl p-4 text-sm focus:outline-none focus:border-blue-500 text-slate-800 dark:text-slate-200 resize-none"
+                                className="w-full h-28 md:h-40 bg-slate-50 dark:bg-black border border-slate-200 dark:border-white/10 rounded-lg md:rounded-xl p-2 md:p-4 text-xs md:text-sm focus:outline-none focus:border-blue-500 text-slate-800 dark:text-slate-200 resize-none"
                                 value={text}
                                 onChange={(e) => setText(e.target.value)}
                                 placeholder="Add details or reminders..."
                                 aria-label="Study note"
                             />
-                            <div className="flex justify-end gap-3">
+                            <div className="flex justify-end gap-2 md:gap-3">
                                 <Button variant="secondary" onClick={onClose}>Cancel</Button>
                                 <Button onClick={onSave}>Save Note</Button>
                             </div>

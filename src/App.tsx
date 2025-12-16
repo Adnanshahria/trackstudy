@@ -10,6 +10,12 @@ import { AuthModal } from './components/auth/AuthModal';
 import { DeveloperModal } from './components/auth/DeveloperModal';
 import { AppGuideModal } from './components/guide/AppGuideModal';
 import { AppearanceModal } from './components/settings/AppearanceModal';
+import { Modal } from './components/ui/Modal';
+import { WeightsEditor } from './components/hero/WeightsEditor';
+import { CountdownEditModal } from './components/hero/CountdownEditModal';
+import { PerformanceConfigModal } from './components/sidebar/PerformanceConfigModal';
+import { SubjectConfigModal } from './components/sidebar/SubjectConfigModal';
+import { MobileLayout } from './components/mobile/MobileLayout';
 
 import { LandingHeader } from './components/layout/LandingHeader';
 import { DashboardHeader } from './components/layout/DashboardHeader';
@@ -23,6 +29,7 @@ import { useAuthHandlers } from './hooks/useAuthHandlers';
 import { useAppearance } from './hooks/ui/useAppearance';
 import { useToast, ToastContext } from './hooks/useToast';
 import { OnboardingProvider } from './components/onboarding/OnboardingProvider';
+import { useHeroLogic } from './hooks/ui/useHeroLogic';
 
 function App() {
   const { userId, setUserId, isAuthResolving, userData, settings, isLoading, connectionStatus, handleStatusUpdate, handleNoteUpdate, handleSettingsUpdate, toggleTheme, handleLogout, forceSync } = useFirebaseSync();
@@ -30,6 +37,10 @@ function App() {
   const [showDevModal, setShowDevModal] = useState(false);
   const [showAppGuide, setShowAppGuide] = useState(false);
   const [showAppearance, setShowAppearance] = useState(false);
+  const [showWeightsModal, setShowWeightsModal] = useState(false);
+  const [showCountdownModal, setShowCountdownModal] = useState(false);
+  const [showPerfConfig, setShowPerfConfig] = useState(false);
+  const [showSubjectConfig, setShowSubjectConfig] = useState(false);
 
   const { toast, showToast, hideToast } = useToast();
 
@@ -99,6 +110,9 @@ function App() {
     [userData, settings]
   );
 
+  // Hero logic for weights editor modal
+  const heroLogic = useHeroLogic(settings, dataMgr.handleWeightUpdate);
+
   if (isAuthResolving || postLoginLoading) {
     return <SkeletonDashboard />;
   }
@@ -117,7 +131,42 @@ function App() {
             onToggleTheme={toggleTheme}
           />
         )}
-        <main className="flex-1 w-full max-w-7xl mx-auto p-4 lg:py-6 lg:overflow-hidden flex flex-col">
+
+        {/* MOBILE LAYOUT - Only visible on mobile when logged in */}
+        {userId && !isLoading && (
+          <MobileLayout
+            userId={userId}
+            userData={userData}
+            settings={settings}
+            compositeData={compositeData}
+            activeSubject={activeSubject}
+            onChangeSubject={setActiveSubject}
+            onUpdateSettings={wrappedSettingsUpdate}
+            onUpdateStatus={wrappedStatusUpdate}
+            onUpdateNote={wrappedNoteUpdate}
+            onTogglePaper={(key) => wrappedSettingsUpdate({ ...settings, syllabusOpenState: { ...settings.syllabusOpenState, [key]: !settings.syllabusOpenState[key] } })}
+            onRenameColumn={dataMgr.onRenameColumn}
+            onAddColumn={dataMgr.onAddColumn}
+            onAddChapter={dataMgr.onAddChapter}
+            onDeleteChapter={dataMgr.onDeleteChapter}
+            onDeletePaper={dataMgr.onDeletePaper}
+            onDeleteColumn={dataMgr.onDeleteColumn}
+            onRenameChapter={dataMgr.handleRenameChapter}
+            onLogout={handleLogout}
+            onToggleTheme={toggleTheme}
+            onOpenGuide={() => setShowAppGuide(true)}
+            onOpenDevModal={() => setShowDevModal(true)}
+            onOpenAppearance={() => setShowAppearance(true)}
+            onForceSync={forceSync}
+            onEditWeights={() => setShowWeightsModal(true)}
+            onEditCountdown={() => setShowCountdownModal(true)}
+            onConfigPerformance={() => setShowPerfConfig(true)}
+            onConfigSubjectProgress={() => setShowSubjectConfig(true)}
+          />
+        )}
+
+        {/* DESKTOP LAYOUT - Hidden on mobile */}
+        <main className="flex-1 w-full max-w-7xl mx-auto p-4 lg:py-6 lg:overflow-hidden flex-col hidden md:flex">
           {userId ? (
             <>
               <DashboardHeader
@@ -174,11 +223,62 @@ function App() {
           )}
         </main>
 
+        {/* Welcome Hero for mobile (when not logged in) */}
+        {!userId && (
+          <main className="flex-1 w-full max-w-7xl mx-auto p-4 flex flex-col md:hidden">
+            <div className="h-full overflow-y-auto"><WelcomeHero onLogin={() => auth.setShowLoginModal(true)} /></div>
+          </main>
+        )}
+
         <AuthModal isOpen={auth.showLoginModal} onClose={() => auth.setShowLoginModal(false)} {...auth} isCheckingUser={auth.isCheckingUser} modalError={auth.modalError} modalSuccess={auth.modalSuccess} />
         <DeveloperModal isOpen={showDevModal} onClose={() => setShowDevModal(false)} />
         <AppGuideModal isOpen={showAppGuide} onClose={() => setShowAppGuide(false)} />
         <AppearanceModal isOpen={showAppearance} onClose={() => setShowAppearance(false)} settings={settings} onUpdateSettings={wrappedSettingsUpdate} />
 
+        {/* Mobile-triggered Modals */}
+        {showWeightsModal && (
+          <Modal isOpen={true} onClose={() => setShowWeightsModal(false)} title="Weighted Progress Config">
+            <WeightsEditor
+              settings={settings}
+              selectedSubject={heroLogic.selectedSubject}
+              setSelectedSubject={heroLogic.setSelectedSubject}
+              weightTotal={heroLogic.weightTotal}
+              tempWeights={heroLogic.tempWeights}
+              handleWeightChange={heroLogic.handleWeightChange}
+              saveWeights={() => { heroLogic.saveWeights(); setShowWeightsModal(false); }}
+              currentConfigItems={heroLogic.currentConfigItems}
+              compositeData={compositeData}
+              isEditing={true}
+            />
+          </Modal>
+        )}
+
+        <CountdownEditModal
+          isOpen={showCountdownModal}
+          onClose={() => setShowCountdownModal(false)}
+          initialTarget={settings.countdownTarget || '2025-12-12T00:00'}
+          initialLabel={settings.countdownLabel || 'Time Remaining'}
+          onSave={(t, l) => wrappedSettingsUpdate({ ...settings, countdownTarget: t, countdownLabel: l })}
+        />
+
+        {showPerfConfig && (
+          <PerformanceConfigModal
+            currentConfig={settings.progressBars}
+            allItems={settings.subjectConfigs?.[activeSubject] || settings.trackableItems}
+            onSave={(c) => { wrappedSettingsUpdate({ ...settings, progressBars: c }); setShowPerfConfig(false); }}
+            onClose={() => setShowPerfConfig(false)}
+          />
+        )}
+
+        {showSubjectConfig && (
+          <SubjectConfigModal
+            currentItems={settings.subjectProgressItems || []}
+            currentWeights={settings.subjectProgressWeights || {}}
+            allItems={settings.subjectConfigs?.[activeSubject] || settings.trackableItems}
+            onSave={(i, w) => { wrappedSettingsUpdate({ ...settings, subjectProgressItems: i, subjectProgressWeights: w }); setShowSubjectConfig(false); }}
+            onClose={() => setShowSubjectConfig(false)}
+          />
+        )}
 
         <Toast
           message={toast.message}

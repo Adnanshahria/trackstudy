@@ -34,27 +34,27 @@ export const CountdownEditModal: React.FC<Props> = ({ isOpen, onClose, initialTa
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} title="Countdown Settings">
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-3 md:gap-4">
                 <div className="flex flex-col gap-1">
-                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Event Label</label>
-                    <input 
-                        type="text" 
-                        value={tempLabel} 
-                        onChange={(e) => setTempLabel(e.target.value)} 
-                        className="bg-slate-50 dark:bg-black/20 border border-slate-300 dark:border-white/10 rounded-xl p-3 text-sm dark:text-white focus:outline-none focus:border-blue-500 transition-colors" 
-                        placeholder="e.g. Final Exam" 
+                    <label className="text-[9px] md:text-[10px] font-bold text-slate-500 uppercase tracking-wider">Event Label</label>
+                    <input
+                        type="text"
+                        value={tempLabel}
+                        onChange={(e) => setTempLabel(e.target.value)}
+                        className="bg-slate-50 dark:bg-black/20 border border-slate-300 dark:border-white/10 rounded-lg md:rounded-xl p-2 md:p-3 text-xs md:text-sm dark:text-white focus:outline-none focus:border-blue-500 transition-colors"
+                        placeholder="e.g. Final Exam"
                     />
                 </div>
                 <div className="flex flex-col gap-1">
-                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Target Date & Time</label>
-                    <input 
-                        type="datetime-local" 
-                        value={tempTarget} 
-                        onChange={(e) => setTempTarget(e.target.value)} 
-                        className="bg-slate-50 dark:bg-black/20 border border-slate-300 dark:border-white/10 rounded-xl p-3 text-sm dark:text-white focus:outline-none focus:border-blue-500 transition-colors" 
+                    <label className="text-[9px] md:text-[10px] font-bold text-slate-500 uppercase tracking-wider">Target Date & Time</label>
+                    <input
+                        type="datetime-local"
+                        value={tempTarget}
+                        onChange={(e) => setTempTarget(e.target.value)}
+                        className="bg-slate-50 dark:bg-black/20 border border-slate-300 dark:border-white/10 rounded-lg md:rounded-xl p-2 md:p-3 text-xs md:text-sm dark:text-white focus:outline-none focus:border-blue-500 transition-colors"
                     />
                 </div>
-                <div className="flex justify-end gap-3 pt-2">
+                <div className="flex justify-end gap-2 md:gap-3 pt-1 md:pt-2">
                     <Button variant="secondary" onClick={onClose}>Cancel</Button>
                     <Button onClick={handleSave}>Save Timer</Button>
                 </div>

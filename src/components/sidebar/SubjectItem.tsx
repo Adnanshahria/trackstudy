@@ -40,29 +40,29 @@ export const SubjectItem: React.FC<Props> = ({ subKey, data, isActive, isEditing
         text: isActive ? theme.text : 'text-slate-700 dark:text-slate-300',
         icon: isActive ? theme.iconBg : 'bg-slate-200/50 dark:bg-white/10 text-slate-500 dark:text-slate-400'
     };
-    
-    // STRICT GRID LAYOUT: Icon (40px) | Text (1fr) | Percent (45px) | Delete (24px)
-    // The last column is strictly 24px even if empty, preventing jitter.
-    const gridStyle = { gridTemplateColumns: '40px minmax(0, 1fr) 45px 24px' };
+
+    // STRICT GRID LAYOUT: Icon (32px/40px) | Text (1fr) | Percent (40px/45px) | Delete (20px/24px)
+    const gridStyle = { gridTemplateColumns: '32px minmax(0, 1fr) 36px 20px' };
+    const gridStyleMd = { gridTemplateColumns: '40px minmax(0, 1fr) 45px 24px' };
 
     return (
-        <div 
-            onClick={() => onChangeSubject(subKey)} 
-            className={`group grid items-center p-3 rounded-2xl border cursor-pointer transition-all duration-300 relative overflow-hidden gap-3 hover:scale-[1.02] active:scale-[0.98] ${styles.bg} ${styles.border} ${isActive ? 'shadow-md shadow-black/5' : 'hover:shadow-sm'}`}
+        <div
+            onClick={() => onChangeSubject(subKey)}
+            className={`group grid items-center p-2 md:p-3 rounded-xl md:rounded-2xl border cursor-pointer transition-all duration-300 relative overflow-hidden gap-2 md:gap-3 hover:scale-[1.02] active:scale-[0.98] ${styles.bg} ${styles.border} ${isActive ? 'shadow-md shadow-black/5' : 'hover:shadow-sm'}`}
             style={gridStyle}
         >
-            {isActive && <div className={`absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b ${styles.bar}`}></div>}
-            
+            {isActive && <div className={`absolute left-0 top-0 bottom-0 w-0.5 md:w-1 bg-gradient-to-b ${styles.bar}`}></div>}
+
             {/* 1. Icon */}
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl transition-colors shrink-0 ${styles.icon}`}>{data.icon}</div>
-            
+            <div className={`w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl flex items-center justify-center text-base md:text-xl transition-colors shrink-0 ${styles.icon}`}>{data.icon}</div>
+
             {/* 2. Content */}
-            <div className="flex flex-col justify-center gap-1.5 min-w-0 h-[42px]">
-                <div className="flex items-center gap-2 w-full h-[20px]">
-                    <span className={`font-bold text-sm truncate w-full leading-tight ${styles.text}`} title={displayName}>{displayName}</span>
-                    {isEditing && <button onClick={(e) => { e.stopPropagation(); onRename(); }} className="text-[10px] text-slate-400 hover:text-blue-500 p-1 shrink-0 bg-white/50 dark:bg-black/20 rounded">✏️</button>}
+            <div className="flex flex-col justify-center gap-1 md:gap-1.5 min-w-0 h-[36px] md:h-[42px]">
+                <div className="flex items-center gap-1 md:gap-2 w-full h-[18px] md:h-[20px]">
+                    <span className={`font-bold text-xs md:text-sm truncate w-full leading-tight ${styles.text}`} title={displayName}>{displayName}</span>
+                    {isEditing && <button onClick={(e) => { e.stopPropagation(); onRename(); }} className="text-[9px] md:text-[10px] text-slate-400 hover:text-blue-500 p-0.5 md:p-1 shrink-0 bg-white/50 dark:bg-black/20 rounded">✏️</button>}
                 </div>
-                <div className="h-1.5 bg-slate-200/50 dark:bg-black/20 rounded-full overflow-hidden w-full">
+                <div className="h-1 md:h-1.5 bg-slate-200/50 dark:bg-black/20 rounded-full overflow-hidden w-full">
                     <div className={`h-full rounded-full bg-gradient-to-r ${styles.bar} shadow-[0_0_10px_rgba(0,0,0,0.1)] relative`} style={{ width: `${Math.max(2, progress.overall)}%` }}>
                         <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
                     </div>
@@ -71,15 +71,15 @@ export const SubjectItem: React.FC<Props> = ({ subKey, data, isActive, isEditing
 
             {/* 3. Percentage */}
             <div className="text-right flex items-center justify-end shrink-0">
-                <span className={`text-xs font-mono font-bold ${styles.text}`}>{progress.overall.toFixed(0)}%</span>
+                <span className={`text-[10px] md:text-xs font-mono font-bold ${styles.text}`}>{progress.overall.toFixed(0)}%</span>
             </div>
 
             {/* 4. Delete Btn - Reserved Space */}
-            <div className="flex items-center justify-center shrink-0 w-6 h-6">
+            <div className="flex items-center justify-center shrink-0 w-5 h-5 md:w-6 md:h-6">
                 {isEditing && (
-                    <button 
-                        onClick={(e) => { e.stopPropagation(); onDelete(); }} 
-                        className="w-6 h-6 bg-rose-500 text-white rounded-full flex items-center justify-center text-xs hover:scale-110 shadow-sm transition-transform"
+                    <button
+                        onClick={(e) => { e.stopPropagation(); onDelete(); }}
+                        className="w-5 h-5 md:w-6 md:h-6 bg-rose-500 text-white rounded-full flex items-center justify-center text-[10px] md:text-xs hover:scale-110 shadow-sm transition-transform"
                     >
                         ✕
                     </button>

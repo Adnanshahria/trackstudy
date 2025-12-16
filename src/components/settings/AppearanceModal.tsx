@@ -22,38 +22,38 @@ export const AppearanceModal: React.FC<Props> = ({ isOpen, onClose, settings, on
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} title="Appearance Settings">
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-4 md:gap-6">
                 {/* Theme Toggle Section */}
-                <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/5">
+                <div className="flex items-center justify-between p-2 md:p-4 bg-slate-50 dark:bg-black rounded-lg md:rounded-xl border border-slate-200 dark:border-white/5">
                     <div className="flex flex-col">
-                        <span className="text-sm font-bold text-slate-700 dark:text-slate-200">Theme Mode</span>
-                        <span className="text-[10px] text-slate-500 dark:text-slate-400">Switch between Light and Dark</span>
+                        <span className="text-xs md:text-sm font-bold text-slate-700 dark:text-slate-200">Theme Mode</span>
+                        <span className="text-[9px] md:text-[10px] text-slate-500 dark:text-slate-400">Switch between Light and Dark</span>
                     </div>
-                    <button 
+                    <button
                         onClick={() => onUpdateSettings({ ...settings, theme: settings.theme === 'dark' ? 'light' : 'dark' })}
-                        className="px-4 py-2 rounded-lg bg-slate-200 dark:bg-black/40 border border-slate-300 dark:border-white/10 text-xs font-bold flex items-center gap-2 transition-all hover:scale-105"
+                        className="px-2 md:px-4 py-1.5 md:py-2 rounded-md md:rounded-lg bg-slate-200 dark:bg-black/40 border border-slate-300 dark:border-white/10 text-[10px] md:text-xs font-bold flex items-center gap-1.5 md:gap-2 transition-all hover:scale-105"
                     >
-                        {settings.theme === 'dark' ? '🌙 Dark Mode' : '☀️ Light Mode'}
+                        {settings.theme === 'dark' ? '🌙 Dark' : '☀️ Light'}
                     </button>
                 </div>
 
                 <div>
-                    <h4 className="text-sm font-bold text-slate-700 dark:text-slate-200 mb-3">Card Border Glow</h4>
-                    <div className="grid grid-cols-2 gap-3">
+                    <h4 className="text-xs md:text-sm font-bold text-slate-700 dark:text-slate-200 mb-2 md:mb-3">Card Border Glow</h4>
+                    <div className="grid grid-cols-2 gap-2 md:gap-3">
                         {glowOptions.map((opt) => (
                             <button
                                 key={opt.id}
                                 onClick={() => onUpdateSettings({ ...settings, glowColor: opt.id as any })}
-                                className={`p-3 rounded-xl border flex items-center gap-3 transition-all ${currentGlow === opt.id ? 'bg-blue-50 dark:bg-white/10 border-blue-500 ring-1 ring-blue-500' : 'bg-slate-50 dark:bg-black/20 border-slate-200 dark:border-white/5 hover:bg-slate-100 dark:hover:bg-white/5'}`}
+                                className={`p-2 md:p-3 rounded-lg md:rounded-xl border flex items-center gap-2 md:gap-3 transition-all ${currentGlow === opt.id ? 'bg-blue-50 dark:bg-white/10 border-blue-500 ring-1 ring-blue-500' : 'bg-slate-50 dark:bg-black border-slate-200 dark:border-white/5 hover:bg-slate-100 dark:hover:bg-white/5'}`}
                             >
-                                <div className={`w-6 h-6 rounded-full border border-white/20 ${opt.colorClass}`}></div>
-                                <span className={`text-xs font-bold ${currentGlow === opt.id ? 'text-blue-600 dark:text-white' : 'text-slate-600 dark:text-slate-400'}`}>
+                                <div className={`w-5 h-5 md:w-6 md:h-6 rounded-full border border-white/20 ${opt.colorClass}`}></div>
+                                <span className={`text-[10px] md:text-xs font-bold ${currentGlow === opt.id ? 'text-blue-600 dark:text-white' : 'text-slate-600 dark:text-slate-400'}`}>
                                     {opt.name}
                                 </span>
                             </button>
                         ))}
                     </div>
-                    <p className="text-[10px] text-slate-400 mt-2">Changes the neon glow color of all glass cards and panels.</p>
+                    <p className="text-[9px] md:text-[10px] text-slate-400 mt-1.5 md:mt-2">Changes the neon glow color of all glass cards and panels.</p>
                 </div>
             </div>
         </Modal>
