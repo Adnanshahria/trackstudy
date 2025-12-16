@@ -58,6 +58,7 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({
     onEditCountdown,
     onConfigPerformance,
     onConfigSubjectProgress,
+    onDeleteSubject,
     ...paperHandlers
 }) => {
     const [activeTab, setActiveTab] = useState<TabType>('dashboard');
@@ -77,7 +78,7 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({
                         onEditWeights={onEditWeights}
                         onEditCountdown={onEditCountdown}
                         onConfigSubjectProgress={onConfigSubjectProgress}
-                        onDeleteSubject={props.onDeleteSubject}
+                        onDeleteSubject={onDeleteSubject}
                     />
                 )}
                 {activeTab === 'syllabus' && (
