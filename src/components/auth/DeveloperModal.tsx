@@ -50,7 +50,7 @@ export const DeveloperModal: React.FC<DeveloperModalProps> = ({ isOpen, onClose 
                             <a href="https://t.me/adnanshahria" target="_blank" rel="noreferrer" className="flex items-center justify-center gap-1.5 md:gap-2 p-2 md:p-3 bg-sky-500/5 hover:bg-sky-500/10 border border-sky-500/20 rounded-lg md:rounded-xl text-[10px] md:text-xs font-bold text-sky-600 dark:text-sky-400 transition-all hover:shadow-[0_0_15px_rgba(14,165,233,0.3)] group">
                                 <span className="group-hover:-translate-y-0.5 transition-transform">✈️</span> Telegram
                             </a>
-                            <a href="https://wa.me/8801998529362" target="_blank" rel="noreferrer" className="flex items-center justify-center gap-1.5 md:gap-2 p-2 md:p-3 bg-emerald-500/5 hover:bg-emerald-500/10 border border-emerald-500/20 rounded-lg md:rounded-xl text-[10px] md:text-xs font-bold text-emerald-600 dark:text-emerald-400 transition-all hover:shadow-[0_0_15px_rgba(16,185,129,0.3)] group">
+                            <a href="https://wa.me/8801705818105" target="_blank" rel="noreferrer" className="flex items-center justify-center gap-1.5 md:gap-2 p-2 md:p-3 bg-emerald-500/5 hover:bg-emerald-500/10 border border-emerald-500/20 rounded-lg md:rounded-xl text-[10px] md:text-xs font-bold text-emerald-600 dark:text-emerald-400 transition-all hover:shadow-[0_0_15px_rgba(16,185,129,0.3)] group">
                                 <span className="group-hover:-translate-y-0.5 transition-transform">💬</span> WhatsApp
                             </a>
                         </div>
