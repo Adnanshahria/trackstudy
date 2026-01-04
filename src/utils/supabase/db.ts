@@ -3,7 +3,6 @@ import { UserData, UserSettings } from '../../types';
 import { supabase } from './client';
 
 import { DEFAULT_SETTINGS } from '../../constants';
-import { getSyllabusData } from '../../constants/data';
 // import { logger } from '../logger'; 
 // Re-implementing a simple logger to avoid dependency circles if logger depends on others
 const logger = { error: console.error, debug: console.log };
@@ -52,12 +51,8 @@ export const initFirebase = async (
                 if (!username && user.email) username = user.email.split('@')[0];
                 if (!username) username = user.id;
 
-                const academicLevel: 'HSC' | 'SSC' = meta.academicLevel || 'HSC';
-                const initialSettings = localSettingsToMigrate || {
-                    ...DEFAULT_SETTINGS,
-                    academicLevel,
-                    syllabus: getSyllabusData(academicLevel)
-                };
+                // Do NOT set academicLevel or syllabus here - let onboarding modal handle it
+                const initialSettings = localSettingsToMigrate || { ...DEFAULT_SETTINGS };
 
                 const newUserData = {
                     id: username, // PK

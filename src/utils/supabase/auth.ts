@@ -22,7 +22,7 @@ const checkUserExists = async (username: string) => {
 
 
 
-export const createUser = async (rawId: string, pass: string, academicLevel: 'HSC' | 'SSC' = 'HSC') => {
+export const createUser = async (rawId: string, pass: string) => {
     const DOMAIN = '@study-dashboard.com';
     const id = sanitizeId(rawId);
     const email = rawId.includes('@') ? rawId : rawId + DOMAIN;
@@ -40,7 +40,7 @@ export const createUser = async (rawId: string, pass: string, academicLevel: 'HS
             options: {
                 data: {
                     displayName: id, // Store custom ID in metadata
-                    academicLevel: academicLevel // Store level in metadata
+                    // academicLevel is NOT set here - it's set during onboarding
                 },
             },
         });

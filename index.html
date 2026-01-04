@@ -6,19 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
   <!-- Universal Path Normalization - MUST be first script -->
-  <script>
-    (function () {
-      var loc = window.location;
-      var path = loc.pathname;
-      // If path has no extension and doesn't end with slash, redirect to add trailing slash
-      // This ensures relative paths (./assets) resolve correctly on subdirectory hosts like GitHub Pages
-      if (path !== '/' && !path.endsWith('/') && !path.includes('.')) {
-        loc.replace(loc.protocol + '//' + loc.host + path + '/' + loc.search + loc.hash);
-      }
-      // Compute and store the base path for runtime use
-      window.__APP_BASE__ = path.endsWith('/') ? path : path + '/';
-    })();
-  </script>
+
 
   <!-- SEO & Branding -->
   <title>TrackStudy | Personal Study Tracker</title>
@@ -78,7 +66,7 @@
   </script>
   <style>
     :root {
-      --bg-dark: #1A1A1C;
+      --bg-dark: #000000;
       --bg-light: #f8fafc;
       --glow-rgb: 16, 185, 129;
       --border-opacity: 0.4;
@@ -86,9 +74,10 @@
     }
 
     body {
-      background-color: var(--bg-dark);
+      background: linear-gradient(135deg, #0f0c29 0%, #1a1a3e 25%, #24243e 50%, #1a1a3e 75%, #0f0c29 100%);
+      background-attachment: fixed;
       color: #e2e8f0;
-      transition: background-color 0.3s ease;
+      transition: background 0.3s ease;
       text-rendering: optimizeLegibility;
       font-feature-settings: "cv11", "ss01";
     }
@@ -99,11 +88,11 @@
     }
 
     .glass-panel {
-      background: rgba(15, 23, 42, 0.7);
+      background: rgba(15, 23, 42, 0.4);
       border: 1px solid rgba(255, 255, 255, 0.08);
       box-shadow: 0 0 15px rgba(var(--glow-rgb), 0.1), inset 0 0 20px rgba(0, 0, 0, 0.2);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       will-change: transform, opacity;
       transition: border-color 0.3s ease, box-shadow 0.3s ease;
     }
@@ -117,11 +106,11 @@
     }
 
     .glass-card {
-      background: rgba(30, 41, 59, 0.7);
+      background: rgba(30, 41, 59, 0.4);
       border: 1px solid rgba(255, 255, 255, 0.08);
       box-shadow: 0 0 15px rgba(var(--glow-rgb), 0.1);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       transition: border-color 0.3s ease, box-shadow 0.3s ease;
     }
 
@@ -134,11 +123,11 @@
     }
 
     .modal-glass {
-      background: rgba(30, 41, 59, 0.82);
+      background: rgba(30, 41, 59, 0.5);
       border: 1px solid rgba(255, 255, 255, 0.1);
       box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
     }
 
     html[data-theme="light"] .modal-glass {

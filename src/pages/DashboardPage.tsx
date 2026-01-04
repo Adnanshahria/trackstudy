@@ -104,22 +104,26 @@ export const DashboardPage: React.FC<DashboardPageProps> = (props) => {
                                 />
                             </div>
                             <div id="syllabus-print-container" className="lg:h-full lg:overflow-y-auto custom-scrollbar pr-1 pb-20 lg:pb-0">
-                                <MemoizedSyllabus
-                                    activeSubject={activeSubject}
-                                    userData={userData}
-                                    settings={settings}
-                                    userId={userId}
-                                    onUpdateStatus={onUpdateStatus}
-                                    onUpdateNote={onUpdateNote}
-                                    onTogglePaper={(key) => onUpdateSettings({ ...settings, syllabusOpenState: { ...settings.syllabusOpenState, [key]: !settings.syllabusOpenState[key] } })}
-                                    onRenameColumn={dataMgr.onRenameColumn}
-                                    onAddColumn={dataMgr.onAddColumn}
-                                    onAddChapter={dataMgr.onAddChapter}
-                                    onDeleteChapter={dataMgr.onDeleteChapter}
-                                    onDeleteColumn={dataMgr.onDeleteColumn}
-                                    onRenameChapter={dataMgr.handleRenameChapter}
-                                    onDeletePaper={dataMgr.onDeletePaper}
-                                />
+                                {settings.syllabus?.[activeSubject] ? (
+                                    <MemoizedSyllabus
+                                        activeSubject={activeSubject}
+                                        userData={userData}
+                                        settings={settings}
+                                        userId={userId}
+                                        onUpdateStatus={onUpdateStatus}
+                                        onUpdateNote={onUpdateNote}
+                                        onTogglePaper={(key) => onUpdateSettings({ ...settings, syllabusOpenState: { ...settings.syllabusOpenState, [key]: !settings.syllabusOpenState[key] } })}
+                                        onRenameColumn={dataMgr.onRenameColumn}
+                                        onAddColumn={dataMgr.onAddColumn}
+                                        onAddChapter={dataMgr.onAddChapter}
+                                        onDeleteChapter={dataMgr.onDeleteChapter}
+                                        onDeleteColumn={dataMgr.onDeleteColumn}
+                                        onRenameChapter={dataMgr.handleRenameChapter}
+                                        onDeletePaper={dataMgr.onDeletePaper}
+                                    />
+                                ) : (
+                                    <div className="p-10 text-center text-slate-500">Select a subject or complete onboarding.</div>
+                                )}
                             </div>
                         </div>
                     </main>

@@ -26,16 +26,33 @@ interface SyllabusProps {
 }
 
 export const Syllabus: React.FC<SyllabusProps> = ({ activeSubject, userData, settings, userId, ...handlers }) => {
+    // ALL HOOKS MUST BE CALLED UNCONDITIONALLY - no early returns allowed
     const ui = useSyllabusUI();
-    const subject = settings.syllabus[activeSubject];
-
     const [confirmAction, setConfirmAction] = useState<{ type: 'chapter' | 'column'; id: string | number; subject: string; } | null>(null);
     const [showPrintModal, setShowPrintModal] = useState(false);
     const [printMode, setPrintMode] = useState<'p1' | 'p2' | 'both'>('both');
 
-    if (!subject) return <div className="p-10 text-center text-slate-500">Subject not found.</div>;
+    useEffect(() => {
+        const resetPrintMode = () => {
+            setPrintMode('both');
+        };
+        window.addEventListener('afterprint', resetPrintMode);
+        return () => window.removeEventListener('afterprint', resetPrintMode);
+    }, []);
 
-    const allItems = settings.subjectConfigs?.[activeSubject] || settings.trackableItems;
+    const handlePrint = useCallback((mode: 'p1' | 'p2' | 'both') => {
+        setPrintMode(mode);
+        setShowPrintModal(false);
+        setTimeout(() => {
+            window.print();
+        }, 0);
+    }, []);
+
+    // Get subject (may be undefined for new users)
+    const subject = settings.syllabus?.[activeSubject];
+
+    // Compute derived values only if subject exists
+    const allItems = subject ? (settings.subjectConfigs?.[activeSubject] || settings.trackableItems) : [];
 
     const safeHandlers = {
         ...handlers,
@@ -55,26 +72,7 @@ export const Syllabus: React.FC<SyllabusProps> = ({ activeSubject, userData, set
         setConfirmAction(null);
     };
 
-    // Robust afterprint listener to reset print mode across all browsers
-    useEffect(() => {
-        const resetPrintMode = () => {
-            setPrintMode('both');
-        };
-        window.addEventListener('afterprint', resetPrintMode);
-        return () => window.removeEventListener('afterprint', resetPrintMode);
-    }, []);
-
-    const handlePrint = useCallback((mode: 'p1' | 'p2' | 'both') => {
-        setPrintMode(mode);
-        setShowPrintModal(false);
-
-        // Use setTimeout(0) instead of requestAnimationFrame
-        // Mobile browsers block print() if called outside direct user gesture context
-        // setTimeout(0) lets React update while preserving the gesture chain
-        setTimeout(() => {
-            window.print();
-        }, 0);
-    }, []);
+    // Subject is guaranteed to exist by parent component (DashboardPage)
 
     return (
         <div className={`flex flex-col gap-6 min-w-0 ${printMode === 'p1' ? 'print-show-p1' : printMode === 'p2' ? 'print-show-p2' : ''}`}>

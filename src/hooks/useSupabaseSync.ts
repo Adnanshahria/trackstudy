@@ -25,6 +25,7 @@ export const useSupabaseSync = () => {
     useEffect(() => { localSettingsRef.current = settings; }, [settings]);
 
     useEffect(() => {
+
         // Initial Check (Explicit)
         supabase.auth.getSession().then(({ data: { session } }) => {
             if (!session) {
@@ -39,6 +40,10 @@ export const useSupabaseSync = () => {
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
             console.log("Auth State Change:", event, session?.user?.id);
+
+            // Check for pending hash redirect - crucial for prevents flash of landing page
+            const hasPendingHash = window.location.hash && window.location.hash.includes('access_token');
+
             try {
                 if (session?.user) {
                     // Resolve the correct public.users ID (Username)
@@ -72,14 +77,21 @@ export const useSupabaseSync = () => {
 
                     console.log("Resolved UserID:", resolvedId);
                     setUserId(resolvedId);
+                    setIsAuthResolving(false);
                 } else {
                     console.log("No User in Session. Clearing ID.");
                     setUserId(null);
+
+                    if (hasPendingHash) {
+                        console.log("Auth: Pending hash detected, waiting for resolution...");
+                        // Do NOT clear resolving state yet
+                    } else {
+                        setIsAuthResolving(false);
+                    }
                 }
             } catch (e) {
                 console.error("Auth resolution error:", e);
                 setUserId(null);
-            } finally {
                 setIsAuthResolving(false);
             }
         });
@@ -94,6 +106,10 @@ export const useSupabaseSync = () => {
         const timer = setTimeout(() => {
             setIsAuthResolving(prev => {
                 if (prev) {
+                    if (window.location.hash && window.location.hash.includes('access_token')) {
+                        console.warn("Auth resolution timeout, but hash token detected. Extending wait...");
+                        return prev;
+                    }
                     console.warn("⚠️ Auth resolution timed out. Forcing completion.");
                     return false;
                 }

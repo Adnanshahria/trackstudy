@@ -14,12 +14,10 @@ interface Props {
     isChecking: boolean; error: string; success: string;
     recoveredPassword: string;
     onSuccess?: () => void;
-    academicLevel: 'HSC' | 'SSC';
-    setAcademicLevel: (val: 'HSC' | 'SSC') => void;
 }
 
 export const AuthForm: React.FC<Props> = (props) => {
-    const { modalMode, setModalMode, tempUserId, setTempUserId, tempPass, setTempPass, confirmPass, setConfirmPass, showPass, setShowPass, handleUserAction, handleGuestLogin, handleGoogleLogin, isChecking, error, success, recoveredPassword, academicLevel, setAcademicLevel } = props;
+    const { modalMode, setModalMode, tempUserId, setTempUserId, tempPass, setTempPass, confirmPass, setConfirmPass, showPass, setShowPass, handleUserAction, handleGuestLogin, handleGoogleLogin, isChecking, error, success, recoveredPassword } = props;
     const [showEmailLogin, setShowEmailLogin] = useState(false);
 
     // Display Logic
@@ -33,24 +31,6 @@ export const AuthForm: React.FC<Props> = (props) => {
 
     return (
         <div className="flex flex-col gap-4">
-
-            {/* Academic Level Selector (Only for Create) */}
-            {isCreate && (
-                <div className="flex bg-neutral-900/50 p-1 rounded-xl mb-2 border border-white/10">
-                    <button
-                        onClick={() => setAcademicLevel('HSC')}
-                        className={`flex-1 py-2 text-[10px] md:text-xs font-bold rounded-lg transition-all ${academicLevel === 'HSC' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30' : 'text-slate-400 hover:text-white'}`}
-                    >
-                        HSC / Admission
-                    </button>
-                    <button
-                        onClick={() => setAcademicLevel('SSC')}
-                        className={`flex-1 py-2 text-[10px] md:text-xs font-bold rounded-lg transition-all ${academicLevel === 'SSC' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30' : 'text-slate-400 hover:text-white'}`}
-                    >
-                        SSC
-                    </button>
-                </div>
-            )}
 
             {/* Email / ID Login (Toggle or Inputs) */}
             {(isLogin || isCreate) && (
@@ -66,12 +46,12 @@ export const AuthForm: React.FC<Props> = (props) => {
                     <div className="flex flex-col gap-3 md:gap-5 animate-slide-down mb-2">
                         {/* Unified Input */}
                         <AuthInput
-                            label="User ID"
+                            label="Email ID"
                             icon="👤"
                             value={tempUserId}
                             onChange={setTempUserId}
                             onEnter={handleUserAction}
-                            placeholder="Enter username"
+                            placeholder="myname@gmail.com"
                         />
 
                         {recoveredPassword && (
@@ -149,13 +129,6 @@ export const AuthForm: React.FC<Props> = (props) => {
                     </svg>
                     Continue with Google
                 </button>
-            )}
-
-            {/* Guest Login and Back to Sign In buttons (remain at the bottom) */}
-            {isLogin && (
-                <div className="relative group p-0.5 md:p-1 rounded-xl md:rounded-2xl bg-gradient-to-r from-slate-500/10 via-slate-400/5 to-slate-500/10 backdrop-blur-lg border border-slate-300/30 dark:border-slate-400/20 shadow-lg shadow-slate-500/10 dark:shadow-slate-600/20">
-                    <button onClick={handleGuestLogin} className="w-full py-2.5 md:py-3 rounded-lg md:rounded-xl text-slate-600 dark:text-slate-300 text-[10px] md:text-xs font-bold hover:text-slate-900 dark:hover:text-white transition-colors">👤 Continue as Guest</button>
-                </div>
             )}
 
             {(isReset || isChange) && (

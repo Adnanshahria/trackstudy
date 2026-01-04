@@ -51,7 +51,7 @@ export interface UserSettings {
   countdownTarget?: string;
   countdownLabel?: string;
   subjectOrder?: string[];
-  academicLevel: 'HSC' | 'SSC';
+  academicLevel?: 'HSC' | 'SSC';
 }
 
 export interface UserData {

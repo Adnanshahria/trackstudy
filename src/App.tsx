@@ -8,7 +8,7 @@ import { AuthPage } from './pages/AuthPage';
 import { DeveloperModal } from './components/auth/DeveloperModal';
 import { AppGuideModal } from './components/guide/AppGuideModal';
 import { AppearanceModal } from './components/settings/AppearanceModal';
-
+import { AcademicLevelModal } from './components/onboarding/AcademicLevelModal';
 
 import { Toast } from './components/ui/Toast';
 import { useSupabaseSync } from './hooks/useSupabaseSync';
@@ -17,11 +17,15 @@ import { useAuthHandlers } from './hooks/useAuthHandlers';
 import { useAppearance } from './hooks/ui/useAppearance';
 import { useToast } from './hooks/useToast';
 import { OnboardingProvider } from './components/onboarding/OnboardingProvider';
+import { getSyllabusData } from './constants/data';
 
 import { SkeletonDashboard } from './components/layout/SkeletonDashboard';
 
 function App() {
   const { userId, setUserId, isAuthResolving, userData, settings, isLoading, connectionStatus, handleStatusUpdate, handleNoteUpdate, handleSettingsUpdate, toggleTheme, handleLogout, forceSync } = useSupabaseSync();
+
+
+
   const [activeSubject, setActiveSubject] = useState<string>('biology');
 
   // Modals state
@@ -29,7 +33,8 @@ function App() {
   const [showAppGuide, setShowAppGuide] = useState(false);
   const [showAppearance, setShowAppearance] = useState(false);
 
-
+  // New user onboarding: detect if academic level needs to be selected
+  const needsAcademicLevel = userId && !isLoading && !settings.academicLevel;
 
   const { toast, showToast, hideToast } = useToast();
   const [postLoginLoading, setPostLoginLoading] = useState(false);
@@ -72,6 +77,11 @@ function App() {
     }
   }, [handleSettingsUpdate, showToast, userId]);
 
+  // Handler for academic level selection (must be after wrappedSettingsUpdate)
+  const handleAcademicLevelSelect = useCallback((level: 'HSC' | 'SSC') => {
+    wrappedSettingsUpdate({ ...settings, academicLevel: level, syllabus: getSyllabusData(level) });
+  }, [settings, wrappedSettingsUpdate]);
+
   const dataMgr = useDataManager(settings, wrappedSettingsUpdate, activeSubject, setActiveSubject);
 
   // Loading Logic
@@ -106,83 +116,84 @@ function App() {
   return (
     <BrowserRouter>
       <OnboardingProvider userId={userId}>
-        <div id="app-root" className="min-h-screen lg:h-screen w-screen lg:overflow-hidden flex flex-col text-slate-800 dark:text-slate-200 bg-slate-50 dark:bg-[#1A1A1C]">
-          <Routes>
-            <Route
-              path="/"
-              element={!userId ? (
-                <LandingPage
-                  onDev={() => setShowDevModal(true)}
-                  onGuide={() => setShowAppGuide(true)}
-                  theme={settings.theme}
-                  onToggleTheme={toggleTheme}
-                />
-              ) : (
-                <Navigate to="/dashboard" replace />
-              )}
+        <div id="app-root" className="min-h-screen lg:h-screen w-screen lg:overflow-hidden flex flex-col text-slate-800 dark:text-slate-200">
+          <div className="flex flex-col flex-1 lg:h-screen lg:overflow-hidden">
+            <Routes>
+              <Route
+                path="/"
+                element={!userId ? (
+                  <LandingPage
+                    onDev={() => setShowDevModal(true)}
+                    onGuide={() => setShowAppGuide(true)}
+                    theme={settings.theme}
+                    onToggleTheme={toggleTheme}
+                  />
+                ) : (
+                  <Navigate to="/dashboard" replace />
+                )}
+              />
+
+              <Route
+                path="/auth"
+                element={!userId ? (
+                  <AuthPage
+                    {...auth}
+                    userId={userId}
+                    isCheckingUser={auth.isCheckingUser}
+                    modalSuccess={auth.modalSuccess}
+                    modalError={auth.modalError}
+                  />
+                ) : (
+                  <Navigate to="/dashboard" replace />
+                )}
+              />
+
+              <Route
+                path="/dashboard"
+                element={userId ? (
+                  <DashboardPage
+                    userId={userId}
+                    userData={userData}
+                    settings={settings}
+                    activeSubject={activeSubject}
+                    setActiveSubject={setActiveSubject}
+                    isLoading={isLoading}
+                    connectionStatus={connectionStatus}
+                    onLogout={handleLogout}
+                    onToggleTheme={toggleTheme}
+                    onDev={() => setShowDevModal(true)}
+                    onGuide={() => setShowAppGuide(true)}
+                    onAppearance={() => setShowAppearance(true)}
+                    onForceSync={forceSync}
+                    onUpdateSettings={wrappedSettingsUpdate}
+                    onUpdateStatus={wrappedStatusUpdate}
+                    onUpdateNote={wrappedNoteUpdate}
+                    compositeData={compositeData}
+                    dataMgr={dataMgr}
+                  />
+                ) : (
+                  <Navigate to="/auth" replace />
+                )}
+              />
+
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+
+            {/* Global Modals */}
+            <DeveloperModal isOpen={showDevModal} onClose={() => setShowDevModal(false)} />
+            <AppGuideModal isOpen={showAppGuide} onClose={() => setShowAppGuide(false)} />
+            <AppearanceModal isOpen={showAppearance} onClose={() => setShowAppearance(false)} settings={settings} onUpdateSettings={wrappedSettingsUpdate} />
+            <AcademicLevelModal isOpen={!!needsAcademicLevel} onSelect={handleAcademicLevelSelect} />
+
+
+
+            <Toast
+              message={toast.message}
+              type={toast.type}
+              isVisible={toast.isVisible}
+              onHide={hideToast}
             />
-
-            <Route
-              path="/auth"
-              element={!userId ? (
-                <AuthPage
-                  {...auth}
-                  userId={userId}
-                  isCheckingUser={auth.isCheckingUser}
-                  modalSuccess={auth.modalSuccess}
-                  modalError={auth.modalError}
-                  academicLevel={auth.academicLevel}
-                  setAcademicLevel={auth.setAcademicLevel}
-                />
-              ) : (
-                <Navigate to="/dashboard" replace />
-              )}
-            />
-
-            <Route
-              path="/dashboard"
-              element={userId ? (
-                <DashboardPage
-                  userId={userId}
-                  userData={userData}
-                  settings={settings}
-                  activeSubject={activeSubject}
-                  setActiveSubject={setActiveSubject}
-                  isLoading={isLoading}
-                  connectionStatus={connectionStatus}
-                  onLogout={handleLogout}
-                  onToggleTheme={toggleTheme}
-                  onDev={() => setShowDevModal(true)}
-                  onGuide={() => setShowAppGuide(true)}
-                  onAppearance={() => setShowAppearance(true)}
-                  onForceSync={forceSync}
-                  onUpdateSettings={wrappedSettingsUpdate}
-                  onUpdateStatus={wrappedStatusUpdate}
-                  onUpdateNote={wrappedNoteUpdate}
-                  compositeData={compositeData}
-                  dataMgr={dataMgr}
-                />
-              ) : (
-                <Navigate to="/auth" replace />
-              )}
-            />
-
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-
-          {/* Global Modals */}
-          <DeveloperModal isOpen={showDevModal} onClose={() => setShowDevModal(false)} />
-          <AppGuideModal isOpen={showAppGuide} onClose={() => setShowAppGuide(false)} />
-          <AppearanceModal isOpen={showAppearance} onClose={() => setShowAppearance(false)} settings={settings} onUpdateSettings={wrappedSettingsUpdate} />
-
-
-
-          <Toast
-            message={toast.message}
-            type={toast.type}
-            isVisible={toast.isVisible}
-            onHide={hideToast}
-          />
+          </div>
         </div>
       </OnboardingProvider>
     </BrowserRouter>

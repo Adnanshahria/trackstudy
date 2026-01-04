@@ -11,7 +11,6 @@ export const useAuthHandlers = (setUserId: (id: string) => void, onSuccess?: () 
     const [tempUserId, setTempUserId] = useState('');
     const [tempPassword, setTempPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    const [academicLevel, setAcademicLevel] = useState<'HSC' | 'SSC'>('HSC');
     const [showPassword, setShowPassword] = useState(false);
     const [modalError, setModalError] = useState('');
     const [modalSuccess, setModalSuccess] = useState('');
@@ -22,7 +21,6 @@ export const useAuthHandlers = (setUserId: (id: string) => void, onSuccess?: () 
         setTempUserId('');
         setTempPassword('');
         setConfirmPassword('');
-        setAcademicLevel('HSC');
         setShowPassword(false);
         setModalError('');
         setModalSuccess('');
@@ -107,8 +105,7 @@ export const useAuthHandlers = (setUserId: (id: string) => void, onSuccess?: () 
                 }
             } else {
                 // Sign Up (ID/Email only)
-                // Pass academicLevel to signup
-                const result = await authService.signup(trimmedId, trimmedPass, academicLevel);
+                const result = await authService.signup(trimmedId, trimmedPass);
 
                 if (result.success) {
                     // Force reload or just let the effect handle it
@@ -162,5 +159,5 @@ export const useAuthHandlers = (setUserId: (id: string) => void, onSuccess?: () 
         }
     };
 
-    return { showLoginModal, setShowLoginModal, modalMode, setModalMode, tempUserId, setTempUserId, tempPassword, setTempPassword, confirmPassword, setConfirmPassword, academicLevel, setAcademicLevel, showPassword, setShowPassword, modalError, modalSuccess, isCheckingUser, handleUserAction, handleGuestLogin, handleGoogleLogin, resetModalState, recoveredPassword, setRecoveredPassword };
+    return { showLoginModal, setShowLoginModal, modalMode, setModalMode, tempUserId, setTempUserId, tempPassword, setTempPassword, confirmPassword, setConfirmPassword, showPassword, setShowPassword, modalError, modalSuccess, isCheckingUser, handleUserAction, handleGuestLogin, handleGoogleLogin, resetModalState, recoveredPassword, setRecoveredPassword };
 };

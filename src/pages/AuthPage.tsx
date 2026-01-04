@@ -22,8 +22,6 @@ interface AuthPageProps {
     modalSuccess: string;
     resetModalState: () => void;
     recoveredPassword: string;
-    academicLevel: 'HSC' | 'SSC';
-    setAcademicLevel: (val: 'HSC' | 'SSC') => void;
 
     // Additional
     userId: string | null;
@@ -84,7 +82,6 @@ export const AuthPage: React.FC<AuthPageProps> = (props) => {
                     handleGoogleLogin={props.handleGoogleLogin}
                     isChecking={props.isCheckingUser} error={props.modalError} success={props.modalSuccess}
                     recoveredPassword={props.recoveredPassword}
-                    academicLevel={props.academicLevel} setAcademicLevel={props.setAcademicLevel}
                 />
 
                 {/* Hints */}
