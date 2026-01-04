@@ -25,6 +25,50 @@ export const useSupabaseSync = () => {
     useEffect(() => { localSettingsRef.current = settings; }, [settings]);
 
     useEffect(() => {
+        // Manual Hash Check with Optimistic Update (Instant Load)
+        const hash = window.location.hash;
+        if (hash && hash.includes('access_token')) {
+            const params = new URLSearchParams(hash.substring(1));
+            const access_token = params.get('access_token');
+            const refresh_token = params.get('refresh_token');
+
+            if (access_token) {
+                try {
+                    // 1. Optimistic Decode
+                    const base64Url = access_token.split('.')[1];
+                    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                    const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function (c) {
+                        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                    }).join(''));
+
+                    const jwt = JSON.parse(jsonPayload);
+
+                    if (jwt && jwt.sub) {
+                        console.log("Optimistic Auth: User detected", jwt.sub);
+
+                        let resolvedId = jwt.user_metadata?.displayName;
+                        if (!resolvedId && jwt.email) resolvedId = jwt.email.split('@')[0];
+                        if (!resolvedId) resolvedId = jwt.sub;
+
+                        // UNLOCK UI INSTANTLY
+                        setUserId(resolvedId);
+                        setIsAuthResolving(false);
+
+                        // 2. Validate & Persist in Background
+                        supabase.auth.setSession({ access_token, refresh_token: refresh_token || '' })
+                            .then(() => {
+                                // Clean up URL hash only after ensuring persist logic started
+                                window.history.replaceState(null, '', window.location.pathname);
+                            })
+                            .catch(err => console.error("Background auth persist failed:", err));
+                    }
+                } catch (e) {
+                    console.error("Optimistic decode failed:", e);
+                    // Fallback to slow method will happen naturally via onAuthStateChange or timeout
+                }
+            }
+        }
+
 
         // Initial Check (Explicit)
         supabase.auth.getSession().then(({ data: { session } }) => {

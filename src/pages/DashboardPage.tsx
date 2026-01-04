@@ -54,7 +54,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = (props) => {
     const heroLogic = useHeroLogic(settings, dataMgr.handleWeightUpdate);
 
     return (
-        <div className="flex flex-col h-screen lg:overflow-hidden bg-slate-50 dark:bg-[#1A1A1C] transition-colors duration-300">
+        <div className="flex flex-col h-screen lg:overflow-hidden transition-colors duration-300">
             {/* DESKTOP LAYOUT */}
             <div className="hidden md:flex flex-col h-full overflow-hidden">
                 <DashboardHeader
