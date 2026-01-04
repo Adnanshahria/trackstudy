@@ -10,30 +10,62 @@ const getErrorMessage = (error: any) => {
 
 const sanitizeId = (id: string) => id.replace(/[/#\?]/g, '_');
 
+// Helper: Promise with timeout
+const withTimeout = <T>(promise: Promise<T>, ms: number, errorMsg: string): Promise<T> => {
+    return Promise.race([
+        promise,
+        new Promise<T>((_, reject) => setTimeout(() => reject(new Error(errorMsg)), ms))
+    ]);
+};
+
 // Helper to check if a user exists in the public 'users' table
-const checkUserExists = async (username: string) => {
-    const { data, error } = await supabase
-        .from(USER_TABLE)
-        .select('id')
-        .eq('id', username)
-        .single();
-    return !!data && !error;
+const checkUserExists = async (username: string): Promise<boolean> => {
+    try {
+        console.log('🔐 checkUserExists: Starting query for', username);
+
+        // Create a proper Promise from the Supabase query
+        const queryPromise = new Promise<{ data: any, error: any }>((resolve) => {
+            supabase
+                .from(USER_TABLE)
+                .select('id')
+                .eq('id', username)
+                .maybeSingle()
+                .then(result => resolve(result));
+        });
+
+        // Race with timeout (5 seconds)
+        const timeoutPromise = new Promise<{ data: any, error: any }>((_, reject) =>
+            setTimeout(() => reject(new Error('User check timed out')), 5000)
+        );
+
+        const { data, error } = await Promise.race([queryPromise, timeoutPromise]);
+        console.log('🔐 checkUserExists: Result', { found: !!data, error: error?.message });
+        return !!data && !error;
+    } catch (e: any) {
+        console.error('🔐 checkUserExists: TIMEOUT or ERROR', e.message);
+        return false; // Assume user doesn't exist on timeout/error
+    }
 };
 
 
 
 export const createUser = async (rawId: string, pass: string) => {
+    console.log('🔐 createUser: Starting signup for', rawId);
     const DOMAIN = '@study-dashboard.com';
     const id = sanitizeId(rawId);
     const email = rawId.includes('@') ? rawId : rawId + DOMAIN;
+    console.log('🔐 createUser: Using email:', email);
 
     try {
         // Check if username already taken in our public table
+        console.log('🔐 createUser: Checking if user exists...');
         const exists = await checkUserExists(id);
+        console.log('🔐 createUser: User exists?', exists);
         if (exists) {
             return { success: false, error: 'User ID already exists.' };
         }
 
+        console.log('🔐 createUser: Calling supabase.auth.signUp...');
         const { data: authData, error: authError } = await supabase.auth.signUp({
             email: email,
             password: pass,
@@ -44,6 +76,7 @@ export const createUser = async (rawId: string, pass: string) => {
                 },
             },
         });
+        console.log('🔐 createUser: signUp returned', { user: authData?.user?.id, error: authError?.message });
 
         if (authError) throw authError;
         if (!authData.user) throw new Error("User creation failed");
@@ -51,10 +84,10 @@ export const createUser = async (rawId: string, pass: string) => {
         // User profile creation is now handled by a Database Trigger on auth.users insert.
         // We trust the trigger to create the public.users row.
 
-
+        console.log('🔐 createUser: SUCCESS!');
         return { success: true, id: id };
     } catch (e: any) {
-        console.error("Signup Error:", e);
+        console.error("🔐 createUser: ERROR", e);
         return { success: false, error: getErrorMessage(e) };
     }
 };
@@ -160,15 +193,28 @@ export const changeUserPassword = async (id: string, oldPassword: string, newPas
 
 // Export signOut for useSyncActions
 export const signOut = async () => {
-    // 1. Attempt Supabase SignOut
+    console.log('🚪 signOut: Starting logout...');
+
+    // 1. Attempt Supabase SignOut with timeout protection
     try {
-        const { error } = await supabase.auth.signOut();
-        if (error) console.error("SignOut Error", error);
+        const signOutPromise = supabase.auth.signOut();
+        const timeoutPromise = new Promise<{ error: any }>((_, reject) =>
+            setTimeout(() => reject(new Error('SignOut timed out')), 3000)
+        );
+
+        try {
+            const { error } = await Promise.race([signOutPromise, timeoutPromise]);
+            if (error) console.error("SignOut Error", error);
+            console.log('🚪 signOut: Supabase signOut completed');
+        } catch (timeoutErr) {
+            console.warn('🚪 signOut: Supabase signOut timed out, proceeding with local cleanup');
+        }
     } catch (e) {
         console.error("SignOut Exception", e);
     }
 
-    // 2. Force Clear LocalStorage Tokens (Scorched Earth)
+    // 2. Force Clear LocalStorage Tokens (Scorched Earth) - ALWAYS runs
+    console.log('🚪 signOut: Clearing local storage tokens...');
     try {
         const keysToRemove: string[] = [];
         for (let i = 0; i < localStorage.length; i++) {
@@ -178,10 +224,12 @@ export const signOut = async () => {
             }
         }
         keysToRemove.forEach(k => localStorage.removeItem(k));
-        console.log("Cleared Supabase Tokens from Storage");
+        console.log("🚪 signOut: Cleared Supabase Tokens from Storage:", keysToRemove.length, "keys");
     } catch (e) {
         console.warn("LocalStorage clear failed", e);
     }
+
+    console.log('🚪 signOut: COMPLETE');
 };
 
 export const shadowLogin = async () => ({ success: false, error: "Shadow login disabled." });

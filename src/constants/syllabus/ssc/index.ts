@@ -1,4 +1,4 @@
-import { SyllabusData } from '../../../../types';
+import { SyllabusData } from '../../../types';
 
 export const SSC_SYLLABUS_DATA: SyllabusData = {
     chemistry: {

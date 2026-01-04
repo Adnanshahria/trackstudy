@@ -28,6 +28,7 @@ export const useAuthHandlers = (setUserId: (id: string) => void, onSuccess?: () 
     }, []);
 
     const handleUserAction = async () => {
+        console.log('🚀 handleUserAction CALLED! modalMode:', modalMode, 'tempUserId:', tempUserId);
         const trimmedId = tempUserId.trim();
         const trimmedPass = tempPassword;
 

@@ -9,8 +9,8 @@ export const DEFAULT_PROGRESS_CONFIG: ProgressBarConfig[] = [
 ];
 
 export const DEFAULT_SETTINGS: UserSettings = {
-  academicLevel: 'HSC', // Default to HSC for new users
-  syllabus: HSC_SYLLABUS_DATA, // Populated with actual data
+  // academicLevel is NOT set here - triggers onboarding modal for new users
+  syllabus: HSC_SYLLABUS_DATA, // Fallback syllabus so app renders while modal shows
   theme: 'dark',
   soundVolume: 0.3,
   glowColor: 'green',

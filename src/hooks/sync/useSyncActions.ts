@@ -104,6 +104,7 @@ export const useSyncActions = (
     };
 
     const handleLogout = async () => {
+        console.log('🚪 handleLogout: CALLED!');
         // Flush any pending debounced saves before logout
         if (userId) {
             flushPendingSaves(userId);

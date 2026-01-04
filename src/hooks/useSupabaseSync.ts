@@ -95,8 +95,11 @@ export const useSupabaseSync = () => {
 
             try {
                 if (session?.user) {
+                    console.log('🔑 Auth: session.user found', session.user.id, session.user.email);
+
                     // Resolve the correct public.users ID (Username)
                     let resolvedId = session.user.user_metadata?.displayName;
+                    console.log('🔑 Step 1 - displayName:', resolvedId);
 
                     if (!resolvedId) {
                         try {
@@ -107,6 +110,7 @@ export const useSupabaseSync = () => {
                                 .eq('auth_id', session.user.id)
                                 .maybeSingle();
 
+                            console.log('🔑 Step 2 - DB lookup:', data, error);
                             if (data?.id) {
                                 resolvedId = data.id;
                             }
@@ -117,6 +121,7 @@ export const useSupabaseSync = () => {
 
                     if (!resolvedId) {
                         // 3. Fallback derivation
+                        console.log('🔑 Step 3 - Fallback derivation');
                         if (session.user.email) {
                             resolvedId = session.user.email.split('@')[0];
                         } else {
@@ -124,7 +129,13 @@ export const useSupabaseSync = () => {
                         }
                     }
 
-                    console.log("Resolved UserID:", resolvedId);
+                    // FINAL SAFETY: Ensure we ALWAYS have a resolvedId
+                    if (!resolvedId) {
+                        console.error('🚨 CRITICAL: resolvedId still null, using UUID');
+                        resolvedId = session.user.id;
+                    }
+
+                    console.log("✅ Resolved UserID:", resolvedId);
                     setUserId(resolvedId);
                     setIsAuthResolving(false);
                 } else {
@@ -140,7 +151,13 @@ export const useSupabaseSync = () => {
                 }
             } catch (e) {
                 console.error("Auth resolution error:", e);
-                setUserId(null);
+                // FALLBACK: Even on error, try to set userId from session
+                if (session?.user) {
+                    console.warn('⚠️ Error recovery: Using UUID as userId');
+                    setUserId(session.user.id);
+                } else {
+                    setUserId(null);
+                }
                 setIsAuthResolving(false);
             }
         });
@@ -173,6 +190,9 @@ export const useSupabaseSync = () => {
     const actions = useSyncActions(userId, userData, setUserData, settings, setSettings, localDataRef, localSettingsRef, setUserId, pendingSettingsUpdateRef);
 
     const { isLoading, connectionStatus } = useDataSync(userId, setUserData, setSettings, localSettingsRef, localDataRef, actions.handleLogout, syncKey, pendingSettingsUpdateRef);
+
+    // DEBUG: Trace data flow
+    console.log('🔍 useSupabaseSync State:', { userId, isLoading, syllabusKeys: Object.keys(settings.syllabus || {}), academicLevel: settings.academicLevel });
 
     const forceSync = () => {
         setSyncKey(prev => prev + 1);

@@ -51,7 +51,12 @@ export const CountdownEditModal: React.FC<Props> = ({ isOpen, onClose, initialTa
                         type="datetime-local"
                         value={tempTarget}
                         onChange={(e) => setTempTarget(e.target.value)}
-                        className="bg-slate-50 dark:bg-black/20 border border-slate-300 dark:border-white/10 rounded-lg md:rounded-xl p-2 md:p-3 text-xs md:text-sm dark:text-white focus:outline-none focus:border-blue-500 transition-colors"
+                        onClick={(e) => {
+                            // Open the date picker when clicking anywhere on the input
+                            const input = e.currentTarget as HTMLInputElement;
+                            if (input.showPicker) input.showPicker();
+                        }}
+                        className="bg-slate-50 dark:bg-black/20 border border-slate-300 dark:border-white/10 rounded-lg md:rounded-xl p-2 md:p-3 text-xs md:text-sm dark:text-white focus:outline-none focus:border-blue-500 transition-colors cursor-pointer"
                     />
                 </div>
                 <div className="flex justify-end gap-2 md:gap-3 pt-1 md:pt-2">

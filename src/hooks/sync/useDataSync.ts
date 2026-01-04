@@ -28,6 +28,8 @@ export const useDataSync = (
     useEffect(() => {
         if (!userId) return;
 
+        console.log('📥 useDataSync: Starting sync for userId:', userId);
+
         const thisSyncId = ++currentSyncId.current;
         let unsub: (() => void) | null = null;
         let isCleanedUp = false;
