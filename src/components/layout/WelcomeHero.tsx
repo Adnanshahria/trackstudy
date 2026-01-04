@@ -55,7 +55,7 @@ export const WelcomeHero: React.FC<{ onLogin: () => void }> = ({ onLogin }) => (
                     onClick={onLogin}
                     className="px-8 py-4 text-sm font-bold rounded-xl bg-gradient-to-r from-blue-600 to-teal-600 hover:from-blue-500 hover:to-teal-500 shadow-xl shadow-blue-500/25 transition-all duration-300 hover:scale-105 hover:shadow-blue-500/40"
                 >
-                    🚀 Start Tracking Free →
+                    🚀 Start Tracking →
                 </Button>
             </div>
 

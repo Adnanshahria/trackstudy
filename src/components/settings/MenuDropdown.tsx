@@ -67,9 +67,10 @@ export const MenuDropdown: React.FC<MenuDropdownProps> = ({ userId, userData, se
                 <div className="px-4 py-3 bg-slate-50/80 dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm">
                     <p className="text-[10px] uppercase font-bold text-slate-500 tracking-wider mb-2">{userId ? 'Signed in as' : 'Welcome'}</p>
                     <div className="flex items-center gap-3">
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs text-white font-bold shadow-md ${userId ? 'bg-gradient-to-br from-blue-500 to-purple-500' : 'bg-slate-400'}`}>
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs text-white font-bold shadow-md shrink-0 ${userId ? 'bg-gradient-to-br from-blue-500 to-purple-500' : 'bg-slate-400'}`}>
                             {displayInitial}
                         </div>
+                        <span className="text-sm font-semibold text-slate-700 dark:text-white truncate">{displayName}</span>
                     </div>
                 </div>
 
