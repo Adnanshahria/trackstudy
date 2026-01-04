@@ -26,7 +26,11 @@ function App() {
 
 
 
-  const [activeSubject, setActiveSubject] = useState<string>('biology');
+  // Derive initial subject from syllabus keys (not hardcoded 'biology')
+  const [activeSubject, setActiveSubject] = useState<string>(() => {
+    const keys = Object.keys(settings.syllabus || {});
+    return keys[0] || 'biology';
+  });
 
   // Modals state
   const [showDevModal, setShowDevModal] = useState(false);

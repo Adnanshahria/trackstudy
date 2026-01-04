@@ -3,7 +3,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { UserData, UserSettings } from '../../types';
 import { initFirebase } from '../../utils/storage';
 import { logger } from '../../utils/logger';
-import { DEFAULT_SETTINGS } from '../../constants';
+import { DEFAULT_SETTINGS, getSyllabusData, HSC_SYLLABUS_DATA } from '../../constants/index';
 
 export const useDataSync = (
     userId: string | null,
@@ -57,12 +57,23 @@ export const useDataSync = (
                         }
 
                         // MERGE STRATEGY:
-                        // 1. Start with DEFAULT_SETTINGS (sets academicLevel='HSC' for legacy users)
-                        // 2. Spread remoteSettings on top
-                        setSettings(prev => ({
-                            ...DEFAULT_SETTINGS,
-                            ...remoteSettings
-                        }));
+                        let finalSettings = { ...DEFAULT_SETTINGS, ...remoteSettings };
+
+                        // Strict Validation: If syllabus is empty, load from academic level
+                        const isSyllabusInvalid = !finalSettings.syllabus ||
+                            Object.keys(finalSettings.syllabus).length === 0;
+
+                        if (isSyllabusInvalid) {
+                            console.warn("⚠️ Empty Syllabus detected. Loading from academicLevel.");
+                            const level = finalSettings.academicLevel || 'HSC';
+                            finalSettings.syllabus = getSyllabusData(level as 'HSC' | 'SSC');
+                            finalSettings.academicLevel = level;
+                        }
+
+                        // NOTE: Do NOT default academicLevel here.
+                        // This allows AcademicLevelModal to trigger for new users.
+
+                        setSettings(finalSettings);
                     }
                     setIsLoading(false);
                 }, (status) => {

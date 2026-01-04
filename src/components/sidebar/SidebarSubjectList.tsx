@@ -22,6 +22,11 @@ const SidebarSubjectListBase: React.FC<Props> = ({ settings, activeSubject, isEd
     const syllabusKeys = Object.keys(settings.syllabus || {});
     const existingOrder = settings.subjectOrder || [];
 
+    // Debug: Warn if syllabus is empty
+    if (syllabusKeys.length === 0) {
+        console.warn('⚠️ SidebarSubjectList: settings.syllabus is empty!', settings);
+    }
+
     // Compute display order without auto-saving - prevents re-saving old cached data
     const validOrder = existingOrder.filter(key => settings.syllabus?.[key]);
     const newKeys = syllabusKeys.filter(key => !validOrder.includes(key));

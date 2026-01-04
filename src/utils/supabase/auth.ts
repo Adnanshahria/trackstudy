@@ -160,8 +160,28 @@ export const changeUserPassword = async (id: string, oldPassword: string, newPas
 
 // Export signOut for useSyncActions
 export const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) console.error("SignOut Error", error);
+    // 1. Attempt Supabase SignOut
+    try {
+        const { error } = await supabase.auth.signOut();
+        if (error) console.error("SignOut Error", error);
+    } catch (e) {
+        console.error("SignOut Exception", e);
+    }
+
+    // 2. Force Clear LocalStorage Tokens (Scorched Earth)
+    try {
+        const keysToRemove: string[] = [];
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && (key.startsWith('sb-') || key.includes('supabase'))) {
+                keysToRemove.push(key);
+            }
+        }
+        keysToRemove.forEach(k => localStorage.removeItem(k));
+        console.log("Cleared Supabase Tokens from Storage");
+    } catch (e) {
+        console.warn("LocalStorage clear failed", e);
+    }
 };
 
 export const shadowLogin = async () => ({ success: false, error: "Shadow login disabled." });

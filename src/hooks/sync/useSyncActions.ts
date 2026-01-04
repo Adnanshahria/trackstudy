@@ -2,7 +2,7 @@ import React from 'react';
 import { UserData, UserSettings } from '../../types';
 import { saveUserProgress, saveSettings, flushPendingSaves, signOut } from '../../utils/storage';
 import { logger } from '../../utils/logger';
-import { DEFAULT_SETTINGS } from '../../constants';
+import { DEFAULT_SETTINGS } from '../../constants/index';
 
 // Debounce wait time (must match writers.ts) + buffer for network latency
 const PENDING_UPDATE_TIMEOUT_MS = 300 + 500; // 300ms debounce + 500ms buffer
@@ -109,17 +109,22 @@ export const useSyncActions = (
             flushPendingSaves(userId);
         }
 
-        // Clear UI state
+        // 1. Sign out from Supabase FIRST (clears tokens)
+        await signOut();
+        logger.debug("SignOut request completed");
+
+        // 2. Clear Local Persisted Data
+        try {
+            localStorage.removeItem('trackstudy_userdata');
+            localStorage.removeItem('trackstudy_settings');
+        } catch (e) { console.error("Clear storage failed", e); }
+
+        // 3. THEN clear UI state (triggers navigation)
         setUserId(null);
         setUserData({});
         setSettings(DEFAULT_SETTINGS);
         localDataRef.current = {};
         localSettingsRef.current = DEFAULT_SETTINGS;
-
-        // THEN sign out from Firebase to properly disconnect
-        // THEN sign out
-        await signOut();
-        logger.debug("SignOut request sent");
     };
 
     return { handleStatusUpdate, handleNoteUpdate, handleSettingsUpdate, toggleTheme, handleLogout };

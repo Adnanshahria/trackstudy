@@ -43,7 +43,12 @@ export const useSupabaseSync = () => {
 
                     const jwt = JSON.parse(jsonPayload);
 
-                    if (jwt && jwt.sub) {
+                    // Bug 7 Fix: Check if token is expired before using it
+                    const now = Math.floor(Date.now() / 1000);
+                    if (jwt.exp && jwt.exp < now) {
+                        console.warn('Optimistic Auth: Token expired, skipping');
+                        // Let Supabase handle expired token via normal flow
+                    } else if (jwt && jwt.sub) {
                         console.log("Optimistic Auth: User detected", jwt.sub);
 
                         let resolvedId = jwt.user_metadata?.displayName;
