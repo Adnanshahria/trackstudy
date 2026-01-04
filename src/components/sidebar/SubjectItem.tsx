@@ -61,7 +61,7 @@ const SubjectItemBase: React.FC<Props> = ({ subKey, data, isActive, isEditing, u
     return (
         <div
             onClick={() => onChangeSubject(subKey)}
-            className={`group grid items-center p-3 md:p-4 rounded-xl md:rounded-2xl border cursor-pointer transition-all duration-300 relative gap-3 md:gap-4 hover:scale-[1.02] active:scale-[0.98] backdrop-blur-md ${styles.bg} ${styles.border}`}
+            className={`group grid items-center p-3 md:p-4 rounded-xl md:rounded-2xl border cursor-pointer transition-all duration-300 relative gap-3 md:gap-4 hover:scale-[1.02] active:scale-[0.98] ${styles.bg} ${styles.border}`}
             style={gridStyle}
         >
             {isActive && <div className={`absolute left-0 top-1.5 bottom-1.5 w-1 md:w-1.5 rounded-r-md bg-gradient-to-b ${styles.bar}`}></div>}

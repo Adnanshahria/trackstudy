@@ -64,7 +64,7 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({
     const [activeTab, setActiveTab] = useState<TabType>('dashboard');
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-black md:hidden">
+        <div className="min-h-screen bg-transparent md:hidden">
             {/* Main Content Area */}
             <main className="overflow-y-auto">
                 {activeTab === 'dashboard' && (

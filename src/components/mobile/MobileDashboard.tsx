@@ -50,17 +50,25 @@ export const MobileDashboard: React.FC<MobileDashboardProps> = ({
     };
 
     return (
-        <div className="flex flex-col gap-3 pb-16 px-3 pt-3">
-            {/* Header - Compact */}
-            <div className="text-center py-1">
-                <h1 className="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500">
-                    TrackStudy
-                </h1>
-                <p className="text-[10px] text-slate-500 dark:text-slate-400">Personal Study Tracker</p>
+        <div className="flex flex-col gap-4 pb-20 px-4 pt-4">
+            {/* Header Card - Appealing design */}
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 p-4 shadow-lg shadow-purple-500/20">
+                {/* Decorative elements */}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
+                <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full blur-xl translate-y-1/2 -translate-x-1/2" />
+
+                <div className="relative z-10 text-center">
+                    <h1 className="text-3xl font-black text-white drop-shadow-lg tracking-tight">
+                        TrackStudy
+                    </h1>
+                    <p className="text-xs text-white/70 mt-1 font-medium tracking-widest uppercase">
+                        Personal Study Tracker
+                    </p>
+                </div>
             </div>
 
-            {/* Progress & Countdown Row */}
-            <div className="grid grid-cols-2 gap-2">
+            {/* Progress & Countdown Row - Larger cards */}
+            <div className="grid grid-cols-2 gap-3">
                 <ProgressCard
                     compositeData={compositeData}
                     onEdit={onEditWeights}
@@ -72,8 +80,8 @@ export const MobileDashboard: React.FC<MobileDashboardProps> = ({
                 />
             </div>
 
-            {/* Subject List */}
-            <div className="glass-panel rounded-2xl p-3">
+            {/* Subject List - Clean card */}
+            <div className="bg-slate-800/80 border border-slate-700/50 shadow-lg shadow-black/20 rounded-2xl p-4">
                 {/* Header with interactions */}
                 <div className="flex justify-between items-center mb-3">
                     <h2 className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">

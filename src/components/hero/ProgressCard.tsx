@@ -10,36 +10,51 @@ interface Props {
 }
 
 export const ProgressCard: React.FC<Props> = ({ compositeData, onEdit, isEditing, children }) => {
+    const progress = compositeData.composite;
+
     return (
-        <div className="glass-card relative overflow-hidden group p-2 md:p-3 rounded-xl md:rounded-2xl transition-all duration-300 h-full flex flex-col justify-between hover:shadow-lg">
-            <div className="relative z-10">
-                <div className="flex justify-between items-start mb-1">
-                    <div>
-                        <h2 className="text-[8px] md:text-[9px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-0.5">Weighted</h2>
-                        <div className="text-2xl md:text-3xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-slate-800 to-slate-600 dark:from-white dark:to-slate-300 drop-shadow-sm">
-                            {compositeData.composite.toFixed(1)}<span className="text-sm md:text-lg">%</span>
-                        </div>
-                    </div>
-                    {onEdit && (
-                        <button
-                            onClick={onEdit}
-                            className={`w-5 h-5 md:w-6 md:h-6 flex items-center justify-center rounded-full transition-all shadow-sm border border-white/20 text-xs ${isEditing ? 'bg-blue-500 text-white' : 'bg-white/50 dark:bg-white/5 text-slate-400 dark:text-slate-500 hover:bg-blue-500 hover:text-white'}`}
-                            title="Configure Weights"
-                        >
-                            {isEditing ? '✓' : '⚙️'}
-                        </button>
-                    )}
-                </div>
+        <div className="relative h-full p-3 md:p-4 rounded-2xl border transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]
+            bg-slate-800/80 border-slate-700/50 shadow-lg shadow-black/20">
 
-                <div className="w-full h-2 md:h-3 bg-slate-200/50 dark:bg-slate-900/50 rounded-full overflow-hidden border border-white/50 dark:border-white/5 shadow-inner relative mb-2 md:mb-3">
-                    <div className="h-full bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-600 transition-all duration-1000 relative shadow-[0_0_20px_rgba(99,102,241,0.6)]" style={{ width: `${Math.max(compositeData.composite, 2)}%` }}>
-                        <div className="absolute inset-x-0 top-0 h-[50%] bg-white/30 rounded-t-full"></div>
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse"></div>
+            {/* Header */}
+            <div className="flex justify-between items-start mb-2">
+                <div>
+                    <h2 className="text-[9px] md:text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+                        Weighted
+                    </h2>
+                    <div className="flex items-baseline gap-0.5">
+                        <span className="text-3xl md:text-4xl font-black text-white tabular-nums">
+                            {progress.toFixed(1)}
+                        </span>
+                        <span className="text-base text-slate-400 font-medium">%</span>
                     </div>
                 </div>
-
-                {children}
+                {onEdit && (
+                    <button
+                        onClick={onEdit}
+                        className={`w-6 h-6 flex items-center justify-center rounded-lg transition-all
+                            ${isEditing
+                                ? 'bg-indigo-500 text-white'
+                                : 'bg-slate-700/50 text-slate-400 hover:bg-indigo-500 hover:text-white opacity-60 hover:opacity-100'}`}
+                        title="Configure Weights"
+                    >
+                        <span className="text-xs">{isEditing ? '✓' : '⚙️'}</span>
+                    </button>
+                )}
             </div>
+
+            {/* Progress Bar */}
+            <div className="w-full h-2.5 md:h-3 bg-slate-900/60 rounded-full overflow-hidden border border-slate-700/30">
+                <div
+                    className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-full transition-all duration-1000 ease-out relative"
+                    style={{ width: `${Math.max(progress, 2)}%` }}
+                >
+                    {/* Shine effect */}
+                    <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent rounded-full" />
+                </div>
+            </div>
+
+            {children}
         </div>
     );
 };

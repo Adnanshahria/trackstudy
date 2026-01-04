@@ -13,24 +13,44 @@ interface Props {
 
 export const PerformanceWidget: React.FC<Props> = ({ settings, userData, activeSubject, onConfig }) => {
     return (
-        <div className="w-full">
-            <div className="flex justify-between items-center mb-3 md:mb-5">
-                <h3 className="font-bold text-[10px] md:text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5 md:gap-2"><span className="w-1 md:w-1.5 h-3 md:h-4 bg-purple-500 rounded-full"></span> Performance</h3>
-                <div className="flex gap-1 md:gap-1.5">
-                    <button onClick={onConfig} className="text-emerald-500 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 p-1 rounded-md md:rounded-lg font-bold text-base md:text-lg leading-none transition-colors" title="Add Progress Bar">+</button>
-                    <button onClick={onConfig} className="text-slate-400 hover:text-blue-600 dark:hover:text-white p-1 rounded-md md:rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 text-xs md:text-sm transition-colors" title="Edit Performance">✏️</button>
-                    <button onClick={onConfig} className="text-slate-400 hover:text-blue-600 dark:hover:text-white p-1 rounded-md md:rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 text-xs md:text-sm transition-colors" title="Configure">⚙️</button>
+        <div className="bg-slate-800/80 border border-slate-700/50 shadow-lg shadow-black/20 rounded-2xl p-4">
+            {/* Header */}
+            <div className="flex justify-between items-center mb-4">
+                <h3 className="font-bold text-[10px] md:text-xs text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                    <span className="w-1.5 h-4 bg-gradient-to-b from-purple-400 to-purple-600 rounded-full" />
+                    Performance
+                </h3>
+                <div className="flex gap-1">
+                    <button
+                        onClick={onConfig}
+                        className="text-emerald-500 hover:text-emerald-400 hover:bg-emerald-500/10 w-7 h-7 rounded-lg font-bold text-lg flex items-center justify-center transition-colors"
+                        title="Add Progress Bar"
+                    >
+                        +
+                    </button>
+                    <button
+                        onClick={onConfig}
+                        className="text-slate-400 hover:text-white hover:bg-slate-700 w-7 h-7 rounded-lg flex items-center justify-center transition-colors text-sm"
+                        title="Edit Performance"
+                    >
+                        ✏️
+                    </button>
                 </div>
             </div>
-            <div className="flex flex-col gap-3 md:gap-5">
+
+            {/* Progress Bars */}
+            <div className="flex flex-col gap-4">
                 {settings.progressBars.filter(conf => conf.visible !== false).map(conf => {
                     if (conf.items.length === 0) return null;
                     const items = settings.subjectConfigs?.[activeSubject] || settings.trackableItems;
                     const p = calculateProgress(activeSubject, conf.items, userData, conf.weights, items, settings.syllabus);
                     return (
                         <div key={conf.id}>
-                            <div className="flex justify-between text-[10px] md:text-xs font-bold mb-1 md:mb-1.5 text-slate-700 dark:text-slate-300"><span>{conf.title}</span><span className="text-blue-600 dark:text-blue-400">{p.overall.toFixed(1)}%</span></div>
-                            <ProgressBar progress={p.overall} color={`bg-gradient-to-r ${conf.color}`} className="!h-2 md:!h-2.5" />
+                            <div className="flex justify-between text-xs font-semibold mb-1.5">
+                                <span className="text-slate-300">{conf.title}</span>
+                                <span className="text-indigo-400 tabular-nums">{p.overall.toFixed(1)}%</span>
+                            </div>
+                            <ProgressBar progress={p.overall} color={`bg-gradient-to-r ${conf.color}`} className="!h-2.5" />
                         </div>
                     );
                 })}
