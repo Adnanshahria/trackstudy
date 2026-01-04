@@ -11,6 +11,7 @@ export const useAuthHandlers = (setUserId: (id: string) => void, onSuccess?: () 
     const [tempUserId, setTempUserId] = useState('');
     const [tempPassword, setTempPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [academicLevel, setAcademicLevel] = useState<'HSC' | 'SSC'>('HSC');
     const [showPassword, setShowPassword] = useState(false);
     const [modalError, setModalError] = useState('');
     const [modalSuccess, setModalSuccess] = useState('');
@@ -21,6 +22,7 @@ export const useAuthHandlers = (setUserId: (id: string) => void, onSuccess?: () 
         setTempUserId('');
         setTempPassword('');
         setConfirmPassword('');
+        setAcademicLevel('HSC');
         setShowPassword(false);
         setModalError('');
         setModalSuccess('');
@@ -35,14 +37,17 @@ export const useAuthHandlers = (setUserId: (id: string) => void, onSuccess?: () 
             setModalError('Please enter a User ID.');
             return;
         }
+
+        // Basic Length Check
         if (trimmedId.length > MAX_INPUT_LENGTH) {
-            setModalError('User ID is too long.');
+            setModalError('Input is too long.');
             return;
         }
 
         setModalError('');
         setModalSuccess('');
 
+        // Validation for Create Mode
         if (modalMode === 'create') {
             if (trimmedPass !== confirmPassword) {
                 setModalError("Passwords do not match.");
@@ -64,12 +69,9 @@ export const useAuthHandlers = (setUserId: (id: string) => void, onSuccess?: () 
         }
 
         if (modalMode === 'change') {
+            // ... existing change password logic ...
             if (confirmPassword.length < MIN_PASSWORD_LENGTH) {
                 setModalError(`New password must be at least ${MIN_PASSWORD_LENGTH} characters.`);
-                return;
-            }
-            if (confirmPassword.length > MAX_INPUT_LENGTH) {
-                setModalError('New password is too long.');
                 return;
             }
         }
@@ -86,7 +88,6 @@ export const useAuthHandlers = (setUserId: (id: string) => void, onSuccess?: () 
                     setModalError(result.error || 'Reset failed.');
                 }
             } else if (modalMode === 'change') {
-                // oldPasswordField is being reused for the old password input
                 const result = await authService.changePassword(trimmedId, trimmedPass, confirmPassword);
                 if (result.success) {
                     setModalSuccess('Password changed successfully!');
@@ -95,8 +96,9 @@ export const useAuthHandlers = (setUserId: (id: string) => void, onSuccess?: () 
                     setModalError(result.error || 'Password change failed.');
                 }
             } else if (modalMode === 'login') {
+                // Login
                 const result = await authService.login(trimmedId, trimmedPass);
-                if (result.success && result.uid) {
+                if (result.success && result.id) {
                     onSuccess?.();
                     setShowLoginModal(false);
                     resetModalState();
@@ -104,9 +106,12 @@ export const useAuthHandlers = (setUserId: (id: string) => void, onSuccess?: () 
                     setModalError(result.error || 'Login failed.');
                 }
             } else {
-                const result = await authService.signup(trimmedId, trimmedPass);
-                if (result.success && result.uid) {
-                    // Force reload to ensure Firebase permissions and profile updates are propagated
+                // Sign Up (ID/Email only)
+                // Pass academicLevel to signup
+                const result = await authService.signup(trimmedId, trimmedPass, academicLevel);
+
+                if (result.success) {
+                    // Force reload or just let the effect handle it
                     window.location.reload();
                     return;
                 } else {
@@ -121,12 +126,13 @@ export const useAuthHandlers = (setUserId: (id: string) => void, onSuccess?: () 
         }
     };
 
+
     const handleGuestLogin = async () => {
         setModalError('');
         setIsCheckingUser(true);
         try {
             const result = await authService.guestLogin();
-            if (result.success && result.uid) {
+            if (result.success && result.id) {
                 // Force reload to ensure connection
                 window.location.reload();
                 return;
@@ -141,5 +147,20 @@ export const useAuthHandlers = (setUserId: (id: string) => void, onSuccess?: () 
         }
     };
 
-    return { showLoginModal, setShowLoginModal, modalMode, setModalMode, tempUserId, setTempUserId, tempPassword, setTempPassword, confirmPassword, setConfirmPassword, showPassword, setShowPassword, modalError, modalSuccess, isCheckingUser, handleUserAction, handleGuestLogin, resetModalState, recoveredPassword, setRecoveredPassword };
+    const handleGoogleLogin = async () => {
+        setModalError('');
+        setIsCheckingUser(true);
+        try {
+            const result = await authService.googleLogin();
+            if (!result.success) {
+                setModalError(result.error || 'Google login failed.');
+                setIsCheckingUser(false);
+            }
+        } catch (e: any) {
+            setModalError(e.message || 'Google login error.');
+            setIsCheckingUser(false);
+        }
+    };
+
+    return { showLoginModal, setShowLoginModal, modalMode, setModalMode, tempUserId, setTempUserId, tempPassword, setTempPassword, confirmPassword, setConfirmPassword, academicLevel, setAcademicLevel, showPassword, setShowPassword, modalError, modalSuccess, isCheckingUser, handleUserAction, handleGuestLogin, handleGoogleLogin, resetModalState, recoveredPassword, setRecoveredPassword };
 };

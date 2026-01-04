@@ -2,6 +2,7 @@
 import React from 'react';
 import { Modal } from '../ui/Modal';
 import { UserSettings } from '../../types';
+import { getSyllabusData } from '../../constants/data';
 
 interface Props {
     isOpen: boolean;
@@ -21,8 +22,30 @@ export const AppearanceModal: React.FC<Props> = ({ isOpen, onClose, settings, on
     const currentGlow = settings.glowColor || 'green';
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Appearance Settings">
+        <Modal isOpen={isOpen} onClose={onClose} title="Settings">
             <div className="flex flex-col gap-4 md:gap-6">
+                {/* Academic Level Section */}
+                <div className="flex items-center justify-between p-2 md:p-4 bg-slate-50 dark:bg-black rounded-lg md:rounded-xl border border-slate-200 dark:border-white/5">
+                    <div className="flex flex-col">
+                        <span className="text-xs md:text-sm font-bold text-slate-700 dark:text-slate-200">Academic Level</span>
+                        <span className="text-[9px] md:text-[10px] text-slate-500 dark:text-slate-400">Switch syllabus template</span>
+                    </div>
+                    <div className="flex bg-slate-200 dark:bg-white/10 rounded-lg p-1">
+                        <button
+                            onClick={() => onUpdateSettings({ ...settings, academicLevel: 'HSC', syllabus: getSyllabusData('HSC') })}
+                            className={`px-3 py-1.5 rounded-md text-[10px] md:text-xs font-bold transition-all ${settings.academicLevel === 'HSC' ? 'bg-white dark:bg-neutral-800 shadow-sm text-blue-600 dark:text-blue-400' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+                        >
+                            HSC
+                        </button>
+                        <button
+                            onClick={() => onUpdateSettings({ ...settings, academicLevel: 'SSC', syllabus: getSyllabusData('SSC') })}
+                            className={`px-3 py-1.5 rounded-md text-[10px] md:text-xs font-bold transition-all ${settings.academicLevel === 'SSC' ? 'bg-white dark:bg-neutral-800 shadow-sm text-indigo-600 dark:text-indigo-400' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+                        >
+                            SSC
+                        </button>
+                    </div>
+                </div>
+
                 {/* Theme Toggle Section */}
                 <div className="flex items-center justify-between p-2 md:p-4 bg-slate-50 dark:bg-black rounded-lg md:rounded-xl border border-slate-200 dark:border-white/5">
                     <div className="flex flex-col">

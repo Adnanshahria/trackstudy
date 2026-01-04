@@ -36,6 +36,7 @@
   <!-- PWA Meta Tags -->
   <link rel="manifest" href="./manifest.json" />
   <meta name="theme-color" content="#1A1A1C" />
+  <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   <meta name="apple-mobile-web-app-title" content="TrackStudy" />
@@ -343,8 +344,8 @@
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        var swPath = (window.__APP_BASE__ || './') + 'sw.js';
-        navigator.serviceWorker.register(swPath)
+        // Always register SW from the root context to support valid scope + SPA routing
+        navigator.serviceWorker.register('/sw.js')
           .then((reg) => console.log('SW registered:', reg.scope))
           .catch((err) => console.log('SW registration failed:', err));
       });

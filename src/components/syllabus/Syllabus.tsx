@@ -81,7 +81,7 @@ export const Syllabus: React.FC<SyllabusProps> = ({ activeSubject, userData, set
             <SyllabusHeader subject={subject} onOpenPrintModal={() => setShowPrintModal(true)} />
 
             <div className="flex flex-col gap-6 print-grid">
-                {[1, 2].map(paper => {
+                {(settings.academicLevel === 'SSC' ? [1] : [1, 2]).map(paper => {
                     const p = calculateProgress(activeSubject, allItems.map(i => i.key), userData, undefined, allItems, settings.syllabus);
                     return (
                         <div key={paper} className={`paper-section-${paper}`}>

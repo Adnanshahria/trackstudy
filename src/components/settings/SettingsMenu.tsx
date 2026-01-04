@@ -1,11 +1,12 @@
 import React, { useState, useRef } from 'react';
 import { MenuDropdown } from './MenuDropdown';
 import { useClickOutside } from '../../hooks/ui/useClickOutside';
-import { UserData } from '../../types';
+import { UserData, UserSettings } from '../../types';
 
 interface SettingsMenuProps {
     userId: string | null;
     userData?: UserData;
+    settings: UserSettings;
     onLogout: () => Promise<void>;
     onToggleTheme: () => void;
     theme: 'dark' | 'light';
@@ -13,6 +14,7 @@ interface SettingsMenuProps {
     onOpenDevModal: () => void;
     onOpenAppearance: () => void;
     onForceSync: () => void;
+    onUpdateSettings: (s: UserSettings) => void;
     className?: string; // Allow overriding button styles
 }
 

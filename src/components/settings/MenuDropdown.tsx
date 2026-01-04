@@ -1,10 +1,12 @@
 
 import React, { useState } from 'react';
-import { UserData } from '../../types';
+import { UserData, UserSettings } from '../../types';
+import { getSyllabusData } from '../../constants/data';
 
 interface MenuDropdownProps {
     userId: string | null;
     userData?: UserData;
+    settings: UserSettings;
     theme: 'dark' | 'light';
     onLogout: () => void;
     onToggleTheme: () => void;
@@ -12,10 +14,11 @@ interface MenuDropdownProps {
     onOpenDevModal: () => void;
     onOpenAppearance: () => void;
     onForceSync: () => void;
+    onUpdateSettings: (s: UserSettings) => void;
     onClose: () => void;
 }
 
-export const MenuDropdown: React.FC<MenuDropdownProps> = ({ userId, userData, theme, onLogout, onToggleTheme, onOpenGuide, onOpenDevModal, onOpenAppearance, onForceSync, onClose }) => {
+export const MenuDropdown: React.FC<MenuDropdownProps> = ({ userId, userData, settings, theme, onLogout, onToggleTheme, onOpenGuide, onOpenDevModal, onOpenAppearance, onForceSync, onUpdateSettings, onClose }) => {
     const [isSyncing, setIsSyncing] = useState(false);
 
     const MenuItem = ({ onClick, icon, text, colorClass, disabled = false }: any) => (
@@ -67,7 +70,25 @@ export const MenuDropdown: React.FC<MenuDropdownProps> = ({ userId, userData, th
                         <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs text-white font-bold shadow-md ${userId ? 'bg-gradient-to-br from-blue-500 to-purple-500' : 'bg-slate-400'}`}>
                             {displayInitial}
                         </div>
-                        <p className="text-sm font-bold text-slate-800 dark:text-white truncate flex-1" title={displayName}>{displayName}</p>
+                    </div>
+                </div>
+
+                {/* Academic Level Section */}
+                <div className="bg-indigo-50/50 dark:bg-indigo-500/10 rounded-2xl p-2 border border-indigo-200/50 dark:border-indigo-500/20 shadow-sm">
+                    <div className="px-2 py-1 text-[10px] font-bold text-indigo-500 dark:text-indigo-400 uppercase tracking-wider">Academic Level</div>
+                    <div className="flex gap-1 p-1">
+                        <button
+                            onClick={() => { onUpdateSettings({ ...settings, academicLevel: 'HSC', syllabus: getSyllabusData('HSC') }); onClose(); }}
+                            className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all ${settings.academicLevel === 'HSC' ? 'bg-blue-500 text-white shadow-md' : 'bg-white dark:bg-white/10 text-slate-600 dark:text-slate-300 hover:bg-blue-100 dark:hover:bg-blue-500/20'}`}
+                        >
+                            🎓 HSC
+                        </button>
+                        <button
+                            onClick={() => { onUpdateSettings({ ...settings, academicLevel: 'SSC', syllabus: getSyllabusData('SSC') }); onClose(); }}
+                            className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all ${settings.academicLevel === 'SSC' ? 'bg-indigo-500 text-white shadow-md' : 'bg-white dark:bg-white/10 text-slate-600 dark:text-slate-300 hover:bg-indigo-100 dark:hover:bg-indigo-500/20'}`}
+                        >
+                            📚 SSC
+                        </button>
                     </div>
                 </div>
 

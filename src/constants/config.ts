@@ -1,6 +1,6 @@
 
 import { UserSettings, ProgressBarConfig } from '../types';
-import { INITIAL_SYLLABUS_DATA, TRACKABLE_ITEMS } from './data';
+import { HSC_SYLLABUS_DATA, TRACKABLE_ITEMS } from './data';
 
 export const DEFAULT_PROGRESS_CONFIG: ProgressBarConfig[] = [
   { id: 'p1', title: 'Concept & Learning', items: ['mainbook', 'class', 'revclass'], color: 'from-sky-400 to-sky-600', visible: true },
@@ -9,6 +9,7 @@ export const DEFAULT_PROGRESS_CONFIG: ProgressBarConfig[] = [
 ];
 
 export const DEFAULT_SETTINGS: UserSettings = {
+  academicLevel: 'HSC',
   theme: 'dark',
   soundVolume: 0.3,
   glowColor: 'green', // Default Glow changed to Green
@@ -21,7 +22,7 @@ export const DEFAULT_SETTINGS: UserSettings = {
   subjectProgressItems: TRACKABLE_ITEMS.map(t => t.key),
   customNames: {},
   trackableItems: JSON.parse(JSON.stringify(TRACKABLE_ITEMS)),
-  syllabus: JSON.parse(JSON.stringify(INITIAL_SYLLABUS_DATA)),
+  syllabus: JSON.parse(JSON.stringify(HSC_SYLLABUS_DATA)),
   countdownLabel: 'Time Remaining',
   countdownTarget: '2025-12-12T00:00:00+06:00'
 };

@@ -1,6 +1,6 @@
 import React from 'react';
 import { UserData, UserSettings } from '../../types';
-import { saveUserProgress, saveSettings, flushPendingSaves, firebaseAuth } from '../../utils/storage';
+import { saveUserProgress, saveSettings, flushPendingSaves, signOut } from '../../utils/storage';
 import { logger } from '../../utils/logger';
 import { DEFAULT_SETTINGS } from '../../constants';
 
@@ -28,26 +28,29 @@ export const useSyncActions = (
             const timestamp = new Date().toISOString();
             const newData = { ...userData, [key]: next, [`timestamp_${key}`]: timestamp };
             setUserData(newData);
-            await saveUserProgress(userId, { [key]: next, [`timestamp_${key}`]: timestamp });
+            await saveUserProgress(userId, newData);
 
             // Create tick log directly (client-side)
             try {
-                const { firestore } = await import('../../utils/firebase/core');
-                if (firestore && key.startsWith('s_')) {
+                if (key.startsWith('s_')) {
                     const parts = key.slice(2).split('_');
                     if (parts.length >= 3) {
-                        await firestore.collection('tickLogs').add({
-                            boxId: key,
-                            subjectId: parts[0],
-                            chapterId: parts[1],
-                            fieldKey: parts.slice(2).join('_'),
-                            userId: userId,
-                            timestamp: new Date(),
-                            iso: timestamp,
-                            percentBefore: validated * 20,
-                            percentAfter: next * 20,
+                        // Dynamically import supabase to avoid circular deps if any
+                        const { supabase } = await import('../../utils/supabase/client');
+                        await supabase.from('tick_logs').insert([{
+                            box_id: key,
+                            subject_id: parts[0],
+                            chapter_id: parts[1],
+                            field_key: parts.slice(2).join('_'),
+                            user_id: userId,
+                            timestamp: new Date().toISOString(),
+                            // iso: timestamp, // Removed 'iso' if it's not in schema? Schema has 'timestamp'. Let's check schema.
+                            // Schema: id, user_id, box_id, subject_id, chapter_id, field_key, percent_before, percent_after, source, comment, timestamp, created_at
+                            // 'iso' was likely legacy.
+                            percent_before: validated * 20,
+                            percent_after: next * 20,
                             source: 'manual'
-                        });
+                        }]);
                     }
                 }
             } catch (logErr: any) {
@@ -64,7 +67,7 @@ export const useSyncActions = (
             const safeText = typeof text === 'string' ? text.slice(0, 10000) : '';
             const newData = { ...userData, [`note_${key}`]: safeText };
             setUserData(newData);
-            await saveUserProgress(userId, { [`note_${key}`]: safeText });
+            await saveUserProgress(userId, newData);
         } catch (error) {
             console.error('Note update failed:', error);
         }
@@ -114,14 +117,9 @@ export const useSyncActions = (
         localSettingsRef.current = DEFAULT_SETTINGS;
 
         // THEN sign out from Firebase to properly disconnect
-        try {
-            if (firebaseAuth) {
-                await firebaseAuth.signOut();
-                logger.debug("Firebase signOut successful");
-            }
-        } catch (error) {
-            logger.error("Firebase signOut error:", error);
-        }
+        // THEN sign out
+        await signOut();
+        logger.debug("SignOut request sent");
     };
 
     return { handleStatusUpdate, handleNoteUpdate, handleSettingsUpdate, toggleTheme, handleLogout };

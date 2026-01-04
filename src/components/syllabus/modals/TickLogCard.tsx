@@ -37,8 +37,8 @@ export const TickLogCard: React.FC<Props> = ({ log }) => {
                 </span>
             </div>
 
-            {/* Center: Percent Pill */}
-            <div className="flex items-center gap-2">
+            {/* Center: Percent Pill (Right aligned now) */}
+            <div className="flex items-center gap-2 ml-auto">
                 <span className={`px-3 py-1 rounded-full text-xs font-bold ${getPercentColor(log.percentAfter)}`}>
                     {log.percentAfter}%
                 </span>
@@ -49,9 +49,7 @@ export const TickLogCard: React.FC<Props> = ({ log }) => {
 
             {/* Right: Field tag */}
             <div className="text-right">
-                <span className="text-[10px] px-2 py-0.5 rounded bg-slate-200 dark:bg-white/10 text-slate-600 dark:text-slate-400 font-medium">
-                    {log.fieldKey}
-                </span>
+
                 {log.comment && (
                     <p className="text-[10px] text-slate-400 mt-1 max-w-[100px] truncate" title={log.comment}>
                         {log.comment}

@@ -38,9 +38,11 @@ export const useCountdown = (targetDate: string | undefined): CountdownResult | 
 
         if (mountedRef.current) setCountdown(calculate());
 
+        // Performance: Update every 60 seconds instead of 1 second
+        // The countdown only displays days/hours/minutes, so second-level precision is unnecessary
         const interval = setInterval(() => {
             if (mountedRef.current) setCountdown(calculate());
-        }, 1000);
+        }, 60000);
 
         return () => clearInterval(interval);
     }, [targetDate]);

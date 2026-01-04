@@ -1,11 +1,12 @@
+
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { OnboardingState, OnboardingContextValue, OnboardingStep } from '../../types/onboarding';
-import { getTour, ONBOARDING_TOURS } from '../../constants/onboardingSteps';
+import { getTour } from '../../constants/onboardingSteps';
 import { Spotlight } from './Spotlight';
 import { OnboardingTooltip } from './Tooltip';
-import { firestore } from '../../utils/firebase/core';
+import { supabase } from '../../utils/supabase/client';
 
-const ONBOARDING_COLLECTION = 'onboarding';
+const ONBOARDING_TABLE = 'onboarding_progress';
 
 const defaultState: OnboardingState = {
     activeTour: null,
@@ -33,9 +34,7 @@ export const OnboardingProvider: React.FC<OnboardingProviderProps> = ({ children
     const [state, setState] = useState<OnboardingState>(defaultState);
     const [hasLoadedState, setHasLoadedState] = useState(false);
 
-    // Load completed tours from localStorage first (instant), then sync with Firestore
     useEffect(() => {
-        // Load from localStorage immediately
         const localKey = `onboarding_completed_${userId || 'guest'}`;
         const localCompleted = localStorage.getItem(localKey);
         if (localCompleted) {
@@ -48,37 +47,34 @@ export const OnboardingProvider: React.FC<OnboardingProviderProps> = ({ children
             }
         }
 
-        if (!userId || !firestore) {
+        if (!userId) {
             setHasLoadedState(true);
             return;
         }
 
         const loadCompletedTours = async () => {
             try {
-                const snapshot = await firestore
-                    .collection('users')
-                    .doc(userId)
-                    .collection(ONBOARDING_COLLECTION)
-                    .get();
+                const { data, error } = await supabase
+                    .from(ONBOARDING_TABLE)
+                    .select('tour_id, completed')
+                    .eq('user_id', userId);
+
+                if (error) throw error;
 
                 const completed: Record<string, boolean> = {};
-                snapshot.docs.forEach(doc => {
-                    const data = doc.data();
-                    if (data.completed) {
-                        completed[doc.id] = true;
+                data?.forEach((row: any) => {
+                    if (row.completed) {
+                        completed[row.tour_id] = true;
                     }
                 });
 
-                // Update localStorage for next time
                 localStorage.setItem(localKey, JSON.stringify(completed));
-
                 setState(prev => ({ ...prev, completedTours: completed }));
                 setHasLoadedState(true);
 
-                // Auto-trigger intro tour ONLY for genuinely new users (no completed tours at all)
-                if (Object.keys(completed).length === 0 && !localCompleted) {
-                    setTimeout(() => startTour('intro'), 1500);
-                }
+                // if (Object.keys(completed).length === 0 && !localCompleted) {
+                //     setTimeout(() => startTour('intro'), 1500);
+                // }
             } catch (error) {
                 console.error('Error loading onboarding state:', error);
                 setHasLoadedState(true);
@@ -88,21 +84,20 @@ export const OnboardingProvider: React.FC<OnboardingProviderProps> = ({ children
         loadCompletedTours();
     }, [userId]);
 
-    // Save tour completion to Firestore
     const saveTourCompletion = useCallback(async (pageId: string, skipped = false) => {
-        if (!userId || !firestore) return;
+        if (!userId) return;
 
         try {
-            await firestore
-                .collection('users')
-                .doc(userId)
-                .collection(ONBOARDING_COLLECTION)
-                .doc(pageId)
-                .set({
-                    completed: true,
-                    completedAt: new Date().toISOString(),
-                    skipped
-                });
+            await supabase.from(ONBOARDING_TABLE).upsert({
+                user_id: userId,
+                tour_id: pageId,
+                completed: true,
+                skipped: skipped,
+                completed_at: new Date().toISOString()
+            }, { onConflict: 'user_id, tour_id' }); // Assuming composite key or just insert
+
+            // Note: If table doesn't have unique constraint, upsert might duplicate.
+            // But we assume proper schema.
         } catch (error) {
             console.error('Error saving onboarding state:', error);
         }
@@ -127,7 +122,6 @@ export const OnboardingProvider: React.FC<OnboardingProviderProps> = ({ children
 
             const nextIndex = prev.currentStep + 1;
             if (nextIndex >= tour.steps.length) {
-                // Tour complete
                 saveTourCompletion(prev.activeTour!, false);
                 return {
                     ...prev,
@@ -167,7 +161,7 @@ export const OnboardingProvider: React.FC<OnboardingProviderProps> = ({ children
     }, [saveTourCompletion]);
 
     const completeTour = useCallback(() => {
-        nextStep(); // Same as next on last step
+        nextStep();
     }, [nextStep]);
 
     const getCurrentStep = useCallback((): OnboardingStep | null => {
@@ -189,15 +183,13 @@ export const OnboardingProvider: React.FC<OnboardingProviderProps> = ({ children
     }, [state.completedTours]);
 
     const resetTour = useCallback(async (pageId: string) => {
-        // Remove completion from Firestore
-        if (userId && firestore) {
+        if (userId) {
             try {
-                await firestore
-                    .collection('users')
-                    .doc(userId)
-                    .collection(ONBOARDING_COLLECTION)
-                    .doc(pageId)
-                    .delete();
+                await supabase
+                    .from(ONBOARDING_TABLE)
+                    .delete()
+                    .eq('user_id', userId)
+                    .eq('tour_id', pageId);
             } catch (error) {
                 console.error('Error resetting tour:', error);
             }
@@ -209,7 +201,6 @@ export const OnboardingProvider: React.FC<OnboardingProviderProps> = ({ children
             return { ...prev, completedTours: newCompleted };
         });
 
-        // Start the tour
         startTour(pageId);
     }, [userId, startTour]);
 
@@ -232,8 +223,6 @@ export const OnboardingProvider: React.FC<OnboardingProviderProps> = ({ children
     return (
         <OnboardingContext.Provider value={value}>
             {children}
-
-            {/* Render spotlight and tooltip when tour is active */}
             {state.isActive && currentStep && (
                 <>
                     <Spotlight

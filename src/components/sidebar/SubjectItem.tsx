@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { calculateProgress } from '../../utils/calculations';
 import { SubjectData, UserData, UserSettings } from '../../types';
 
@@ -15,9 +15,15 @@ interface Props {
     onDelete: () => void;
 }
 
-export const SubjectItem: React.FC<Props> = ({ subKey, data, isActive, isEditing, userData, settings, onChangeSubject, onRename, onDelete }) => {
+const SubjectItemBase: React.FC<Props> = ({ subKey, data, isActive, isEditing, userData, settings, onChangeSubject, onRename, onDelete }) => {
     const items = settings.subjectConfigs?.[subKey] || settings.trackableItems;
-    const progress = calculateProgress(subKey, items.map(i => i.key), userData, settings.subjectProgressWeights, items, settings.syllabus);
+
+    // Memoize progress calculation to avoid recalculating on every render
+    const progress = useMemo(() =>
+        calculateProgress(subKey, items.map(i => i.key), userData, settings.subjectProgressWeights, items, settings.syllabus),
+        [subKey, items, userData, settings.subjectProgressWeights, settings.syllabus]
+    );
+
     const displayName = settings.customNames?.[subKey] || data.name;
 
     // Enhanced Color Map with Gradients & Transparencies
@@ -29,6 +35,8 @@ export const SubjectItem: React.FC<Props> = ({ subKey, data, isActive, isEditing
         indigo: { bar: 'from-indigo-400 to-indigo-600', border: 'border-indigo-500/30 ring-1 ring-indigo-500/20', bg: 'bg-indigo-500/10', text: 'text-indigo-700 dark:text-indigo-300', iconBg: 'bg-indigo-500/20 text-indigo-600 dark:text-indigo-400', shadowHex: 'rgba(99,102,241,0.5)' },
         purple: { bar: 'from-purple-400 to-purple-600', border: 'border-purple-500/30 ring-1 ring-purple-500/20', bg: 'bg-purple-500/10', text: 'text-purple-700 dark:text-purple-300', iconBg: 'bg-purple-500/20 text-purple-600 dark:text-purple-400', shadowHex: 'rgba(168,85,247,0.5)' },
         teal: { bar: 'from-teal-400 to-teal-600', border: 'border-teal-500/30 ring-1 ring-teal-500/20', bg: 'bg-teal-500/10', text: 'text-teal-700 dark:text-teal-300', iconBg: 'bg-teal-500/20 text-teal-600 dark:text-teal-400', shadowHex: 'rgba(20,184,166,0.5)' },
+        sky: { bar: 'from-sky-400 to-sky-600', border: 'border-sky-500/30 ring-1 ring-sky-500/20', bg: 'bg-sky-500/10', text: 'text-sky-700 dark:text-sky-300', iconBg: 'bg-sky-500/20 text-sky-600 dark:text-sky-400', shadowHex: 'rgba(14,165,233,0.5)' },
+        violet: { bar: 'from-violet-400 to-violet-600', border: 'border-violet-500/30 ring-1 ring-violet-500/20', bg: 'bg-violet-500/10', text: 'text-violet-700 dark:text-violet-300', iconBg: 'bg-violet-500/20 text-violet-600 dark:text-violet-400', shadowHex: 'rgba(139,92,246,0.5)' },
     };
 
     const theme = colorMap[data.color] || colorMap.blue;
@@ -93,3 +101,6 @@ export const SubjectItem: React.FC<Props> = ({ subKey, data, isActive, isEditing
         </div>
     );
 };
+
+// Export memoized component to prevent unnecessary re-renders
+export const SubjectItem = React.memo(SubjectItemBase);

@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const StatusButton: React.FC<{ val: number; onClick: () => void }> = ({ val, onClick }) => {
+export const StatusButton: React.FC<{ val: number; onClick: () => void }> = React.memo(({ val, onClick }) => {
     let bg = "bg-white dark:bg-white/5 border-slate-200 dark:border-white/10 print:border-gray-300 hover:border-blue-400 dark:hover:border-blue-500/50";
     let text = "text-slate-400 dark:text-slate-500 print:text-gray-400";
     let label = (val * 20) + '%';
@@ -16,11 +16,11 @@ export const StatusButton: React.FC<{ val: number; onClick: () => void }> = ({ v
         >
             {val !== 5 && val !== 6 && (
                 <div
-                    className="absolute top-0 bottom-0 left-0 bg-sky-500/20 dark:bg-sky-400/20 print:bg-gray-300 transition-all duration-300 ease-out"
-                    style={{ width: `${fill}%` }}
+                    className="absolute inset-0 origin-left bg-sky-500/20 dark:bg-sky-400/20 print:bg-gray-300 transition-transform duration-300 ease-out will-change-transform"
+                    style={{ transform: `scaleX(${fill / 100})` }}
                 />
             )}
             <span className="relative z-10 drop-shadow-sm">{label}</span>
         </button>
     );
-};
+});

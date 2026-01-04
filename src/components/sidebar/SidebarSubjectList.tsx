@@ -1,5 +1,5 @@
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { SubjectItem } from './SubjectItem';
 import { SubjectData, UserData, UserSettings } from '../../types';
 
@@ -14,7 +14,7 @@ interface Props {
     onDeleteSubject: (k: string) => void;
 }
 
-export const SidebarSubjectList: React.FC<Props> = ({ settings, activeSubject, isEditing, userData, onChangeSubject, setModals, onUpdateSettings, onDeleteSubject }) => {
+const SidebarSubjectListBase: React.FC<Props> = ({ settings, activeSubject, isEditing, userData, onChangeSubject, setModals, onUpdateSettings, onDeleteSubject }) => {
     const [draggedKey, setDraggedKey] = useState<string | null>(null);
     const [dragOverKey, setDragOverKey] = useState<string | null>(null);
     const dragCounter = useRef(0);
@@ -34,34 +34,32 @@ export const SidebarSubjectList: React.FC<Props> = ({ settings, activeSubject, i
         .map(key => [key, settings.syllabus?.[key]] as [string, SubjectData])
         .filter(([_, data]) => data !== undefined);
 
-    const handleDragStart = (e: React.DragEvent, key: string) => {
+    const handleDragStart = useCallback((e: React.DragEvent, key: string) => {
         setDraggedKey(key);
         e.dataTransfer.effectAllowed = 'move';
         e.dataTransfer.setData('text/plain', key);
-    };
+    }, []);
 
-    const handleDragEnter = (e: React.DragEvent, key: string) => {
+    const handleDragEnter = useCallback((e: React.DragEvent, key: string) => {
         e.preventDefault();
         dragCounter.current++;
-        if (key !== draggedKey) {
-            setDragOverKey(key);
-        }
-    };
+        setDragOverKey(prevKey => key !== draggedKey ? key : prevKey);
+    }, [draggedKey]);
 
-    const handleDragLeave = (e: React.DragEvent) => {
+    const handleDragLeave = useCallback((e: React.DragEvent) => {
         e.preventDefault();
         dragCounter.current--;
         if (dragCounter.current === 0) {
             setDragOverKey(null);
         }
-    };
+    }, []);
 
-    const handleDragOver = (e: React.DragEvent) => {
+    const handleDragOver = useCallback((e: React.DragEvent) => {
         e.preventDefault();
         e.dataTransfer.dropEffect = 'move';
-    };
+    }, []);
 
-    const handleDrop = (e: React.DragEvent, targetKey: string) => {
+    const handleDrop = useCallback((e: React.DragEvent, targetKey: string) => {
         e.preventDefault();
         dragCounter.current = 0;
 
@@ -81,13 +79,22 @@ export const SidebarSubjectList: React.FC<Props> = ({ settings, activeSubject, i
         onUpdateSettings({ ...settings, subjectOrder: currentOrder });
         setDraggedKey(null);
         setDragOverKey(null);
-    };
+    }, [draggedKey, orderedSubjects, settings, onUpdateSettings]);
 
-    const handleDragEnd = () => {
+    const handleDragEnd = useCallback(() => {
         setDraggedKey(null);
         setDragOverKey(null);
         dragCounter.current = 0;
-    };
+    }, []);
+
+    // Stable callbacks for SubjectItem
+    const handleRename = useCallback((key: string, name: string) => {
+        setModals((m: any) => ({ ...m, rename: { key, name } }));
+    }, [setModals]);
+
+    const handleDelete = useCallback((key: string) => {
+        onDeleteSubject(key);
+    }, [onDeleteSubject]);
 
     return (
         <div className="flex flex-col gap-4 pr-1">
@@ -114,11 +121,14 @@ export const SidebarSubjectList: React.FC<Props> = ({ settings, activeSubject, i
                         isActive={activeSubject === key} isEditing={isEditing}
                         userData={userData} settings={settings}
                         onChangeSubject={onChangeSubject}
-                        onRename={() => setModals((m: any) => ({ ...m, rename: { key, name: settings.customNames?.[key] || data.name } }))}
-                        onDelete={() => onDeleteSubject(key)}
+                        onRename={() => handleRename(key, settings.customNames?.[key] || data.name)}
+                        onDelete={() => handleDelete(key)}
                     />
                 </div>
             ))}
         </div>
     );
 };
+
+// Memoize the entire list to prevent re-renders when parent state changes
+export const SidebarSubjectList = React.memo(SidebarSubjectListBase);

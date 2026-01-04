@@ -57,10 +57,8 @@ export const useDataSync = (
                         }
 
                         // MERGE STRATEGY:
-                        // 1. Start with DEFAULT_SETTINGS to ensure all partial fields exist
-                        // 2. Spread remoteSettings on top:
-                        //    - Since we sanitized before saving, explicit empty arrays/objects ARE in remoteSettings
-                        //    - So ({ ...defaults, syllabus: {} }) results in empty syllabus, not defaults
+                        // 1. Start with DEFAULT_SETTINGS (sets academicLevel='HSC' for legacy users)
+                        // 2. Spread remoteSettings on top
                         setSettings(prev => ({
                             ...DEFAULT_SETTINGS,
                             ...remoteSettings

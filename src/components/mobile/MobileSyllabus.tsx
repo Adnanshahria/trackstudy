@@ -205,19 +205,21 @@ export const MobileSyllabus: React.FC<MobileSyllabusProps> = ({
                         actions={actions}
                     />
 
-                    {/* Paper 2 */}
-                    <PaperSection
-                        paper={2}
-                        activeSubject={activeSubject}
-                        userData={userData}
-                        settings={settings}
-                        allItems={allItems}
-                        allChapters={subject.chapters}
-                        pVal={progress.p2}
-                        isOpen={settings.syllabusOpenState[`${activeSubject}-p2`] !== false}
-                        editMode={false}
-                        actions={actions}
-                    />
+                    {/* Paper 2 - Only for HSC */}
+                    {settings.academicLevel !== 'SSC' && (
+                        <PaperSection
+                            paper={2}
+                            activeSubject={activeSubject}
+                            userData={userData}
+                            settings={settings}
+                            allItems={allItems}
+                            allChapters={subject.chapters}
+                            pVal={progress.p2}
+                            isOpen={settings.syllabusOpenState[`${activeSubject}-p2`] !== false}
+                            editMode={false}
+                            actions={actions}
+                        />
+                    )}
                 </div>
             )}
 

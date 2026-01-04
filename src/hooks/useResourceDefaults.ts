@@ -1,16 +1,10 @@
-/**
- * useResourceDefaults - Read-only hook for global resource defaults
- * 
- * Fetches resourceDefaults from Firestore, caches locally, and provides
- * resolved labels with per-user override support.
- */
 
 import { useState, useEffect, useCallback } from 'react';
-import { firestore } from '../utils/firebase/core';
+import { supabase } from '../utils/supabase/client';
 import { ResourceDefault, DEFAULT_RESOURCES, CustomLabels, resolveLabel } from '../types/resourceDefaults';
 
-const RESOURCE_DEFAULTS_COLLECTION = 'resourceDefaults';
-const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+const RESOURCE_DEFAULTS_TABLE = 'resource_defaults';
+const CACHE_TTL_MS = 5 * 60 * 1000;
 
 interface UseResourceDefaultsResult {
     resources: ResourceDefault[];
@@ -21,7 +15,6 @@ interface UseResourceDefaultsResult {
     getColor: (id: number) => string;
 }
 
-// In-memory cache
 let cachedResources: ResourceDefault[] | null = null;
 let cacheTimestamp: number = 0;
 
@@ -31,17 +24,9 @@ export const useResourceDefaults = (): UseResourceDefaultsResult => {
     const [error, setError] = useState<string | null>(null);
 
     const fetchResources = useCallback(async (force = false) => {
-        // Use cache if valid and not forced
         const now = Date.now();
         if (!force && cachedResources && (now - cacheTimestamp) < CACHE_TTL_MS) {
             setResources(cachedResources);
-            setIsLoading(false);
-            return;
-        }
-
-        // Check Firestore availability
-        if (!firestore) {
-            setResources(DEFAULT_RESOURCES);
             setIsLoading(false);
             return;
         }
@@ -50,71 +35,58 @@ export const useResourceDefaults = (): UseResourceDefaultsResult => {
         setError(null);
 
         try {
-            const snapshot = await firestore
-                .collection(RESOURCE_DEFAULTS_COLLECTION)
-                .orderBy('order', 'asc')
-                .get();
+            const { data, error } = await supabase
+                .from(RESOURCE_DEFAULTS_TABLE)
+                .select('*')
+                .order('order', { ascending: true });
 
-            if (snapshot.empty) {
-                // Collection doesn't exist yet - use defaults
+            if (error) throw error;
+
+            if (!data || data.length === 0) {
                 setResources(DEFAULT_RESOURCES);
                 cachedResources = DEFAULT_RESOURCES;
             } else {
-                const fetchedResources: ResourceDefault[] = snapshot.docs.map(doc => {
-                    const data = doc.data();
-                    return {
-                        id: data.id || parseInt(doc.id),
-                        order: data.order || parseInt(doc.id),
-                        key: data.key || '',
-                        label: data.label || `Resource ${doc.id}`,
-                        color: data.color || 'bg-slate-500',
-                        createdAt: data.createdAt,
-                        updatedAt: data.updatedAt,
-                        updatedBy: data.updatedBy
-                    };
-                });
+                const fetchedResources: ResourceDefault[] = data.map(d => ({
+                    id: d.id,
+                    order: d.order,
+                    key: d.key,
+                    label: d.label,
+                    color: d.color,
+                    createdAt: d.created_at, // Mapping from snake_case if standard Supabase
+                    updatedAt: d.updated_at,
+                    updatedBy: d.updated_by
+                }));
+                // Fallback for snake_case if fields missing? assuming standard
                 setResources(fetchedResources);
                 cachedResources = fetchedResources;
             }
             cacheTimestamp = now;
         } catch (err: any) {
             console.error('Error fetching resource defaults:', err);
-            // Fall back to defaults on error
             setResources(DEFAULT_RESOURCES);
             cachedResources = DEFAULT_RESOURCES;
-            if (err.code !== 'permission-denied') {
-                setError('Failed to load column settings');
-            }
+            setError('Failed to load column settings');
         } finally {
             setIsLoading(false);
         }
     }, []);
 
-    // Initial fetch
-    useEffect(() => {
-        fetchResources();
-    }, [fetchResources]);
+    useEffect(() => { fetchResources(); }, [fetchResources]);
 
-    // Get resolved label with custom override support
     const getLabel = useCallback((id: number, customLabels?: CustomLabels): string => {
         return resolveLabel(id, customLabels, resources);
     }, [resources]);
 
-    // Get color for a resource ID
     const getColor = useCallback((id: number): string => {
         const resource = resources.find(r => r.id === id);
         return resource?.color || 'bg-slate-500';
     }, [resources]);
 
-    // Force refresh
-    const refresh = useCallback(async () => {
-        await fetchResources(true);
-    }, [fetchResources]);
+    const refresh = useCallback(async () => { await fetchResources(true); }, [fetchResources]);
 
     return { resources, isLoading, error, refresh, getLabel, getColor };
 };
 
-// Utility: Clear cache (for testing or after admin updates)
 export const clearResourceDefaultsCache = () => {
     cachedResources = null;
     cacheTimestamp = 0;
