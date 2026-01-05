@@ -38,7 +38,21 @@ function App() {
   const [showAppearance, setShowAppearance] = useState(false);
 
   // New user onboarding: detect if academic level needs to be selected
-  const needsAcademicLevel = userId && !isLoading && !settings.academicLevel;
+  // Add delay to prevent flash during settings sync race condition
+  const [academicModalReady, setAcademicModalReady] = useState(false);
+  const rawNeedsAcademicLevel = userId && !isLoading && !settings.academicLevel;
+
+  useEffect(() => {
+    if (rawNeedsAcademicLevel) {
+      // Wait 500ms before showing modal to let settings stabilize
+      const timer = setTimeout(() => setAcademicModalReady(true), 500);
+      return () => clearTimeout(timer);
+    } else {
+      setAcademicModalReady(false);
+    }
+  }, [rawNeedsAcademicLevel]);
+
+  const needsAcademicLevel = rawNeedsAcademicLevel && academicModalReady;
 
   const { toast, showToast, hideToast } = useToast();
   const [postLoginLoading, setPostLoginLoading] = useState(false);
