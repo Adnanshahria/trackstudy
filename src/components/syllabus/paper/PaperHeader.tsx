@@ -19,12 +19,12 @@ export const PaperHeader: React.FC<Props> = ({ paper, pVal, isOpen, activeSubjec
             <span className="md:hidden">P{paper}</span>
             <span className="text-[10px] md:text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-200/50 dark:bg-black/30 px-2 md:px-3 py-0.5 md:py-1 rounded-full border border-black/5 dark:border-white/10">{pVal.toFixed(0)}%</span>
         </div>
-        <div className="flex items-center gap-1 md:gap-3 no-print">
+        <div className="flex items-center gap-1 md:gap-3 no-print relative z-20">
             {editMode && onDeletePaper && (
                 <button onClick={(e) => { e.stopPropagation(); onDeletePaper(activeSubject, paper); }} className="w-7 h-7 md:w-9 md:h-9 flex items-center justify-center rounded-full transition-all text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 text-sm">✕</button>
             )}
-            <button onClick={(e) => { e.stopPropagation(); onToggleEdit(); }} className={`w-7 h-7 md:w-9 md:h-9 flex items-center justify-center rounded-full transition-all text-sm ${editMode ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-blue-500'}`}>✏️</button>
-            <button onClick={() => onTogglePaper(`${activeSubject}-p${paper}`)} className={`w-7 h-7 md:w-9 md:h-9 rounded-full border border-slate-200 dark:border-white/10 flex items-center justify-center transition-all text-sm ${isOpen ? 'bg-blue-600 text-white rotate-180' : 'text-slate-400'}`}>▼</button>
+            <button onClick={(e) => { e.stopPropagation(); onToggleEdit(); }} className={`w-7 h-7 md:w-9 md:h-9 flex items-center justify-center rounded-full transition-all text-sm cursor-pointer ${editMode ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-blue-500'}`}>✏️</button>
+            <button onClick={() => onTogglePaper(`${activeSubject}-p${paper}`)} className={`w-7 h-7 md:w-9 md:h-9 rounded-full border border-slate-200 dark:border-white/10 flex items-center justify-center transition-all text-sm cursor-pointer ${isOpen ? 'bg-blue-600 text-white rotate-180' : 'text-slate-400'}`}>▼</button>
         </div>
     </div>
 );
