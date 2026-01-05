@@ -23,7 +23,12 @@ export const PaperHeader: React.FC<Props> = ({ paper, pVal, isOpen, activeSubjec
             {editMode && onDeletePaper && (
                 <button onClick={(e) => { e.stopPropagation(); onDeletePaper(activeSubject, paper); }} className="w-7 h-7 md:w-9 md:h-9 flex items-center justify-center rounded-full transition-all text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 text-sm cursor-pointer relative z-50">✕</button>
             )}
-            <button onClick={(e) => { e.stopPropagation(); onToggleEdit(); }} className={`w-7 h-7 md:w-9 md:h-9 flex items-center justify-center rounded-full transition-all text-sm cursor-pointer relative z-50 ${editMode ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-blue-500'}`}>✏️</button>
+            <button
+                onClick={(e) => { e.stopPropagation(); onToggleEdit(); }}
+                className={`w-7 h-7 md:w-9 md:h-9 flex items-center justify-center rounded-full transition-all text-sm cursor-pointer relative z-50 ${editMode ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-blue-500'}`}
+            >
+                ✏️
+            </button>
             <button onClick={() => onTogglePaper(`${activeSubject}-p${paper}`)} className={`w-7 h-7 md:w-9 md:h-9 rounded-full border border-slate-200 dark:border-white/10 flex items-center justify-center transition-all text-sm cursor-pointer relative z-50 ${isOpen ? 'bg-blue-600 text-white rotate-180' : 'text-slate-400'}`}>▼</button>
         </div>
     </div>

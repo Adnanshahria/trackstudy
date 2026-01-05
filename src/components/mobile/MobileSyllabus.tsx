@@ -79,9 +79,7 @@ export const MobileSyllabus: React.FC<MobileSyllabusProps> = ({
         setAddChapterModal: ui.setAddChapterModal,
         setAddColumnModal: ui.setAddColumnModal,
         chapterNotes: {},
-        setChapterNotes: () => { },
-        editMode: false,
-        setEditMode: () => { }
+        setChapterNotes: () => { }
     };
 
     // Handlers for modals
@@ -201,7 +199,7 @@ export const MobileSyllabus: React.FC<MobileSyllabusProps> = ({
                         allChapters={subject.chapters}
                         pVal={progress.p1}
                         isOpen={settings.syllabusOpenState[`${activeSubject}-p1`] !== false}
-                        editMode={false}
+                        editMode={ui.editMode}
                         actions={actions}
                     />
 
@@ -216,7 +214,7 @@ export const MobileSyllabus: React.FC<MobileSyllabusProps> = ({
                             allChapters={subject.chapters}
                             pVal={progress.p2}
                             isOpen={settings.syllabusOpenState[`${activeSubject}-p2`] !== false}
-                            editMode={false}
+                            editMode={ui.editMode}
                             actions={actions}
                         />
                     )}
