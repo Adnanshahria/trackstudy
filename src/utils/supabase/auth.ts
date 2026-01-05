@@ -84,6 +84,12 @@ export const createUser = async (rawId: string, pass: string) => {
         // User profile creation is now handled by a Database Trigger on auth.users insert.
         // We trust the trigger to create the public.users row.
 
+        // IMPORTANT: Sign out immediately to prevent auto-redirect to dashboard
+        // Supabase creates an active session on signup when email verification is disabled
+        // We want the user to manually log in after seeing the success message
+        console.log('🔐 createUser: Signing out to prevent auto-login...');
+        await supabase.auth.signOut();
+
         console.log('🔐 createUser: SUCCESS!');
         return { success: true, id: id };
     } catch (e: any) {
