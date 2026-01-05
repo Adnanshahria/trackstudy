@@ -43,7 +43,11 @@ export const useDataSync = (
 
             try {
                 const unsubscribe = await initFirebase(userId, (remoteData, remoteSettings) => {
-                    if (!isMounted.current || isCleanedUp || thisSyncId !== currentSyncId.current) return;
+                    console.log('📥 useDataSync: onData received', { hasData: !!remoteData, hasSettings: !!remoteSettings, academicLevel: remoteSettings?.academicLevel });
+                    if (!isMounted.current || isCleanedUp || thisSyncId !== currentSyncId.current) {
+                        console.log('📥 useDataSync: SKIPPING - not mounted or stale sync');
+                        return;
+                    }
 
                     if (remoteData && typeof remoteData === 'object') {
                         setUserData(prev => ({ ...prev, ...remoteData }));
@@ -66,10 +70,15 @@ export const useDataSync = (
                             Object.keys(finalSettings.syllabus).length === 0;
 
                         if (isSyllabusInvalid) {
-                            console.warn("⚠️ Empty Syllabus detected. Loading from academicLevel.");
-                            const level = finalSettings.academicLevel || 'HSC';
-                            finalSettings.syllabus = getSyllabusData(level as 'HSC' | 'SSC');
-                            finalSettings.academicLevel = level;
+                            // Only auto-fill syllabus if academicLevel was ALREADY set
+                            // If academicLevel is undefined, leave it so modal can trigger
+                            if (finalSettings.academicLevel) {
+                                console.warn("⚠️ Empty Syllabus detected. Loading from academicLevel.");
+                                const level = finalSettings.academicLevel;
+                                finalSettings.syllabus = getSyllabusData(level as 'HSC' | 'SSC');
+                            }
+                            // If academicLevel is also undefined, don't set defaults
+                            // This allows AcademicLevelModal to show for new users
                         }
 
                         // NOTE: Do NOT default academicLevel here.
@@ -77,6 +86,7 @@ export const useDataSync = (
 
                         setSettings(finalSettings);
                     }
+                    console.log('📥 useDataSync: Setting isLoading=FALSE');
                     setIsLoading(false);
                 }, (status) => {
                     if (isMounted.current && !isCleanedUp && thisSyncId === currentSyncId.current) {

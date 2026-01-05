@@ -31,13 +31,30 @@ export const initFirebase = async (
         onStatus('connected');
         const debouncedOnData = debounce(onData, 100);
 
-        // 1. Initial Fetch
+        // 1. Initial Fetch with timeout to prevent hanging
         console.log('📡 initFirebase: Fetching user data...');
-        const { data: initialData, error: fetchError } = await supabase
-            .from(USER_TABLE)
-            .select('*')
-            .eq('id', uid)
-            .maybeSingle();
+
+        let initialData = null;
+        let fetchError = null;
+
+        try {
+            const fetchPromise = supabase
+                .from(USER_TABLE)
+                .select('*')
+                .eq('id', uid)
+                .maybeSingle();
+
+            const timeoutPromise = new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('Fetch timeout after 3s')), 3000)
+            );
+
+            const result = await Promise.race([fetchPromise, timeoutPromise]) as any;
+            initialData = result?.data || null;
+            fetchError = result?.error || null;
+        } catch (e: any) {
+            console.warn('📡 initFirebase: Fetch timed out or failed:', e.message);
+            fetchError = e;
+        }
 
         console.log('📡 initFirebase: Fetch result:', { found: !!initialData, error: fetchError?.message });
 
@@ -46,68 +63,70 @@ export const initFirebase = async (
             console.log('📡 initFirebase: User not found, attempting self-repair...');
             logger.debug("User doc not found on init. Attempting self-repair...");
 
-            // 1.1 Self-Repair: Create missing user row
-            const { data: { user } } = await supabase.auth.getUser();
-            if (user) {
-                console.log('📡 initFirebase: Auth user found, creating profile...');
-                // Determine username/id using same logic as SQL trigger if possible, or fallback to UID
-                // Determine username/id using same logic as SQL trigger if possible, or fallback to UID
-                const meta = user.user_metadata || {};
-                let username = meta.displayName || meta.full_name || meta.name;
-                if (!username && user.email) username = user.email.split('@')[0];
-                if (!username) username = user.id;
+            // Wrap self-repair with timeout to prevent hanging
+            try {
+                const selfRepairPromise = (async () => {
+                    // 1.1 Self-Repair: Create missing user row
+                    const { data: { user } } = await supabase.auth.getUser();
+                    if (user) {
+                        console.log('📡 initFirebase: Auth user found, creating profile...');
+                        const meta = user.user_metadata || {};
+                        let username = meta.displayName || meta.full_name || meta.name;
+                        if (!username && user.email) username = user.email.split('@')[0];
+                        if (!username) username = user.id;
 
-                // Do NOT set academicLevel or syllabus here - let onboarding modal handle it
-                const initialSettings = localSettingsToMigrate || { ...DEFAULT_SETTINGS };
+                        // Do NOT set academicLevel or syllabus here - let onboarding modal handle it
+                        const initialSettings = localSettingsToMigrate || { ...DEFAULT_SETTINGS };
 
-                const newUserData = {
-                    id: username, // PK
-                    auth_id: user.id,
-                    settings: initialSettings,
-                    data: localDataToMigrate || { username }, // Keep minimal
-                };
+                        const newUserData = {
+                            id: username, // PK
+                            auth_id: user.id,
+                            settings: initialSettings,
+                            data: localDataToMigrate || { username }, // Keep minimal
+                        };
 
-                const { error: insertError } = await supabase
-                    .from(USER_TABLE)
-                    .insert(newUserData);
-
-                if (insertError) {
-                    console.log('📡 initFirebase: Insert failed:', insertError.code, insertError.message);
-                    // Handle Race Condition (Trigger vs Client Init) - 409 Conflict / Unique Violation
-                    if (insertError.code === '23505') {
-                        logger.debug("Race condition detected (User exists or Auth ID conflict). Re-fetching by Auth ID...");
-                        const { data: retryData } = await supabase
+                        const { error: insertError } = await supabase
                             .from(USER_TABLE)
-                            .select('*')
-                            .eq('auth_id', newUserData.auth_id) // Query by Auth ID, which is the source of truth
-                            .maybeSingle();
+                            .insert(newUserData);
 
-                        if (retryData) {
-                            console.log('📡 initFirebase: Recovered via auth_id lookup, calling onData');
-                            debouncedOnData(retryData.data || {}, retryData.settings || null);
+                        if (insertError) {
+                            console.log('📡 initFirebase: Insert failed:', insertError.code, insertError.message);
+                            if (insertError.code === '23505') {
+                                logger.debug("Race condition detected. Re-fetching by Auth ID...");
+                                const { data: retryData } = await supabase
+                                    .from(USER_TABLE)
+                                    .select('*')
+                                    .eq('auth_id', newUserData.auth_id)
+                                    .maybeSingle();
+
+                                if (retryData) {
+                                    console.log('📡 initFirebase: Recovered via auth_id lookup');
+                                    return { data: retryData.data || {}, settings: retryData.settings || null };
+                                }
+                            }
+                            // Insert failed - return defaults
+                            console.error('📡 initFirebase: Insert error:', insertError);
+                            return { data: {}, settings: DEFAULT_SETTINGS };
                         } else {
-                            console.error('📡 initFirebase: CRITICAL - Recovery failed!');
-                            logger.error("Failed to recover from 409 Conflict: User still not found.");
-                            // CRITICAL FIX: Call onData with defaults so isLoading can be set to false
-                            debouncedOnData({}, DEFAULT_SETTINGS);
+                            console.log('📡 initFirebase: Self-repair SUCCESS');
+                            return { data: newUserData.data, settings: newUserData.settings };
                         }
-                    } else {
-                        console.error('📡 initFirebase: Insert error:', insertError);
-                        logger.error("Failed to self-repair user profile:", insertError);
-                        // CRITICAL FIX: Call onData with defaults so isLoading can be set to false
-                        debouncedOnData({}, DEFAULT_SETTINGS);
                     }
-                } else {
-                    console.log('📡 initFirebase: Self-repair SUCCESS, calling onData');
-                    logger.debug("Self-repaired user profile successfully.");
-                    debouncedOnData(newUserData.data, newUserData.settings);
-                }
-            } else {
-                console.error('📡 initFirebase: No auth user found for self-repair!');
-                // CRITICAL FIX: Still call onData to prevent hang
+                    console.error('📡 initFirebase: No auth user found for self-repair!');
+                    return { data: {}, settings: DEFAULT_SETTINGS };
+                })();
+
+                const timeoutPromise = new Promise<{ data: any; settings: any }>((_, reject) =>
+                    setTimeout(() => reject(new Error('Self-repair timeout after 2s')), 2000)
+                );
+
+                const result = await Promise.race([selfRepairPromise, timeoutPromise]);
+                debouncedOnData(result.data, result.settings);
+            } catch (e: any) {
+                console.warn('📡 initFirebase: Self-repair timed out or failed:', e.message);
+                // CRITICAL: Always call onData to prevent hang
                 debouncedOnData({}, DEFAULT_SETTINGS);
             }
-
         } else if (initialData) {
             console.log('📡 initFirebase: User found, calling onData with data');
             debouncedOnData(initialData.data || {}, initialData.settings || null);
