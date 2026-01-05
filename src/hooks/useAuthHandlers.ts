@@ -109,9 +109,12 @@ export const useAuthHandlers = (setUserId: (id: string) => void, onSuccess?: () 
                 const result = await authService.signup(trimmedId, trimmedPass);
 
                 if (result.success) {
-                    // Force reload or just let the effect handle it
-                    window.location.reload();
-                    return;
+                    // Show success message and prompt user to login
+                    // This is compatible with email verification if enabled
+                    setModalSuccess('Account created successfully! Please switch to Login and sign in.');
+                    // Clear password fields for security, keep email for convenience
+                    setTempPassword('');
+                    setConfirmPassword('');
                 } else {
                     setModalError(result.error || 'Account creation failed.');
                 }
@@ -131,8 +134,11 @@ export const useAuthHandlers = (setUserId: (id: string) => void, onSuccess?: () 
         try {
             const result = await authService.guestLogin();
             if (result.success && result.id) {
-                // Force reload to ensure connection
-                window.location.reload();
+                // Trigger success callback to update UI state
+                // Don't use window.location.reload() - it causes infinite loop with hash tokens
+                onSuccess?.();
+                setShowLoginModal(false);
+                resetModalState();
                 return;
             } else {
                 setModalError(result.error || 'Guest login failed. Please try again.');
