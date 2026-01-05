@@ -1,6 +1,7 @@
 
 import { useState, useCallback } from 'react';
 import { authService } from '../services/authService';
+import { supabase } from '../utils/supabase/client';
 
 const MAX_INPUT_LENGTH = 100;
 const MIN_PASSWORD_LENGTH = 6;
@@ -109,6 +110,10 @@ export const useAuthHandlers = (setUserId: (id: string) => void, onSuccess?: () 
                 const result = await authService.signup(trimmedId, trimmedPass);
 
                 if (result.success) {
+                    // Sign out immediately to prevent auto-redirect
+                    // Supabase creates an active session on signup when email verification is off
+                    await supabase.auth.signOut();
+
                     // Show success message and prompt user to login
                     // This is compatible with email verification if enabled
                     setModalSuccess('Account created successfully! Please switch to Login and sign in.');
